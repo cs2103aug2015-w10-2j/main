@@ -39,11 +39,6 @@ public class Tasks {
 		setTaskID(taskID);
 	}
 	
-	//for searching
-	public Tasks(String desc) {
-		setDescription(desc);
-	}
-	
 	//select a blocked timeslot as final, position starts from 1 (arraylist[0])
 	//returns true if selection was successful, false = task was not blocked task or invalid selection index
 	public boolean selectBlockedSlot(int position) {
