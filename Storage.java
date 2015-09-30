@@ -15,6 +15,12 @@ public class Storage {
 	private BufferedWriter bw;
 	private BufferedReader br;
 	
+	private int type = 0;
+	private final int DeadlineType = 1;
+	private final int DurationType = 2;
+	private final int BlockedType = 3;
+	private final int FloatingType = 4;
+	
 	Gson gson = new Gson(); 
 	
 	//default path
@@ -82,9 +88,29 @@ public class Storage {
 		Tasks tempTask;
 		
 		//read contents of file
+		//String segments[] = path.split("\"type\":");
+		String splitter = "\"type\":";
+		
+		
 		try {
 			while ((tempLine = br.readLine()) != null) {
-				tempTask = gson.fromJson(tempLine, Tasks.class);
+				//extract type
+				int startIndex = tempLine.indexOf(splitter)+splitter.length();
+				type = Integer.parseInt( tempLine.substring(startIndex, startIndex+1));
+				
+				switch(type) {
+					case DeadlineType: 	tempTask = gson.fromJson(tempLine, DeadlineTask.class);
+										break;
+					case DurationType: 	tempTask = gson.fromJson(tempLine, DurationTask.class);
+										break;
+					case FloatingType: 	tempTask = gson.fromJson(tempLine, FloatingTask.class);
+										break;
+					case BlockedType: 	tempTask = gson.fromJson(tempLine, BlockedTask.class);
+										break;
+					default:			tempTask = null;
+										break;
+				}
+				//tempTask = gson.fromJson(tempLine, Tasks.class);
 				myTaskList.add(tempTask);
 			}
 		}
@@ -106,7 +132,7 @@ public class Storage {
 		return myTaskList;
 	}
 
-	public ArrayList<Tasks> appendTask(Tasks newTask) {
+	public Tasks appendTask(Tasks newTask) {
 		
 		try {
 			openWriterReader();
@@ -116,14 +142,11 @@ public class Storage {
 			e1.printStackTrace();
 		}
 		
-		myTaskList = readFile();
 		
 		//if task has no taskID, generate one!
 		if(newTask.getTaskID() == 0) {
 			newTask.setTaskID(GenerateTaskID());
 		}
-		
-		myTaskList.add(newTask);
 		
 		try {
 			closeWriterReader();
@@ -159,13 +182,14 @@ public class Storage {
 			e.printStackTrace();
 		}
 		
-		return myTaskList;
+		return newTask;
 	}
 
 	
 	
-	public ArrayList<Tasks> deleteTask(int taskID) throws IOException{
+	public Tasks deleteTask(int taskID) throws IOException{
 		
+		Tasks deletedTask = null;
 		try {
 			openWriterReader();
 		} catch (FileNotFoundException e1) {
@@ -181,6 +205,7 @@ public class Storage {
 		for(int i=0; i<myTaskList.size(); i++) {
 			if(myTaskList.get(i).getTaskID() == taskID) {
 				needDelete = true;
+				deletedTask = myTaskList.get(i);
 				myTaskList.remove(i);
 				break;
 			}
@@ -233,7 +258,7 @@ public class Storage {
 		    	System.out.println("Could not rename file");
 		    }
 		}	
-		return myTaskList;
+		return deletedTask;
 	}
 	
 	//search and returns entries with description matching search String
@@ -268,7 +293,7 @@ public class Storage {
 	}
 	
 	//replaces specified taskID with updated Tasks
-	public ArrayList<Tasks> UpdateTask(int TaskID, Tasks updatedTask){
+	public Tasks UpdateTask(int TaskID, Tasks updatedTask){
 		
 			
 		try {
@@ -287,7 +312,7 @@ public class Storage {
 			e1.printStackTrace();
 		}
 		
-		myTaskList = readFile();
+		//myTaskList = readFile();
 		
 		/*
 		ArrayList<Tasks> tempList = readFile();
@@ -310,7 +335,7 @@ public class Storage {
 		}
 		*/
 		
-		return myTaskList;
+		return updatedTask;
 	}
 	
 	private int GenerateTaskID() {

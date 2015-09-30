@@ -1,5 +1,5 @@
 
-public class DeadLines {
+public class Duration {
 	
 	private String startDate = "";		//date format is “DDMMYY”
 	private String startTime = "";		//time is 24hrs “0000”
@@ -9,7 +9,7 @@ public class DeadLines {
 	private final int DeadlineType = 1;
 	private final int DurationType = 2;
 
-	public DeadLines(String sDate, String sTime, String eDate, String eTime) {
+	public Duration(String sDate, String sTime, String eDate, String eTime) {
 		setStartDate(sDate);
 		setStartTime(sTime);
 		setEndDate(eDate);
@@ -17,7 +17,7 @@ public class DeadLines {
 		setType(DurationType);
 	}
 	
-	public DeadLines(String eDate, String eTime) {
+	public Duration(String eDate, String eTime) {
 		setEndDate(eDate);
 		setEndTime(eTime);
 		setType(DeadlineType);
