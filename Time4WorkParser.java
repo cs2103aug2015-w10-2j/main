@@ -11,43 +11,25 @@ public class Time4WorkParser {
   public Time4WorkParser() {
   }
   
-  enum COMMANDS {
-    ADD, DELETE, UPDATE, SEARCH, EXIT
-  };
-  
   public Command parse(String userInput) {
     Command command;
     ArrayList<String> parameters = splitString(userInput);
     String userCommand = getUserCommand(parameters);
     ArrayList<String> arguments = getUserArguments(parameters);
     
-    switch (COMMANDS.valueOf(userCommand.toUpperCase())) {
-      
-      case ADD :
+    if (userCommand.toUpperCase().equals("ADD")){
         command = createAddCommand(arguments);
-        break; 
-        
-      case DELETE :
-        command = createDeleteCommand(arguments);
-        break;
-        
-      case UPDATE :
-        command = createUpdateCommand(arguments);
-        break;
-        
-      case SEARCH : 
-        command = createSearchCommand(arguments);
-        break;
-        
-      case EXIT :
-        command = createExitCommand();
-        break;
-        
-      default :
-    	  command = createInvalidCommand();
-    	  break;
+    } else if (userCommand.toUpperCase().equals("DELETE")) {
+    	command = createDeleteCommand(arguments);
+    } else if (userCommand.toUpperCase().equals("UPDATE")) {
+    	command = createUpdateCommand(arguments);
+    } else if (userCommand.toUpperCase().equals("SEARCH")) {
+    	command = createSearchCommand(arguments);
+    } else if (userCommand.toUpperCase().equals("EXIT")) {
+    	command = createExitCommand();
+    } else {
+    	command = createInvalidCommand();
     }
-    
     return command;
   }
   
