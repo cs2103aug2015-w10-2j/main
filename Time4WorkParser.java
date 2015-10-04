@@ -44,7 +44,8 @@ public class Time4WorkParser {
         break;
         
       default :
-    	  return createInvalidCommand();
+    	  command = createInvalidCommand();
+    	  break;
     }
     
     return command;
