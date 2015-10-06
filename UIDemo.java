@@ -48,7 +48,7 @@ public class UIDemo extends JPanel implements ActionListener {
             
             FeedbackMessage output;
             output = logic.executeCommand(userCommand);
-            currentList = logic.getCurrentList();
+            currentList = output.getTaskList();
             taskContent.setText(display(currentList));
             feedback.setText(output.getFeedback());
         } catch (IOException e) {

@@ -32,7 +32,7 @@ public class Logic {
         String taskListContent = getTaskListContent(myTaskList);
         
         if(checkIfEmptyString(userCommand)){
-            return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, EMPTY_COMMAND), taskListContent);
+            return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, EMPTY_COMMAND), myTaskList);
         }
         
         Time4WorkParser parser = new Time4WorkParser();
@@ -64,11 +64,11 @@ public class Logic {
                 String searchKeyword = parsedCommand.getSearchKeyword();
                 return executeSearch(searchKeyword);
             case INVALID:
-                return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "invalid"), taskListContent);
+                return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "invalid"), myTaskList);
             case EXIT:
                 System.exit(0);
             default:
-                return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "invalid"), taskListContent);
+                return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "invalid"), myTaskList);
         }
     }
     
@@ -105,15 +105,13 @@ public class Logic {
         commandHistoryList.addCommand(reversedCommand);
         commandTypeList.addCommandType("add");
         
-        return new FeedbackMessage(MESSAGE_ADDED, taskListContent);
-        //		return new FeedbackMessage(MESSAGE_ADDED, myTaskList);
+        return new FeedbackMessage(MESSAGE_ADDED, myTaskList);
     }
     
     private FeedbackMessage executeRead() {
         myTaskList = getCurrentList();
         String taskListContent = getTaskListContent(myTaskList);
-        return new FeedbackMessage(taskListContent, taskListContent);
-        //		return new FeedbackMessage(MESSAGE_ADDED, myTaskList);
+        return new FeedbackMessage(MESSAGE_ADDED, myTaskList);
     }
     
     private FeedbackMessage executeDelete(int userInputIndex) throws IOException {
@@ -129,8 +127,7 @@ public class Logic {
         commandHistoryList.addCommand(reversedCommand);
         commandTypeList.addCommandType("delete");
         
-        return new FeedbackMessage(MESSAGE_DELETED, taskListContent);
-        //		return new FeedbackMessage(MESSAGE_DELETED, myTaskList);
+        return new FeedbackMessage(MESSAGE_DELETED, myTaskList);
     }
     
     private FeedbackMessage executeUpdate(Tasks task) throws IOException {
@@ -147,16 +144,14 @@ public class Logic {
         
         commandTypeList.addCommandType("update");
         
-        return new FeedbackMessage(MESSAGE_UPDATED, taskListContent);
-        //		return new FeedbackMessage(MESSAGE_UPDATED, myTaskList);
+        return new FeedbackMessage(MESSAGE_UPDATED, myTaskList);
     }
     
     private FeedbackMessage executeSort() throws IOException {
         myTaskList = getCurrentList();
         myTaskList.sort(null);
         String taskListContent = getTaskListContent(myTaskList);
-        return new FeedbackMessage(MESSAGE_SORTED, taskListContent);
-        //		return new FeedbackMessage(MESSAGE_SORTED, myTaskList);
+        return new FeedbackMessage(MESSAGE_SORTED, myTaskList);
     }
     
     private FeedbackMessage executeSearch(String keyword) throws IOException {
@@ -165,12 +160,10 @@ public class Logic {
         
         if (searchList.size() != 0) {
             String taskListContent = getTaskListContent(searchList);
-            return new FeedbackMessage(String.format(MESSAGE_SEARCH, "successfully"), taskListContent);
-            //          return new FeedbackMessage(String.format(MESSAGE_SEARCH, "successfully"), searchList);
+            return new FeedbackMessage(String.format(MESSAGE_SEARCH, "successfully"), searchList);
         } else {
             String taskListContent = getTaskListContent(myTaskList);
-            return new FeedbackMessage(String.format(MESSAGE_SEARCH, "failed"), taskListContent);
-            //          return new FeedbackMessage(String.format(MESSAGE_SEARCH, "successfully"), myTaskList);
+            return new FeedbackMessage(String.format(MESSAGE_SEARCH, "successfully"), myTaskList);
         }
     }
     
@@ -197,14 +190,13 @@ public class Logic {
         
         myTaskList = getCurrentList();
         String taskListContent = getTaskListContent(myTaskList);
-        return new FeedbackMessage(MESSAGE_UNDO, taskListContent);
-        //      return new FeedbackMessage(String.format(MESSAGE_UNDO, myTaskList);
+        return new FeedbackMessage(MESSAGE_UNDO, myTaskList);
     }
     
     private FeedbackMessage executeClear() {
         myTaskList = getCurrentList();
         String taskListContent = getTaskListContent(myTaskList);
-        return new FeedbackMessage(MESSAGE_CLEAR, taskListContent);
+        return new FeedbackMessage(MESSAGE_CLEAR, myTaskList);
     }
     
     private int getTaskIDFromUserInput(int userInput) {
