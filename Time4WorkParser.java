@@ -18,17 +18,19 @@ public class Time4WorkParser {
     ArrayList<String> arguments = getUserArguments(parameters);
     
     if (userCommand.toUpperCase().equals("ADD")){
-        command = createAddCommand(arguments);
+      command = createAddCommand(arguments);
     } else if (userCommand.toUpperCase().equals("DELETE")) {
-    	command = createDeleteCommand(arguments);
+      command = createDeleteCommand(arguments);
     } else if (userCommand.toUpperCase().equals("UPDATE")) {
-    	command = createUpdateCommand(arguments);
+      command = createUpdateCommand(arguments);
     } else if (userCommand.toUpperCase().equals("SEARCH")) {
-    	command = createSearchCommand(arguments);
+      command = createSearchCommand(arguments);
+    } else if (userCommand.toUpperCase().equals("UNDO")){
+      command = createUndoCommand();
     } else if (userCommand.toUpperCase().equals("EXIT")) {
-    	command = createExitCommand();
+      command = createExitCommand();
     } else {
-    	command = createInvalidCommand();
+      command = createInvalidCommand();
     }
     return command;
   }
@@ -146,6 +148,12 @@ public class Time4WorkParser {
     return command;
   }
   
+  private Command createUndoCommand(){
+    Command command = new Command("undo");
+    
+    return command;
+  }
+  
   private Command createExitCommand(){
     Command command = new Command("exit");
     
@@ -157,4 +165,5 @@ public class Time4WorkParser {
     
     return command;
   }
+  
 }
