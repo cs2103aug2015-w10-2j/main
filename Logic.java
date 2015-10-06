@@ -152,6 +152,11 @@ public class Logic {
         return taskListContent;
     }
     
+    // retrieve the task list from storage to display in ui
+    public ArrayList<Tasks> getCurrentList(){
+    	return storage.getMyTaskList();
+    }
+    
     private static boolean checkIfEmptyString(String userCommand) {
         return userCommand.trim().equals("");
     }
