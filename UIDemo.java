@@ -65,10 +65,12 @@ public class UIDemo extends JPanel implements ActionListener {
     public static String display(ArrayList<Tasks> taskList){
         String taskListContent = "";
         int taskListSize = taskList.size();
-        for (int i = 0; i < taskListSize - 1; i++){
-            taskListContent += (i+1) + ". " + taskList.get(i).getDescription() + "\n";
+        if (taskListSize != 0) {
+            for (int i = 0; i < taskListSize - 1; i++){
+                taskListContent += (i+1) + ". " + taskList.get(i).getDescription() + "\n";
+            }
+            taskListContent += taskListSize + ". " + taskList.get(taskListSize - 1).getDescription();
         }
-        taskListContent += taskListSize + ". " + taskList.get(taskListSize - 1).getDescription();
         return taskListContent;
     }
     
