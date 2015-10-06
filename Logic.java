@@ -3,15 +3,23 @@ import java.util.ArrayList;
 
 public class Logic {
     
+    // =========================================================================
+    // Feedback massage string
+    // =========================================================================
+    
     private static final String MESSAGE_INVALID_FORMAT = "invalid command: %1$s";
-    private static final String EMPTY_COMMAND = "Command is empty!";
+    private static final String MESSAGE_EMPTY_COMMAND = "Command is empty!";
     private static final String MESSAGE_ADDED = "Task added successfully!";
-    private static final String MESSAGE_UPDATED = "Task updated successfully!";
-    private static final String MESSAGE_DELETED = "Task deleted successfully!";
+    private static final String MESSAGE_UPDATED_ = "Task updated %1$s !";
+    private static final String MESSAGE_DELETED_ = "Task deleted %1$s !";
     private static final String MESSAGE_SORTED = "Task sorted successfully!";
-    private static final String MESSAGE_SEARCH = "Task searched %1$s";
+    private static final String MESSAGE_SEARCH_ = "Task searched %1$s";
     private static final String MESSAGE_CLEAR = "All task cleared successfully!";
-    private static final String MESSAGE_UNDO = "Undo successfully!";
+    private static final String MESSAGE_UNDO_ = "Undo %1$s!";
+    
+    // =========================================================================
+    // local variables for Logic
+    // =========================================================================
     
     private Storage storage;
     private ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
@@ -19,37 +27,36 @@ public class Logic {
     private CommandHistory commandTypeList = new CommandHistory();
     
     enum COMMAND_TYPE {
-        ADD, READ, UPDATE, DELETE, SEARCH, SORT, INVALID, UNDO, CLEAR, EXIT
+        ADD, UPDATE, DELETE, SEARCH, SORT, INVALID, UNDO, CLEAR, EXIT
     };
     
+    // Constructor
     public Logic() {
         storage = new Storage();
     }
     
+    // =========================================================================
+    // Method to interact with UI and parser
+    // =========================================================================
+    
     public FeedbackMessage executeCommand (String userInput) throws IOException {
         String userCommand = userInput;
         myTaskList = getCurrentList();
-        String taskListContent = getTaskListContent(myTaskList);
-        
-        if(checkIfEmptyString(userCommand)){
-            return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, EMPTY_COMMAND), myTaskList);
+        if(checkIfEmptyString(userCommand)) {
+            return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, MESSAGE_EMPTY_COMMAND), myTaskList);
         }
         
         Time4WorkParser parser = new Time4WorkParser();
         
         Command parsedCommand = parser.parse(userCommand);
-        Tasks task;
+        Tasks task = parsedCommand.getTask();
         
         COMMAND_TYPE commandType = determineCommandType(parsedCommand.getCommand());
         
         switch (commandType) {
             case ADD:
-                task = parsedCommand.getTask();
                 return executeAdd(task);
-            case READ:
-                return executeRead();
             case UPDATE:
-                task = parsedCommand.getTask();
                 return executeUpdate(task);
             case DELETE:
                 int userInputIndex = parsedCommand.getIndexToBeDeleted();
@@ -75,14 +82,14 @@ public class Logic {
     public static COMMAND_TYPE determineCommandType(String commandTypeString) {
         if (commandTypeString.equalsIgnoreCase("add")) {
             return COMMAND_TYPE.ADD;
-        } else if (commandTypeString.equalsIgnoreCase("read")) {
-            return COMMAND_TYPE.READ;
         } else if (commandTypeString.equalsIgnoreCase("delete")) {
             return COMMAND_TYPE.DELETE;
         } else if (commandTypeString.equalsIgnoreCase("update")) {
             return COMMAND_TYPE.UPDATE;
         } else if (commandTypeString.equalsIgnoreCase("sort")) {
             return COMMAND_TYPE.SORT;
+        } else if (commandTypeString.equalsIgnoreCase("undo")) {
+            return COMMAND_TYPE.UNDO;
         } else if (commandTypeString.equalsIgnoreCase("search")) {
             return COMMAND_TYPE.SEARCH;
         } else if (commandTypeString.equalsIgnoreCase("clear")) {
@@ -94,64 +101,82 @@ public class Logic {
         }
     }
     
+    private static boolean checkIfEmptyString(String userCommand) {
+        return userCommand.trim().equals("");
+    }
+    
+    public ArrayList<Tasks> getCurrentList() {
+        return storage.readFile();
+    }
+    
+    // =========================================================================
+    // Execute Command
+    // =========================================================================
     private FeedbackMessage executeAdd(Tasks newTask) {
         storage.appendTask(newTask);
         myTaskList = getCurrentList();
-        String taskListContent = getTaskListContent(myTaskList);
         
         int taskListSize = myTaskList.size();
         int newTaskID = myTaskList.get(taskListSize - 1).getTaskID();
-        Command reversedCommand = new Command("delete", newTaskID);
+        Command reversedCommand = new Command("delete", newTaskID); //only can store taskID here
         commandHistoryList.addCommand(reversedCommand);
         commandTypeList.addCommandType("add");
         
         return new FeedbackMessage(MESSAGE_ADDED, myTaskList);
     }
     
-    private FeedbackMessage executeRead() {
-        myTaskList = getCurrentList();
-        String taskListContent = getTaskListContent(myTaskList);
-        return new FeedbackMessage(MESSAGE_ADDED, myTaskList);
-    }
-    
     private FeedbackMessage executeDelete(int userInputIndex) throws IOException {
-        int taskID = getTaskIDFromUserInput(userInputIndex);
         myTaskList = getCurrentList();
-        Tasks deletedTask = getTaskFromTaskID(myTaskList, taskID); //store the task to be deleted
+        int taskListSize = myTaskList.size();
         
-        storage.deleteTask(taskID);
-        myTaskList = getCurrentList();
-        String taskListContent = getTaskListContent(myTaskList);
+        if (taskListSize < userInputIndex || userInputIndex < 1) {
+            return new FeedbackMessage(String.format(MESSAGE_DELETED_, "failed"), myTaskList);
+        } else {
+            int taskID = getTaskIDFromUserInput(userInputIndex);
+            myTaskList = getCurrentList();
+            Tasks deletedTask = getTaskFromTaskID(myTaskList, taskID); //store the task to be deleted
+            
+            storage.deleteTask(taskID);
+            myTaskList = getCurrentList();
+            
+            Command reversedCommand = new Command("add", deletedTask);
+            commandHistoryList.addCommand(reversedCommand);
+            commandTypeList.addCommandType("delete");
+            
+            return new FeedbackMessage(String.format(MESSAGE_DELETED_, "successfully"), myTaskList);
+        }
         
-        Command reversedCommand = new Command("add", deletedTask);
-        commandHistoryList.addCommand(reversedCommand);
-        commandTypeList.addCommandType("delete");
-        
-        return new FeedbackMessage(MESSAGE_DELETED, myTaskList);
     }
     
     private FeedbackMessage executeUpdate(Tasks task) throws IOException {
-        int indexToBeDeleted = task.getTaskID();
-        int taskIDToBeDeleted = getTaskIDFromUserInput(indexToBeDeleted);
-        Tasks taskBeforeUpdated = storage.UpdateTask(taskIDToBeDeleted, task);
-        
         myTaskList = getCurrentList();
-        String taskListContent = getTaskListContent(myTaskList);
+        int taskListSize = myTaskList.size();
+        int indexToBeDeleted = task.getTaskID();
         
-        Command reversedCommand = new Command("delete", taskIDToBeDeleted);
-        commandHistoryList.addCommand(reversedCommand);
-        reversedCommand = new Command("add", taskBeforeUpdated);
-        commandHistoryList.addCommand(reversedCommand);
+        if (taskListSize < indexToBeDeleted || indexToBeDeleted < 1) {
+            return new FeedbackMessage(String.format(MESSAGE_UPDATED_, "failed"), myTaskList);
+        } else {
+            int taskIDToBeDeleted = getTaskIDFromUserInput(indexToBeDeleted);
+            task.setTaskID(taskIDToBeDeleted);
+            
+            Tasks taskBeforeUpdated = storage.UpdateTask(taskIDToBeDeleted, task);
+            myTaskList = getCurrentList();
+            
+            Command reversedCommand = new Command("add", taskBeforeUpdated); // add the original one back
+            commandHistoryList.addCommand(reversedCommand);
+            reversedCommand = new Command("delete", taskIDToBeDeleted); // delete the updated one
+            commandHistoryList.addCommand(reversedCommand);
+            
+            commandTypeList.addCommandType("update");
+            
+            return new FeedbackMessage(String.format(MESSAGE_UPDATED_, "successfully"), myTaskList);
+        }
         
-        commandTypeList.addCommandType("update");
-        
-        return new FeedbackMessage(MESSAGE_UPDATED, myTaskList);
     }
     
     private FeedbackMessage executeSort() throws IOException {
         myTaskList = getCurrentList();
         myTaskList.sort(null);
-        String taskListContent = getTaskListContent(myTaskList);
         return new FeedbackMessage(MESSAGE_SORTED, myTaskList);
     }
     
@@ -160,64 +185,55 @@ public class Logic {
         ArrayList<Tasks> searchList = storage.SearchTask(keyword);
         
         if (searchList.size() != 0) {
-            String taskListContent = getTaskListContent(searchList);
-            return new FeedbackMessage(String.format(MESSAGE_SEARCH, "successfully"), searchList);
+            return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "successfully"), searchList);
         } else {
-            String taskListContent = getTaskListContent(myTaskList);
-            return new FeedbackMessage(String.format(MESSAGE_SEARCH, "successfully"), myTaskList);
+            return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "failed"), myTaskList);
         }
     }
     
     private FeedbackMessage executeUndo() throws IOException {
-        String lastCommandType = commandTypeList.getLastCommandType();
-        if (lastCommandType != "update") {
-            Command commandToUndo = commandHistoryList.getLastCommand();
-            if (commandToUndo.getCommand() == "delete") {
-                storage.appendTask(commandToUndo.getTask());
-            } else {
-                myTaskList = getCurrentList();
-                int taskIDToBeDeleted = commandToUndo.getIndexToBeDeleted();
-                int indexToBeDeleted = getIndexFromTaskID(taskIDToBeDeleted);
-                storage.deleteTask(indexToBeDeleted);
-            }
+        if (commandTypeList.isEmpty()) {
+            return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed"), myTaskList);
         } else {
-            Command commandToUndo = commandHistoryList.getLastCommand();
-            int taskIDToBeDeleted = commandToUndo.getIndexToBeDeleted();
-            int indexToBeDeleted = getIndexFromTaskID(taskIDToBeDeleted);
-            storage.deleteTask(indexToBeDeleted);
-            commandToUndo = commandHistoryList.getLastCommand();
-            storage.appendTask(commandToUndo.getTask());
+            String lastCommandType = commandTypeList.getLastCommandType();
+            if (lastCommandType != "update") {
+                Command commandToUndo = commandHistoryList.getLastCommand();
+                if (lastCommandType == "add") { //undo add operation
+                    myTaskList = getCurrentList();
+                    int taskIDToBeDeleted = commandToUndo.getIndexToBeDeleted();
+                    storage.deleteTask(taskIDToBeDeleted);
+                } else { // undo delete operation
+                    Tasks task = commandToUndo.getTask();
+                    storage.appendTask(task);
+                }
+            } else {  // undo update operation
+                Command commandToUndo = commandHistoryList.getLastCommand();
+                int taskIDToBeDeleted = commandToUndo.getIndexToBeDeleted();
+                storage.deleteTask(taskIDToBeDeleted);
+                commandToUndo = commandHistoryList.getLastCommand();
+                storage.appendTask(commandToUndo.getTask());
+            }
+            
+            myTaskList = getCurrentList();
+            return new FeedbackMessage(String.format(MESSAGE_UNDO_, "successfully!"), myTaskList);
+            
         }
-        
-        myTaskList = getCurrentList();
-        String taskListContent = getTaskListContent(myTaskList);
-        return new FeedbackMessage(MESSAGE_UNDO, myTaskList);
     }
     
     private FeedbackMessage executeClear() {
         myTaskList = getCurrentList();
-        String taskListContent = getTaskListContent(myTaskList);
         return new FeedbackMessage(MESSAGE_CLEAR, myTaskList);
     }
+    
+    // =========================================================================
+    // get task other information from known info
+    // =========================================================================
     
     private int getTaskIDFromUserInput(int userInput) {
         myTaskList = getCurrentList();
         Tasks requriedTask = myTaskList.get(userInput - 1);
         int taskID = requriedTask.getTaskID();
         return taskID;
-    }
-    
-    private String getTaskListContent(ArrayList<Tasks> taskList) {
-        String taskListContent = "";
-        int taskListSize = taskList.size();
-        for (int i = 0; i < taskListSize - 1; i++) {
-            taskListContent += taskList.get(i).getDescription() + "\n";
-        }
-        if (taskListSize > 1) {
-            taskListContent += taskList.get(taskListSize - 1);
-        }
-        
-        return taskListContent;
     }
     
     private Tasks getTaskFromTaskID(ArrayList<Tasks> taskList, int taskID) {
@@ -233,22 +249,15 @@ public class Logic {
     }
     
     private int getIndexFromTaskID(int taskID) {
-        myTaskList = storage.readFile();
+        myTaskList = getCurrentList();
         int index = -1;
         for  (int i = 0; i < myTaskList.size(); i++) {
             if (myTaskList.get(i).getTaskID() == taskID) {
-                index = i;
+                index = i + 1;
                 break;
             }
         }
         return index;
     }
     
-    private static boolean checkIfEmptyString(String userCommand) {
-        return userCommand.trim().equals("");
-    }
-    
-    public ArrayList<Tasks> getCurrentList(){
-        return storage.readFile();
-    }
 }
