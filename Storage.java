@@ -9,7 +9,6 @@ public class Storage {
 	private File myFile;
 	private String defPath = "myTasks.txt";
 	private String currentPath = "";
-	private ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
 	private FileWriter fw;
 	private FileReader fr; 
 	private BufferedWriter bw;
@@ -47,6 +46,8 @@ public class Storage {
 	//if file exists, return contents
 	private ArrayList<Tasks> createFile(String path) throws IOException {
 		
+		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
+		
 		//set up file
 		myFile = new File(currentPath);
 		
@@ -54,11 +55,10 @@ public class Storage {
 		if(!myFile.exists()) {
 			//myFile.mkdirs();
 			myFile.createNewFile();
-			setMyTaskList(new ArrayList<Tasks>());
 		}
 		//file exists, read file and return contents
 		else {
-			setMyTaskList(readFile());
+			myTaskList = readFile();
 		}
 		return myTaskList;
 
@@ -83,7 +83,7 @@ public class Storage {
 			e1.printStackTrace();
 		}
 		
-		myTaskList = new ArrayList<Tasks>();
+		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
 		String tempLine = "";
 		Tasks tempTask;
 		
@@ -190,6 +190,8 @@ public class Storage {
 	public Tasks deleteTask(int taskID) throws IOException{
 		
 		Tasks deletedTask = null;
+		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
+		
 		try {
 			openWriterReader();
 		} catch (FileNotFoundException e1) {
@@ -274,7 +276,7 @@ public class Storage {
 		
 		
 		ArrayList<Tasks> tempList = readFile();
-		myTaskList = new ArrayList<Tasks>();
+		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
 		
 		for(int i=0; i<tempList.size(); i++) {
 			if(tempList.get(i).getDescription().contains(searchString)) {
@@ -292,17 +294,10 @@ public class Storage {
 		return myTaskList;
 	}
 	
-	//replaces specified taskID with updated Tasks
-	public Tasks UpdateTask(int TaskID, Tasks updatedTask){
+	//replaces specified taskID with updated Tasks and returns new complete list
+	public ArrayList<Tasks> UpdateTask(int TaskID, Tasks updatedTask){
 		
-			
-		try {
-			deleteTask(TaskID);
-			appendTask(updatedTask);
-		} 
-		catch (IOException e) {
-			e.printStackTrace();
-		}
+		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
 		
 		try {
 			openWriterReader();
@@ -312,35 +307,29 @@ public class Storage {
 			e1.printStackTrace();
 		}
 		
-		//myTaskList = readFile();
-		
-		/*
-		ArrayList<Tasks> tempList = readFile();
-		myTaskList = new ArrayList<Tasks>();
-		
-		for(int i=0; i<tempList.size(); i++) {
-			if(tempList.get(i).getTaskID() == TaskID) {
-				myTaskList.add(updatedTask);
-			}
-			else {
-				myTaskList.add(tempList.get(i));
-			}
+		try {
+			deleteTask(TaskID);
+			appendTask(updatedTask);
+		} 
+		catch (IOException e) {
+			e.printStackTrace();
 		}
 		
 		try {
 			closeWriterReader();
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		*/
 		
-		return updatedTask;
+		return myTaskList;
 	}
 	
 	private int GenerateTaskID() {
 		
 		int largestID = 0;
+		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
 		
 		try {
 			openWriterReader();
@@ -380,11 +369,5 @@ public class Storage {
 		this.currentPath = currentPath;
 	}
 
-	public ArrayList<Tasks> getMyTaskList() {
-		return myTaskList;
-	}
 
-	public void setMyTaskList(ArrayList<Tasks> myTaskList) {
-		this.myTaskList = myTaskList;
-	}
 }
