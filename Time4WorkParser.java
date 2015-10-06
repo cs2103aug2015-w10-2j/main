@@ -11,6 +11,13 @@ public class Time4WorkParser {
   public Time4WorkParser() {
   }
   
+  /**
+   * @param userInput
+   * takes in the user input string and converts it into a command for the logic segment
+   * the end of the description is stipulated with a ".", full stop, to indicate the end
+   * 
+   * @return command
+   */
   public Command parse(String userInput) {
     Command command;
     ArrayList<String> parameters = splitString(userInput);
@@ -18,11 +25,19 @@ public class Time4WorkParser {
     ArrayList<String> arguments = getUserArguments(parameters);
     
     if (userCommand.toUpperCase().equals("ADD")){
-      command = createAddCommand(arguments);
+      if (findFullStop(arguments)){
+        command = createAddCommand(arguments);
+      } else {
+        command = createInvalidCommand();
+      }
     } else if (userCommand.toUpperCase().equals("DELETE")) {
       command = createDeleteCommand(arguments);
     } else if (userCommand.toUpperCase().equals("UPDATE")) {
-      command = createUpdateCommand(arguments);
+      if (findFullStop(arguments)){
+        command = createUpdateCommand(arguments);
+      } else {
+        command = createInvalidCommand();
+      }
     } else if (userCommand.toUpperCase().equals("SEARCH")) {
       command = createSearchCommand(arguments);
     } else if (userCommand.toUpperCase().equals("UNDO")){
@@ -35,11 +50,23 @@ public class Time4WorkParser {
     return command;
   }
   
+  /**
+   * @param arguments
+   * takes in the string and splits it into a array list of the split string
+   * 
+   * @return String[] of the string input
+   */
   private ArrayList<String> splitString(String arguments) {
     String[] strArray = arguments.trim().split(REGEX_WHITESPACES);
     return new ArrayList<String>(Arrays.asList(strArray));
   }
   
+  /**
+   * @param parameters
+   * takes in the arraylist<String> and gets the first argument, which is the action to be done
+   * 
+   * @return String of the action to be done
+   */
   private String getUserCommand(ArrayList<String> parameters) {
     return parameters.get(POSITION_PARAM_COMMAND);
   }
@@ -58,13 +85,21 @@ public class Time4WorkParser {
   }
   
   private int findIndexOfLastWord (ArrayList<String> parameters){
-    int indexOfLastWord = 0;
+    int indexOfLastWord = -1;
     for(int i = 0; i < parameters.size(); i++){
       if (parameters.get(i).contains(".")){
         indexOfLastWord = i;
       }      
     }
     return indexOfLastWord;
+  }
+  
+  private boolean findFullStop(ArrayList<String> parameters) {
+    int index = findIndexOfLastWord(parameters);
+    if (index == -1){
+      return false;
+    }
+    return true;
   }
   
   private String createDescription(ArrayList<String> parameters,int end){
@@ -74,6 +109,7 @@ public class Time4WorkParser {
   }
   
   private ArrayList<String> createNewListWithCombinedDescription(ArrayList<String> parameters){
+    
     int lastWordIndex = findIndexOfLastWord(parameters);
     String description = createDescription(parameters, lastWordIndex).replace(".", "");
     ArrayList<String> timeArray = getTimeArray(parameters, lastWordIndex);
