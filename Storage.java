@@ -215,6 +215,61 @@ public class Storage {
 		
 		//taskID to be deleted is found
 		if(needDelete) {
+			
+			try {
+				closeWriterReader();
+				System.gc();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			//wait for garbage collector
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			//delete old file
+			if (!myFile.delete()) {
+		        System.out.println("Could not delete file");
+		    } 
+			
+			createFile(currentPath);
+			
+			try {
+				openWriterReader();
+			} catch (FileNotFoundException e1) {
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			
+			
+			
+			for(int i=0; i<myTaskList.size(); i++) {
+				String tempLine = gson.toJson(myTaskList.get(i)); 
+			
+				//write new Tasks into file
+				try {
+					bw.write(tempLine);
+					bw.newLine();
+				} 
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		try {
+			closeWriterReader();
+			System.gc();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+				/*
 			//create temporary file without deleted entry
 			File tempFile = new File(myFile.getAbsolutePath() + ".tmp");
 			FileWriter TempFw = new FileWriter(tempFile.getAbsoluteFile(), true);
@@ -260,6 +315,7 @@ public class Storage {
 		    	System.out.println("Could not rename file");
 		    }
 		}	
+		*/
 		return deletedTask;
 	}
 	
@@ -294,10 +350,44 @@ public class Storage {
 		return myTaskList;
 	}
 	
-	//replaces specified taskID with updated Tasks and returns new complete list
-	public ArrayList<Tasks> UpdateTask(int TaskID, Tasks updatedTask){
+	//search and returns task by taskID
+		public Tasks SearchTaskID(int taskID) throws FileNotFoundException, IOException{
+			
+			openWriterReader();
+
+			
+			ArrayList<Tasks> tempList = readFile();
+			Tasks myTask = null;
+			
+			for(int i=0; i<tempList.size(); i++) {
+				if(tempList.get(i).getTaskID() == taskID) {
+					myTask = tempList.get(i);
+				}
+			}
+			
+			closeWriterReader();
+			
+			return myTask;
+		}
+	
+	//replaces specified taskID with updated Tasks and returns "old" updated task
+	public Tasks UpdateTask(int TaskID, Tasks updatedTask){
 		
-		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
+		Tasks oldTask = null;
+		
+		try {
+			openWriterReader();
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
+		try {
+			oldTask = SearchTaskID(TaskID);
+		} catch (IOException e2) {
+			e2.printStackTrace();
+		}
 		
 		try {
 			openWriterReader();
@@ -323,7 +413,7 @@ public class Storage {
 			e1.printStackTrace();
 		}
 		
-		return myTaskList;
+		return oldTask;
 	}
 	
 	private int GenerateTaskID() {
