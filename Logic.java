@@ -131,13 +131,14 @@ public class Logic {
     }
     
     private FeedbackMessage executeUpdate(Tasks task) throws IOException {
-        int taskID = task.getTaskID();
-        Tasks taskBeforeUpdated = storage.UpdateTask(taskID, task);
+        int indexToBeDeleted = task.getTaskID();
+        int taskIDToBeDeleted = getTaskIDFromUserInput(indexToBeDeleted);
+        Tasks taskBeforeUpdated = storage.UpdateTask(taskIDToBeDeleted, task);
         
         myTaskList = getCurrentList();
         String taskListContent = getTaskListContent(myTaskList);
         
-        Command reversedCommand = new Command("delete", taskID);
+        Command reversedCommand = new Command("delete", taskIDToBeDeleted);
         commandHistoryList.addCommand(reversedCommand);
         reversedCommand = new Command("add", taskBeforeUpdated);
         commandHistoryList.addCommand(reversedCommand);
