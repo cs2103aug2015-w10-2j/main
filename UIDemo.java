@@ -38,7 +38,7 @@ public class UIDemo extends JPanel implements ActionListener {
         c.weighty = 1.0;
         add(scrollPane, c);
         
-        currentList = logic.getCurrentList();
+        currentList = logic.getFullTaskList();
         taskContent.setText(display(currentList));
     }
     
