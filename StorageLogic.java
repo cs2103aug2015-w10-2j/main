@@ -561,5 +561,52 @@ public class StorageLogic {
 		}
 		
 		return myTaskList;
+	}
+	
+	//deletes the file and recreates it, returning all the deleted tasks
+	public ArrayList<Tasks> clear() throws IOException, InterruptedException {
+		
+		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
+		
+		try {
+			openWriterReader();
+		} catch (IOException e) {
+			throw e;
+		}
+		
+		try {
+			myTaskList = getAllTasks();
+		} catch (IOException e) {
+			throw e;
+		}
+		
+		try {
+			closeWriterReader();
+			System.gc();
+		}
+		catch (IOException e) {
+			throw e;
+		}
+		
+		//wait for garbage collector
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			throw e;
+		}
+		
+		//delete old file
+		if (!myFile.delete()) {
+	        throw new IOException("File cannot be deleted!");
+	    } 
+		
+		try {
+			createFile(currentPath);
+		} catch (IOException e) {
+			throw e;
+		}
+					
+		return myTaskList;
+		
 	}	
 }

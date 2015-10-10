@@ -83,4 +83,13 @@ public class Storage {
 		}		
 	}
 	
+	//clear the file of contents, does not delete file
+	public ArrayList<Tasks> ClearAll() throws Exception{		
+		try {
+			return myLogic.clear();
+		} catch (IOException | InterruptedException e) {
+			throw e;
+		}		
+	}
+	
 }
