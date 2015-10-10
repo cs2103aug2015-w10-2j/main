@@ -58,11 +58,17 @@ public class Storage {
 	//replaces specified taskID with updated Tasks and returns "old" updated task
 	public Tasks UpdateTask(int taskID, Tasks updatedTask) throws Exception{
 		
+		Tasks oldTask = null;
+		
 		try {
-			return myLogic.replaceTask(taskID, updatedTask);
+			oldTask = myLogic.delete(taskID);
+			myLogic.addNewTask(updatedTask);
+			
 		} catch (IOException | InterruptedException e) {
 			throw e;
 		}
+		
+		return oldTask;
 	}
 	
 	//search and returns list of completed/incomplete tasks based on boolean input

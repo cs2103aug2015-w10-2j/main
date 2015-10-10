@@ -449,7 +449,7 @@ public class StorageLogic {
 		return myTask;
 	
 	}
-
+	/*
 	//AKA update, replaces task with same taskID
 	public Tasks replaceTask(int taskID, Tasks updatedTask) throws IOException, InterruptedException {
 
@@ -491,6 +491,7 @@ public class StorageLogic {
 		
 		return oldTask;
 	}
+	*/
 	
 	//returns list of completed/incomplete tasks based on boolean input
 	public ArrayList<Tasks> searchComplete(boolean complete) throws IOException {
