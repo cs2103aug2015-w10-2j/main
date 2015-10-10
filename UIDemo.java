@@ -62,17 +62,62 @@ public class UIDemo extends JPanel implements ActionListener {
         taskContent.setCaretPosition(taskContent.getDocument().getLength());
     }
     
-    public static String display(ArrayList<Tasks> taskList){
-        String taskListContent = "";
-        int taskListSize = taskList.size();
-        if (taskListSize != 0) {
-            for (int i = 0; i < taskListSize - 1; i++){
-                taskListContent += (i+1) + ". " + taskList.get(i).getDescription() + "\n";
-            }
-            taskListContent += taskListSize + ". " + taskList.get(taskListSize - 1).getDescription();
-        }
-        return taskListContent;
-    }
+   	public static String display(ArrayList<Tasks> taskList) {
+		String taskListContent = "";
+		int taskListSize = taskList.size();
+		if (taskListSize != 0) {
+			for (int i = 0; i < taskListSize - 1; i++) {
+				taskListContent += (i + 1) + ". " + taskList.get(i).getDescription() + "     "
+						+ getStartDuration(taskList.get(i)) + "     " + getEndDuration(taskList.get(i)) + "\n";
+			}
+			taskListContent += taskListSize + ". " + taskList.get(taskListSize - 1).getDescription()+
+					"     " + getStartDuration(taskList.get(taskListSize - 1)) + "     " + getEndDuration(taskList.get(taskListSize - 1));
+		}
+		return taskListContent;
+	}
+
+	private static String getStartDuration(Tasks task) {
+		Duration taskDuration = new Duration("","","","") ;
+		String startDuration = "";
+
+		if (task instanceof DeadlineTask) {
+			DeadlineTask classifiedTask = (DeadlineTask) task;
+			taskDuration = classifiedTask.getDurationDetails();
+		} else if (task instanceof DurationTask) {
+			DurationTask classifiedTask = (DurationTask) task;
+			taskDuration = classifiedTask.getDurationDetails();
+		} else if (task instanceof FloatingTask) {
+			return "";
+		}
+		String date = taskDuration.getEndDate();
+		String time = taskDuration.getEndTime();
+		String dateDisplay = date.substring(0,2)+ "/" + date.substring(2,4) + "/" + date.substring(4);
+		String timeDisplay = time.substring(0,2)+ ":" + time.substring(2,4) ;
+		startDuration += dateDisplay + "  " + timeDisplay;
+		return startDuration;
+	}
+
+	private static String getEndDuration(Tasks task) {
+		Duration taskDuration = new Duration("", "", "", "");
+		String endDuration = "";
+
+		if (task instanceof DeadlineTask) {
+			DeadlineTask classifiedTask = (DeadlineTask) task;
+			taskDuration = classifiedTask.getDurationDetails();
+		} else if (task instanceof DurationTask) {
+			DurationTask classifiedTask = (DurationTask) task;
+			taskDuration = classifiedTask.getDurationDetails();
+		} else if (task instanceof FloatingTask) {
+			return "";
+		}
+
+		String date = taskDuration.getEndDate();
+		String time = taskDuration.getEndTime();
+		String dateDisplay = date.substring(0,2)+ "/" + date.substring(2,4) + "/" + date.substring(4);
+		String timeDisplay = time.substring(0,2)+ ":" + time.substring(2,4) ;
+		endDuration += dateDisplay + "  " + timeDisplay;
+		return endDuration;
+	}
     
     /**
      * Create the GUI and show it.  For thread safety,
