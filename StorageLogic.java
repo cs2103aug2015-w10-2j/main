@@ -420,7 +420,7 @@ public class StorageLogic {
 	}
 	
 	//search and returns task by taskID
-	public Tasks SearchTaskID(int taskID) throws FileNotFoundException, IOException{
+	private Tasks SearchTaskID(int taskID) throws FileNotFoundException, IOException{
 		
 		try {
 			openWriterReader();
