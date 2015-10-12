@@ -23,9 +23,10 @@ public class Logic {
     
     private Storage storage;
     private ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
+    private ArrayList<Tasks> fullTaskList = new ArrayList<Tasks>();
     private CommandHistory commandHistoryList = new CommandHistory();
     private CommandHistory commandTypeList = new CommandHistory();
-    private ArrayList<Tasks> previousList = new ArrayList<Tasks>();
+    
     
     enum COMMAND_TYPE {
         ADD, UPDATE, DELETE, SEARCH, SORT, INVALID, UNDO, CLEAR, EXIT
@@ -33,7 +34,12 @@ public class Logic {
     
     // Constructor
     public Logic() {
-        storage = new Storage();
+        try {
+            storage = new Storage();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
     
     // =========================================================================
@@ -42,8 +48,12 @@ public class Logic {
     
     public FeedbackMessage executeCommand (String userInput) throws IOException {
         String userCommand = userInput;
-        myTaskList = getCurrentList();
-        previousList = getFullTaskList();
+        fullTaskList = getFullTaskList();
+        
+        if (myTaskList.isEmpty()) {
+            myTaskList = fullTaskList;
+        }
+        
         if(checkIfEmptyString(userCommand)) {
             return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, MESSAGE_EMPTY_COMMAND), myTaskList);
         }
@@ -107,18 +117,21 @@ public class Logic {
         return userCommand.trim().equals("");
     }
     
-    public ArrayList<Tasks> getCurrentList() {
-        return previousList;
-    }
     
     public ArrayList<Tasks> getFullTaskList() {
-        return storage.readFile();
+        try {
+            return storage.readFile();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return fullTaskList;
     }
     
     // =========================================================================
     // Execute Command
     // =========================================================================
-    private FeedbackMessage executeAdd(Tasks newTask) {
+    private FeedbackMessage executeAdd(Tasks newTask) throws IOException {
         storage.appendTask(newTask);
         myTaskList = getFullTaskList();
         
@@ -129,12 +142,10 @@ public class Logic {
         commandHistoryList.addCommand(reversedCommand);
         commandTypeList.addCommandType("add");
         
-        previousList = myTaskList;
         return new FeedbackMessage(MESSAGE_ADDED, myTaskList);
     }
     
     private FeedbackMessage executeDelete(int userInputIndex) throws IOException {
-        myTaskList = previousList;
         int taskListSize = myTaskList.size();
         
         if (taskListSize < userInputIndex || userInputIndex < 1) {
@@ -143,9 +154,13 @@ public class Logic {
             int taskID = getTaskIDFromUserInput(userInputIndex);
             Tasks deletedTask = getTaskFromTaskID(myTaskList, taskID); //store the task to be deleted
             
-            storage.deleteTask(taskID);
-            previousList.remove(userInputIndex - 1);
-            myTaskList = previousList;
+            try {
+                storage.deleteTask(taskID);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            myTaskList.remove(userInputIndex - 1);
             
             // Set up for undo operation
             Command reversedCommand = new Command("add", deletedTask);
@@ -159,7 +174,6 @@ public class Logic {
     
     private FeedbackMessage executeUpdate(Tasks task) throws IOException {
         
-        myTaskList = getCurrentList();
         int taskListSize = myTaskList.size();
         int indexToBeDeleted = task.getTaskID();   // get index to be deleted by retrieving taskID
         
@@ -169,10 +183,15 @@ public class Logic {
             int taskIDToBeDeleted = getTaskIDFromUserInput(indexToBeDeleted);
             task.setTaskID(taskIDToBeDeleted);
             
-            Tasks taskBeforeUpdated = storage.UpdateTask(taskIDToBeDeleted, task);
-            previousList.remove(indexToBeDeleted);
-            previousList.add(task);
-            myTaskList = getCurrentList();
+            Tasks taskBeforeUpdated = null;
+            try {
+                taskBeforeUpdated = storage.UpdateTask(taskIDToBeDeleted, task);
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            myTaskList.remove(indexToBeDeleted - 1);
+            myTaskList.add(task);
             
             // Set up for undo operation
             Command reversedCommand = new Command("add", taskBeforeUpdated); // add the original one back
@@ -187,20 +206,17 @@ public class Logic {
     }
     
     private FeedbackMessage executeSort() throws IOException {
-        myTaskList = getCurrentList();
         myTaskList.sort(null);
         return new FeedbackMessage(MESSAGE_SORTED, myTaskList);
     }
     
     private FeedbackMessage executeSearch(String keyword) throws IOException {
-        myTaskList = getCurrentList();
         ArrayList<Tasks> searchList = storage.SearchTask(keyword);
         
         if (searchList.size() != 0) {
-            previousList = searchList;
+            myTaskList = searchList;
             return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "successfully"), searchList);
         } else {
-            previousList = myTaskList;
             return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "failed"), myTaskList);
         }
     }
@@ -213,36 +229,43 @@ public class Logic {
             if (lastCommandType != "update") {
                 Command commandToUndo = commandHistoryList.getLastCommand();
                 if (lastCommandType == "add") { //undo add operation
-                    myTaskList = getCurrentList();
                     int taskIDToBeDeleted = commandToUndo.getIndexToBeDeleted();
-                    storage.deleteTask(taskIDToBeDeleted);
-                    int indexInPreviouslist = getIndexFromTaskID(previousList, taskIDToBeDeleted);
-                    previousList.remove(indexInPreviouslist);
+                    try {
+                        storage.deleteTask(taskIDToBeDeleted);
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    int indexInPreviouslist = getIndexFromTaskID(myTaskList, taskIDToBeDeleted);
+                    myTaskList.remove(indexInPreviouslist);
                 } else { // undo delete operation
                     Tasks task = commandToUndo.getTask();
                     storage.appendTask(task);
-                    previousList.add(task);
+                    myTaskList.add(task);
                 }
             } else {  // undo update operation
                 Command commandToUndo = commandHistoryList.getLastCommand();
                 int taskIDToBeDeleted = commandToUndo.getIndexToBeDeleted();
-                storage.deleteTask(taskIDToBeDeleted);
-                int indexInPreviousList = getIndexFromTaskID(previousList, taskIDToBeDeleted);
-                previousList.remove(indexInPreviousList);
+                try {
+                    storage.deleteTask(taskIDToBeDeleted);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                int indexInPreviousList = getIndexFromTaskID(myTaskList, taskIDToBeDeleted);
+                myTaskList.remove(indexInPreviousList);
                 
                 commandToUndo = commandHistoryList.getLastCommand();
                 storage.appendTask(commandToUndo.getTask());
-                previousList.add(commandToUndo.getTask());
+                myTaskList.add(commandToUndo.getTask());
             }
             
-            myTaskList = getCurrentList();
             return new FeedbackMessage(String.format(MESSAGE_UNDO_, "successfully!"), myTaskList);
             
         }
     }
     
     private FeedbackMessage executeClear() {
-        myTaskList = getCurrentList();
         return new FeedbackMessage(MESSAGE_CLEAR, myTaskList);
     }
     
@@ -251,7 +274,6 @@ public class Logic {
     // =========================================================================
     
     private int getTaskIDFromUserInput(int userInput) {
-        myTaskList = getCurrentList();
         Tasks requriedTask = myTaskList.get(userInput - 1);
         int taskID = requriedTask.getTaskID();
         return taskID;
