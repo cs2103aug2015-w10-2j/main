@@ -1,3 +1,4 @@
+package Time4WorkStorage;
 
 public class DurationTask extends Tasks{
 	

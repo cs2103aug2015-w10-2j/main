@@ -1,8 +1,7 @@
+package Time4WorkStorage;
+
 import java.io.*;
 import java.util.ArrayList;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 
 public class Storage {
 	

@@ -1,3 +1,4 @@
+package Time4WorkStorage;
 
 public class FloatingTask extends Tasks{
 	

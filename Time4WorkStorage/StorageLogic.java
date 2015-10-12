@@ -1,3 +1,5 @@
+package Time4WorkStorage;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -5,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 
 import com.google.gson.Gson;
@@ -136,8 +137,8 @@ public class StorageLogic {
 										break;
 					case FloatingType: 	tempTask = gson.fromJson(tempLine, FloatingTask.class);
 										break;
-					case BlockedType: 	tempTask = gson.fromJson(tempLine, BlockedTask.class);
-										break;
+					/*case BlockedType: 	tempTask = gson.fromJson(tempLine, BlockedTask.class);
+										break;*/
 					default:			tempTask = null;
 										break;
 				}
