@@ -57,7 +57,7 @@ public class UIDemo extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent evt) {
         try {
             String userCommand = commandInput.getText();
-            logger.log(Level.INFO, "user command received");
+            logger.log(Level.INFO, userCommand + "was entered.");
             FeedbackMessage output;
             output = logic.executeCommand(userCommand);
             currentList = output.getTaskList();
