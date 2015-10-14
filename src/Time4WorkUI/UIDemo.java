@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import Time4WorkLogic.FeedbackMessage;
 import Time4WorkLogic.Logic;
@@ -21,6 +23,7 @@ public class UIDemo extends JPanel implements ActionListener {
     private JLabel feedback;
     private static Logic logic = new Logic();
     private static ArrayList<Tasks> currentList = new ArrayList<Tasks>();
+    private static final Logger logger = Logger.getLogger(Logic.class.getName());
     
     public UIDemo() {
         super(new GridBagLayout());
@@ -54,12 +57,13 @@ public class UIDemo extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent evt) {
         try {
             String userCommand = commandInput.getText();
-            
+            logger.log(Level.INFO, "user command received");
             FeedbackMessage output;
             output = logic.executeCommand(userCommand);
             currentList = output.getTaskList();
             taskContent.setText(display(currentList));
             feedback.setText(output.getFeedback());
+            logger.log(Level.INFO, "feedback received");
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
