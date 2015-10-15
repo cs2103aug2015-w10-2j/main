@@ -17,6 +17,22 @@ public class DeadlineTask extends Tasks{
 		super.setType(DeadlineType);
 		setDurationDetails(duration);
 	}
+	
+	public String getTime() {
+		return durationDetails.getEndTime();
+	}
+	
+	public void setTime(String eTime) {
+		this.durationDetails.setEndTime(eTime);
+	}
+	
+	public String getDate() {
+		return durationDetails.getEndDate();
+	}
+	
+	public void setDate(String eDate) {
+		this.durationDetails.setEndDate(eDate);
+	}
 
 	public Duration getDurationDetails() {
 		return durationDetails;

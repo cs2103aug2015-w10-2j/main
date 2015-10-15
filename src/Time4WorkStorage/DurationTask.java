@@ -25,5 +25,39 @@ public class DurationTask extends Tasks{
 		this.durationDetails = durationDetails;
 	}
 	
+	public String getStartTime() {
+		return durationDetails.getStartTime();
+	}
+	
+	public void setStartTime(String sTime) {
+		this.durationDetails.setStartTime(sTime);
+	}
+	
+	public String getStartDate() {
+		return durationDetails.getStartDate();
+	}
+	
+	public void setStartDate(String sDate) {
+		this.durationDetails.setStartDate(sDate);
+	}
+
+	
+	public String getEndTime() {
+		return durationDetails.getEndTime();
+	}
+	
+	public void setEndTime(String eTime) {
+		this.durationDetails.setEndTime(eTime);
+	}
+	
+	public String getEndDate() {
+		return durationDetails.getEndDate();
+	}
+	
+	public void setEndDate(String eDate) {
+		this.durationDetails.setEndDate(eDate);
+	}
+
+	
 	
 }
