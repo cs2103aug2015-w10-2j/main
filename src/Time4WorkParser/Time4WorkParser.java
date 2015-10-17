@@ -48,6 +48,8 @@ public class Time4WorkParser {
       command = createSearchCommand(arguments);
     } else if (userCommand.toUpperCase().equals("UNDO")){
       command = createUndoCommand();
+    } else if (userCommand.toUpperCase().equals("CLEAR")) {
+      command = createClearCommand();
     } else if (userCommand.toUpperCase().equals("EXIT")) {
       command = createExitCommand();
     } else {
@@ -192,6 +194,12 @@ public class Time4WorkParser {
   
   private Command createUndoCommand(){
     Command command = new Command("undo");
+    
+    return command;
+  }
+  
+  private Command createClearCommand(){
+    Command command = new Command("clear");
     
     return command;
   }
