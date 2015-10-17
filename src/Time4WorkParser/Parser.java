@@ -153,13 +153,20 @@ public class Parser {
   private Tasks createTaskListForAddingOrUpdating(ArrayList<String> arguments) {
     Tasks task;
     int numberOfArguments = arguments.size();
+    assert numberOfArguments <= 5;
     String descriptionOfTask = arguments.get(0);
     
     if (numberOfArguments == 1) {
       task = new FloatingTask(descriptionOfTask);
+    } else if (numberOfArguments ==2){
+      Duration deadline = new Duration(arguments.get(1), "2359");
+      task = new DeadlineTask(descriptionOfTask, deadline);
     } else if (numberOfArguments == 3) {
       Duration deadline = new Duration(arguments.get(1), arguments.get(2));
       task = new DeadlineTask(descriptionOfTask, deadline);
+    } else if (numberOfArguments == 4) {
+      Duration durationPeriod = new Duration(arguments.get(1), arguments.get(2), arguments.get(1), arguments.get(3));
+      task = new DurationTask(descriptionOfTask, durationPeriod);
     } else {
       Duration durationPeriod = new Duration(arguments.get(1), arguments.get(2), arguments.get(3), arguments.get(4));
       task = new DurationTask(descriptionOfTask, durationPeriod);
