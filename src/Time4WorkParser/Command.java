@@ -1,12 +1,15 @@
 package Time4WorkParser;
 import Time4WorkStorage.Tasks;
 
+import java.util.*;
+
 public class Command {
   
   private Tasks task;
   private String command;
   private String searchKeyword;
-  private int indexToBeDeleted;
+  private int selectedIndexNumber;
+  private ArrayList<Integer> selectedIndexNumbers = new ArrayList<Integer>();
   
   //for adding and updating
   public Command(String command, Tasks task) {
@@ -20,11 +23,18 @@ public class Command {
 	  this.searchKeyword = searchKeyword;
   }
   
-  //for deleting
-  public Command(String command, int indexToBeDeleted){
+  //for deleting 1 task or marking 1 task as done
+  public Command(String command, int selectedIndexNumber){
 	  this.command = command;
-	  this.indexToBeDeleted = indexToBeDeleted;
+	  this.selectedIndexNumber = selectedIndexNumber;
   }
+  
+  //for deleting multiple tasks or marking multiple tasks as done
+  public Command(String command, ArrayList<Integer> selectedIndexNumbers){
+	  this.command = command;
+	  this.selectedIndexNumbers = selectedIndexNumbers;
+  }
+  
   
   //for exit and invalid commands
   public Command(String command){
@@ -43,8 +53,11 @@ public class Command {
 	  return searchKeyword;
   }
 
-  public int getIndexToBeDeleted() {
-	  return indexToBeDeleted;
+  public int getSelectedIndexNumber() {
+	  return selectedIndexNumber;
   }
   
+  public ArrayList<Integer> getSelectedIndexNumbers(){
+	  return selectedIndexNumbers;
+	  }
 }
