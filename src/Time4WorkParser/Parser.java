@@ -8,13 +8,13 @@ import Time4WorkStorage.DurationTask;
 import Time4WorkStorage.FloatingTask;
 import Time4WorkStorage.Tasks;
 
-public class Time4WorkParser {
+public class Parser {
 	private static final int POSITION_PARAM_COMMAND = 0;
   private static final int POSITION_FIRST_PARAM_ARGUMENT = 1;
   
   private static final String REGEX_WHITESPACES = "[\\s,]+";
   
-  public Time4WorkParser() {
+  public Parser() {
   }
   
   /**
