@@ -2,6 +2,9 @@ package Time4WorkParser;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import Time4WorkStorage.DeadlineTask;
 import Time4WorkStorage.Duration;
 import Time4WorkStorage.DurationTask;
@@ -9,11 +12,13 @@ import Time4WorkStorage.FloatingTask;
 import Time4WorkStorage.Tasks;
 
 public class Parser {
-	private static final int POSITION_PARAM_COMMAND = 0;
+  private static final int POSITION_PARAM_COMMAND = 0;
   private static final int POSITION_FIRST_PARAM_ARGUMENT = 1;
   
   private static final String REGEX_WHITESPACES = "[\\s,]+";
   
+  private static final Logger logger = Logger.getLogger(Parser.class.getName());
+   
   public Parser() {
   }
   
@@ -27,23 +32,17 @@ public class Parser {
   public Command parse(String userInput) {
     Command command;
     ArrayList<String> parameters = splitString(userInput);
+    logger.log(Level.INFO, "parsing user input");
     String userCommand = getUserCommand(parameters);
+    logger.log(Level.INFO, "user command is: " + userCommand);
     ArrayList<String> arguments = getUserArguments(parameters);
     
     if (userCommand.toUpperCase().equals("ADD")){
-      if (findFullStop(arguments)){
-        command = createAddCommand(arguments);
-      } else {
-        command = createInvalidCommand();
-      }
+      command = createAddIfValidCommand(arguments);
     } else if (userCommand.toUpperCase().equals("DELETE")) {
       command = createDeleteCommand(arguments);
     } else if (userCommand.toUpperCase().equals("UPDATE")) {
-      if (findFullStop(arguments)){
-        command = createUpdateCommand(arguments);
-      } else {
-        command = createInvalidCommand();
-      }
+      command = createUpdateIfValidCommand(arguments);
     } else if (userCommand.toUpperCase().equals("SEARCH")) {
       command = createSearchCommand(arguments);
     } else if (userCommand.toUpperCase().equals("UNDO")){
@@ -53,6 +52,29 @@ public class Parser {
     } else if (userCommand.toUpperCase().equals("EXIT")) {
       command = createExitCommand();
     } else {
+      logger.log(Level.WARNING, "invalid command by user");
+      command = createInvalidCommand();
+    }
+    return command;
+  }
+  
+  private Command createUpdateIfValidCommand(ArrayList<String> arguments) {
+    Command command;
+    if (findFullStop(arguments)){
+      command = createUpdateCommand(arguments);
+    } else {
+      logger.log(Level.WARNING, "full stop not found in user input.");
+      command = createInvalidCommand();
+    }
+    return command;
+  }
+  
+  private Command createAddIfValidCommand(ArrayList<String> arguments) {
+    Command command;
+    if (findFullStop(arguments)){
+      command = createAddCommand(arguments);
+    } else {
+      logger.log(Level.WARNING, "full stop not found in user input.");
       command = createInvalidCommand();
     }
     return command;
