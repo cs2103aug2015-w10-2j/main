@@ -61,7 +61,6 @@ public class StorageLogic {
 		
 		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
 		
-		//set up file
 		myFile = new File(currentPath);
 		
 		try {
@@ -72,13 +71,10 @@ public class StorageLogic {
 		}
 		
 		
-		//file exists, read file and return contents
 		if(myFile.exists() && myFile.isFile()) {
 			assert(myFile.exists());
 			myTaskList = getAllTasks();
-		}
-		//file not found, create file, intermediate directory? and return null
-		else {			
+		} else {			
 			assert(myFile.exists() == false);
 			
 			try {
@@ -97,11 +93,9 @@ public class StorageLogic {
 		
 		File parentFile = theFile.getParentFile();
 		
-		//String provided is a path, create directories
+
 		if(parentFile != null) {
-			//if creation of directories fail
 			if(!parentFile.mkdirs()) {
-				//because it doesn't exist
 				if(!parentFile.exists()) {
 					throw new IOException("Unable to create directories.");
 				}
@@ -126,8 +120,6 @@ public class StorageLogic {
 		//read contents of file		
 		try {
 			while ((tempLine = br.readLine()) != null) {
-				
-				//extract type				
 				int type = getTypeFromGsonString(tempLine);
 				
 				switch(type) {
@@ -144,19 +136,15 @@ public class StorageLogic {
 				}
 				myTaskList.add(tempTask);
 			}
-		}
-		catch (JsonSyntaxException e) {
+		} catch (JsonSyntaxException e) {
 			throw e;
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw e;
 		}
 		
-		//close writer and reader
 		try {
 			closeWriterReader();
-		} 
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw e;
 		}
 		   
@@ -196,8 +184,7 @@ public class StorageLogic {
 		
 		try {
 			closeWriterReader();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw e;
 		}
 		
@@ -209,20 +196,18 @@ public class StorageLogic {
 			throw e;
 		}
 		
-		//write new Tasks into file
+
 		try {
 			bw.write(tempLine);
 			bw.newLine();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw e;
 		}
 		
-		//close writer
+
 		try {
 			closeWriterReader();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw e;
 		}
 		
@@ -254,17 +239,16 @@ public class StorageLogic {
 		
 		try {
 			closeWriterReader();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw e;
 		}
 		
 		return largestID +1;
 	}
 	
-	//open reader and writer
+
 	private void openWriterReader() throws IOException, FileNotFoundException{
-		//set up writers
+
 		try {
 			fw = new FileWriter(myFile.getAbsoluteFile(),true);
 			bw = new BufferedWriter(fw);
@@ -279,7 +263,7 @@ public class StorageLogic {
 		}
 	}
 	
-	//close reader and writer
+
 	private void closeWriterReader() throws IOException {
 
 			try {
@@ -328,8 +312,7 @@ public class StorageLogic {
 			try {
 				closeWriterReader();
 				System.gc();
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				throw e;
 			}
 			
@@ -366,8 +349,7 @@ public class StorageLogic {
 				try {
 					bw.write(tempLine);
 					bw.newLine();
-				} 
-				catch (IOException e) {
+				}  catch (IOException e) {
 					throw e;
 				}
 			}
@@ -376,8 +358,7 @@ public class StorageLogic {
 		try {
 			closeWriterReader();
 			System.gc();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw e;
 		}
 			
@@ -385,7 +366,7 @@ public class StorageLogic {
 		
 	}
 
-	//searches task descriptiong for matching task and returns all matches, null if no match
+	//searches task description for matching task and returns all matches, null if no match
 	public ArrayList<Tasks> searchDescription(String searchString) throws IOException {
 		
 		try {
@@ -412,8 +393,7 @@ public class StorageLogic {
 		
 		try {
 			closeWriterReader();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw e;
 		}
 		
@@ -425,8 +405,7 @@ public class StorageLogic {
 		
 		try {
 			openWriterReader();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw e;
 		}
 
@@ -442,8 +421,7 @@ public class StorageLogic {
 		
 		try {
 			closeWriterReader();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw e;
 		}
 		
@@ -477,8 +455,7 @@ public class StorageLogic {
 		try {
 			delete(taskID);
 			addNewTask(updatedTask);
-		} 
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw e;
 		} catch (InterruptedException e) {
 			throw e;
@@ -497,12 +474,11 @@ public class StorageLogic {
 	//returns list of completed/incomplete tasks based on boolean input
 	public ArrayList<Tasks> searchComplete(boolean complete) throws IOException {
 		
-		ArrayList<Tasks> myTaskList = null;
+		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
 		
 		try {
 			openWriterReader();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw e;
 		}
 
@@ -522,8 +498,7 @@ public class StorageLogic {
 		
 		try {
 			closeWriterReader();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw e;
 		}
 		
@@ -532,12 +507,11 @@ public class StorageLogic {
 
 	//returns list of specified tasks type
 	public ArrayList<Tasks> searchTaskType(int type) throws IOException {
-		ArrayList<Tasks> myTaskList = null;
+		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
 		
 		try {
 			openWriterReader();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw e;
 		}
 
@@ -557,8 +531,7 @@ public class StorageLogic {
 		
 		try {
 			closeWriterReader();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw e;
 		}
 		
@@ -585,8 +558,7 @@ public class StorageLogic {
 		try {
 			closeWriterReader();
 			System.gc();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw e;
 		}
 		

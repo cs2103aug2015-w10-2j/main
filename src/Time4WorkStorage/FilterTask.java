@@ -5,11 +5,11 @@ import java.util.ArrayList;
 
 public class FilterTask {
 			
-	//searches task description for matching task and returns all matches, null if no match
+	//filters task description for matching task and returns all matches
 	public ArrayList<Tasks> searchDescription(ArrayList<Tasks> myList, String searchString) {
 		
 		
-		ArrayList<Tasks> resultList = null;
+		ArrayList<Tasks> resultList = new ArrayList<Tasks>();
 		
 		for(int i=0; i<myList.size(); i++) {
 			if(myList.get(i).getDescription().toUpperCase().contains(searchString.toUpperCase())) {
@@ -24,7 +24,7 @@ public class FilterTask {
 	public ArrayList<Tasks> searchCompleted(ArrayList<Tasks> myList, boolean completed) {
 		
 		
-		ArrayList<Tasks> resultList = null;
+		ArrayList<Tasks> resultList = new ArrayList<Tasks>();
 		
 		for(int i=0; i<myList.size(); i++) {
 			if(myList.get(i).isCompleted() == completed) {
@@ -35,10 +35,11 @@ public class FilterTask {
 		return resultList;
 	}
 	
+
 	public ArrayList<Tasks> searchType(ArrayList<Tasks> myList, int searchType) {
 		
 		
-		ArrayList<Tasks> resultList = null;
+		ArrayList<Tasks> resultList = new ArrayList<Tasks>();
 		
 		for(int i=0; i<myList.size(); i++) {
 			if(myList.get(i).getType() == searchType) {

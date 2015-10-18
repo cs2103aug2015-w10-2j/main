@@ -6,7 +6,7 @@ public class Duration {
 	private String startTime = "";		//time is 24hrs “0000”
 	private String endDate = "";
 	private String endTime = "";
-	private int type = 0;				//1 = deadline task, 2 = duration
+	private int type = 0;				
 	private final int DeadlineType = 1;
 	private final int DurationType = 2;
 
