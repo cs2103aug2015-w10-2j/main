@@ -72,11 +72,8 @@ public class StorageLogic {
 		
 		
 		if(myFile.exists() && myFile.isFile()) {
-			assert(myFile.exists());
 			myTaskList = getAllTasks();
 		} else {			
-			assert(myFile.exists() == false);
-			
 			try {
 				myFile.createNewFile();
 			} catch (IOException e) {
