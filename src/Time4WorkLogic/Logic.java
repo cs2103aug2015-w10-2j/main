@@ -23,6 +23,7 @@ public class Logic {
     private static final String MESSAGE_DELETED_ = "Task %1$s deleted %2$s !";
     private static final String MESSAGE_SORTED = "Task sorted successfully!";
     private static final String MESSAGE_SEARCH_ = "Task searched %1$s";
+    private static final String MESSAGE_DONE_ = "Mark task as done %1$s";
     private static final String MESSAGE_CLEAR = "All task cleared successfully!";
     private static final String MESSAGE_UNDO_ = "Undo %1$s!";
     
@@ -41,7 +42,7 @@ public class Logic {
     
     
     enum COMMAND_TYPE {
-        ADD, UPDATE, DELETE, SEARCH, SORT, INVALID, UNDO, CLEAR, EXIT
+        ADD, UPDATE, DELETE, SEARCH, SORT, INVALID, UNDO, DONE, CLEAR, EXIT
     };
     
     // Constructor
@@ -79,36 +80,46 @@ public class Logic {
         
         Tasks task = parsedCommand.getTask();
         
+        ArrayList<Integer> userInputIndexes = new ArrayList<Integer>();
+        
+        userInputIndexes = parsedCommand.getSelectedIndexNumbers();
+        
         COMMAND_TYPE commandType = determineCommandType(parsedCommand.getCommand());
         
         switch (commandType) {
-            case ADD:
+            case ADD :
                 return executeAdd(task);
-            case UPDATE:
+            case UPDATE :
                 return executeUpdate(task);
-            case DELETE:
-                ArrayList<Integer> userInputIndexes = parsedCommand.getSelectedIndexNumbers();
+            case DELETE :
                 if (userInputIndexes.isEmpty()) {
                     int userInputIndex = parsedCommand.getSelectedIndexNumber();
                     return executeDeleteOneTask(userInputIndex);
                 } else {
                     return executeDeleteTasks(userInputIndexes);
                 }
-            case SORT:
+            case SORT :
                 return executeSort();
-            case UNDO:
+            case UNDO :
                 return executeUndo();
-            case CLEAR:
+            case CLEAR :
                 return executeClear();
-            case SEARCH:
+            case SEARCH :
                 String searchKeyword = parsedCommand.getSearchKeyword();
                 return executeSearch(searchKeyword);
-            case INVALID:
+            case DONE:
+                if (userInputIndexes.isEmpty()) {
+                    int userInputIndex = parsedCommand.getSelectedIndexNumber();
+                    userInputIndexes.add(userInputIndex);
+                }
+                return executeMarkTaskAsDone(userInputIndexes);
+                
+            case INVALID :
                 return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "invalid"), myTaskList);
-            case EXIT:
+            case EXIT :
                 logger.log(Level.INFO, "exit");
                 System.exit(0);
-            default:
+            default :
                 return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "invalid"), myTaskList);
         }
     }
@@ -126,6 +137,8 @@ public class Logic {
             return COMMAND_TYPE.UNDO;
         } else if (commandTypeString.equalsIgnoreCase("search")) {
             return COMMAND_TYPE.SEARCH;
+        } else if (commandTypeString.equalsIgnoreCase("done")) {
+            return COMMAND_TYPE.DONE;
         } else if (commandTypeString.equalsIgnoreCase("clear")) {
             return COMMAND_TYPE.CLEAR;
         } else if (commandTypeString.equalsIgnoreCase("exit")) {
@@ -257,6 +270,59 @@ public class Logic {
         }
         
     }
+    private FeedbackMessage executeMarkTaskAsDone(ArrayList<Integer> userInputIndexes) throws IOException {
+        logger.log(Level.INFO, "start processing mark command");
+        
+        int taskListSize = myTaskList.size();
+        int numToBeDeleted = userInputIndexes.size();
+        int deletedTaskNum = 0;
+        
+        String indexDeletedSuccessfully = "";
+        String indexDeletedFailed = "";
+        
+        ArrayList<Integer> arrangedIndexes = new ArrayList<Integer>();
+        
+        userInputIndexes.sort(null);
+        for (int i = numToBeDeleted - 1; i >= 0; i--) {
+            arrangedIndexes.add(userInputIndexes.get(i));
+        }
+        
+        for (int i = 0; i < numToBeDeleted; i++) {
+            int userInputIndex = arrangedIndexes.get(i);
+            if (taskListSize < userInputIndex || userInputIndex < 1) {
+                indexDeletedFailed += String.valueOf(userInputIndex + " ");
+            } else {
+                int taskID = getTaskIDFromUserInput(userInputIndex);
+                Tasks deletedTask = getTaskFromTaskID(myTaskList, taskID); //store the task to be deleted
+                
+                try {
+                    storage.deleteTask(taskID);
+                } catch (InterruptedException e) {
+                    logger.log(Level.WARNING, "mark error");
+                    e.printStackTrace();
+                }
+                myTaskList.remove(userInputIndex - 1);
+                
+                // Set up for undo operation
+                Command reversedCommand = new Command("add", deletedTask);
+                reversedCommandHistory.addReversedCommand(reversedCommand);
+                
+                deletedTaskNum++;
+                indexDeletedSuccessfully = String.valueOf(userInputIndex + " ") + indexDeletedSuccessfully;
+                logger.log(Level.INFO, "end of processing mark command");
+            }
+        }
+        
+        if (indexDeletedSuccessfully.isEmpty()) {
+            return new FeedbackMessage(String.format(MESSAGE_DELETED_, indexDeletedFailed, "failed")
+                                       , myTaskList);
+        } else {
+            commandHistory.addCommand(new Command("deleteMulTask", deletedTaskNum));
+            return new FeedbackMessage(String.format(MESSAGE_DELETED_, indexDeletedSuccessfully, "successfully")
+                                       , myTaskList);
+        }
+        
+    }
     
     private FeedbackMessage executeUpdate(Tasks task) throws IOException {
         logger.log(Level.INFO, "start processing update command");
@@ -339,7 +405,6 @@ public class Logic {
                 myTaskList.add(task);
             } else if (lastCommandType == "deleteMulTask"){ //undo delete multiple task
                 int undoDeleteNum = lastCommand.getSelectedIndexNumber();
-                System.out.println(undoDeleteNum);
                 for (int i = 0; i < undoDeleteNum; i++) {
                     Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
                     Tasks task = commandToUndo.getTask();
@@ -361,8 +426,14 @@ public class Logic {
                 commandToUndo = reversedCommandHistory.getLastReversedCommand();
                 storage.appendTask(commandToUndo.getTask());
                 myTaskList.add(commandToUndo.getTask());
-            } else if (lastCommandType == "clear") {
-                
+            } else if (lastCommandType == "clear") {  // undo clear operation
+                int clearedTaskNum = lastCommand.getSelectedIndexNumber();
+                for (int i = 0; i < clearedTaskNum; i++) {
+                    Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
+                    Tasks task = commandToUndo.getTask();
+                    storage.appendTask(task);
+                    myTaskList.add(task);
+                }
             }
             
             logger.log(Level.INFO, "end of processing undo command");
@@ -376,7 +447,16 @@ public class Logic {
         ArrayList<Tasks> previousTaskList = storage.ClearAll();
         int previousTaskListSize = previousTaskList.size();
         
-        commandHistory.addCommand(new Command("clear"));
+        commandHistory.addCommand(new Command("clear", previousTaskListSize));
+        
+        Tasks taskInPreviousTaskList;
+        for (int i = previousTaskListSize - 1; i >= 0; i--) {
+            taskInPreviousTaskList = previousTaskList.get(i);
+            Command reversedCommand = new Command("add", taskInPreviousTaskList);
+            reversedCommandHistory.addReversedCommand(reversedCommand);
+        }
+        
+        myTaskList.clear();
         
         logger.log(Level.INFO, "end of processing clear command");
         return new FeedbackMessage(MESSAGE_CLEAR, myTaskList);

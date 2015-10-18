@@ -4,41 +4,42 @@ import java.util.Stack;
 import Time4WorkParser.Command;
 
 public class CommandHistory {
-	private Stack<Command> commandHistory;
-	private Stack<String> commandTypeList;
-	
-	
-	public CommandHistory() {
-		commandHistory = new Stack<Command>();
-		commandTypeList = new Stack<String>();
-	}
-	
-	public Command getLastCommand() {
-		return commandHistory.pop();
-	}
-	
-	public String getLastCommandType() {
-		return commandTypeList.pop();
-	}
-	
-	public void addCommand(Command recentCommand) {
-		commandHistory.add(recentCommand);
-	}
-	
-	public void addCommandType(String recentCommandType) {
-		commandTypeList.add(recentCommandType);
-	}
-	
-	public int getCommandHistorySize() {
-		return commandTypeList.size();
-	}
-	
-	
-	public boolean isEmpty() {
-		if (commandTypeList.isEmpty()){
-			return true;
-		} else {
-			return false;
-		}
-	}
+    private Stack<Command> reversedCommand;
+    private Stack<Command> commandHistory;
+    
+    
+    public CommandHistory() {
+        reversedCommand = new Stack<Command>();
+        commandHistory = new Stack<Command>();
+    }
+    
+    public Command getLastCommand() {
+        return commandHistory.pop();
+    }
+    
+    public Command getLastReversedCommand() {
+        return reversedCommand.pop();
+    }
+    
+    public void addCommand(Command recentCommand) {
+        commandHistory.add(recentCommand);
+    }
+    
+    public void addReversedCommand(Command recentReversedCommand) {
+        reversedCommand.add(recentReversedCommand);
+    }
+    
+    public int getCommandHistorySize() {
+        return commandHistory.size();
+    }
+    
+    
+    
+    public boolean isEmpty() {
+        if (commandHistory.isEmpty()){
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
