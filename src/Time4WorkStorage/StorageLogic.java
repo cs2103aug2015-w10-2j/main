@@ -43,14 +43,26 @@ public class StorageLogic {
 	
 	//custom path and filename, path has to have escape characters
 	//eg. C:\\user\\Desktop\\myTasks.txt
-	public void createCustomFile(String path) throws IOException {
+	public void createCustomFile(String path, boolean transfer) throws IOException {
 		
 		currentPath = path;
+		
+		ArrayList<Tasks> tempList = new ArrayList<Tasks>();
+		
+		if(transfer) {
+			tempList = getAllTasks();
+		}
 		
 		try {
 			createFile(currentPath);
 		} catch (IOException e) {
 			throw e;
+		}
+		
+		if(transfer) {
+			for(int i=0; i<tempList.size(); i++) {
+				addNewTask(tempList.get(i));
+			}
 		}
 		
 	}
@@ -315,7 +327,7 @@ public class StorageLogic {
 			
 			//wait for garbage collector
 			try {
-				Thread.sleep(500);
+				Thread.sleep(200);
 			} catch (InterruptedException e) {
 				throw e;
 			}
@@ -342,7 +354,6 @@ public class StorageLogic {
 			for(int i=0; i<myTaskList.size(); i++) {
 				String tempLine = gson.toJson(myTaskList.get(i)); 
 			
-				//write new Tasks into file
 				try {
 					bw.write(tempLine);
 					bw.newLine();

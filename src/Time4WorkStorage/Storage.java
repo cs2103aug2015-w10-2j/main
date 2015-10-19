@@ -5,17 +5,37 @@ import java.util.ArrayList;
 
 public class Storage {
 	
+	private static Storage theStorage; 
 	private StorageLogic myLogic = new StorageLogic();
-	
-	//use storage default path, <local directory>/myTasks.txt
-	public Storage() throws IOException {		
-		myLogic.createDefaultFile();		
+	private CustomPathLogic myPath = new CustomPathLogic();
+
+	//use storage default path, <local directory>/myTasks.txt unless there's a previous saved path
+	private Storage() throws IOException {
+		
+		String customPath = "";
+		if(myPath.savedPathExists()) {
+			customPath = myPath.readCustomPath();
+			myLogic.createCustomFile(customPath, false);
+		} else {
+			myLogic.createDefaultFile();
+		}
 	}
 	
 	//custom path and filename, path has to have escape characters
 	//eg. C:\\user\\Desktop\\myTasks.txt
-	public Storage(String path) throws IOException {		
-		myLogic.createCustomFile(path);		
+	public void setCustomPath(String path) throws IOException {
+		
+		String customPath = "";
+		if(myPath.savedPathExists()) {
+			customPath = myPath.readCustomPath();
+		}
+
+		String newPath = path.replace("\\", "\\\\");
+		
+		if(!newPath.equalsIgnoreCase(customPath)) {
+			myLogic.createCustomFile(path, true);	
+			myPath.writeCustomPath(path);
+		}
 	}
 	
 	//read from file, deserialize and returns all tasks
@@ -95,6 +115,18 @@ public class Storage {
 		} catch (IOException | InterruptedException e) {
 			throw e;
 		}		
+	}
+	
+	
+	public static Storage getInstance() throws IOException {
+		
+		try {
+			theStorage = new Storage();
+		} catch (IOException e) {
+			throw e;
+		}
+		
+		return theStorage;
 	}
 	
 }
