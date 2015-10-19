@@ -374,114 +374,9 @@ public class StorageLogic {
 		
 	}
 
-	//searches task description for matching task and returns all matches, null if no match
-	public ArrayList<Tasks> searchDescription(String searchString) throws IOException {
-		
-		try {
-			openWriterReader();
-		} catch (IOException e) {
-			throw e;
-		}
-		
-		
-		ArrayList<Tasks> tempList;
-		try {
-			tempList = getAllTasks();
-		} catch (IOException e) {
-			throw e;
-		}
-		
-		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
-		
-		for(int i=0; i<tempList.size(); i++) {
-			if(tempList.get(i).getDescription().toUpperCase().contains(searchString.toUpperCase())) {
-				myTaskList.add(tempList.get(i));
-			}
-		}
-		
-		try {
-			closeWriterReader();
-		} catch (IOException e) {
-			throw e;
-		}
-		
-		return myTaskList;
-	}
-	
-	//search and returns task by taskID
-	private Tasks SearchTaskID(int taskID) throws FileNotFoundException, IOException{
-		
-		try {
-			openWriterReader();
-		} catch (IOException e) {
-			throw e;
-		}
-
-		
-		ArrayList<Tasks> tempList = getAllTasks();
-		Tasks myTask = null;
-		
-		for(int i=0; i<tempList.size(); i++) {
-			if(tempList.get(i).getTaskID() == taskID) {
-				myTask = tempList.get(i);
-			}
-		}
-		
-		try {
-			closeWriterReader();
-		} catch (IOException e) {
-			throw e;
-		}
-		
-		return myTask;
-	
-	}
-	/*
-	//AKA update, replaces task with same taskID
-	public Tasks replaceTask(int taskID, Tasks updatedTask) throws IOException, InterruptedException {
-
-		Tasks oldTask = null;
-		
-		try {
-			openWriterReader();
-		} catch (IOException e) {
-			throw e;
-		}
-		
-		try {
-			oldTask = SearchTaskID(taskID);
-		} catch (IOException e) {
-			throw e;
-		}
-		
-		try {
-			openWriterReader();
-		} catch (IOException e) {
-			throw e;
-		}
-		
-		try {
-			delete(taskID);
-			addNewTask(updatedTask);
-		} catch (IOException e) {
-			throw e;
-		} catch (InterruptedException e) {
-			throw e;
-		}
-		
-		try {
-			closeWriterReader();
-		} catch (IOException e) {
-			throw e;
-		}
-		
-		return oldTask;
-	}
-	*/
-	
-	//returns list of completed/incomplete tasks based on boolean input
-	public ArrayList<Tasks> searchComplete(boolean complete) throws IOException {
-		
+	//sets task as completed, returns the target task
+	public Tasks setCompleted(int taskID, boolean status) throws IOException, InterruptedException {
+		Tasks editedTask = null;
 		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
 		
 		try {
@@ -489,63 +384,82 @@ public class StorageLogic {
 		} catch (IOException e) {
 			throw e;
 		}
-
 		
-		ArrayList<Tasks> tempList = null;
+		boolean needUpdate = false;
 		try {
-			tempList = getAllTasks();
+			myTaskList = getAllTasks();
 		} catch (IOException e) {
 			throw e;
 		}
 		
-		for(int i=0; i<tempList.size(); i++) {
-			if(tempList.get(i).isCompleted() == complete) {
-				myTaskList.add(tempList.get(i));
+		for(int i=0; i<myTaskList.size(); i++) {
+			if(myTaskList.get(i).getTaskID() == taskID) {
+				needUpdate = true;
+				myTaskList.get(i).setCompleted(status);
+				editedTask = myTaskList.get(i);				
+			}
+			
+		}
+		
+		//taskID to be deleted is found
+		if(needUpdate) {
+			
+			try {
+				closeWriterReader();
+				System.gc();
+			} catch (IOException e) {
+				throw e;
+			}
+			
+			//wait for garbage collector
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				throw e;
+			}
+			
+			//delete old file
+			if (!myFile.delete()) {
+		        System.out.println("Could not delete file");
+		    } 
+			
+			try {
+				createFile(currentPath);
+			} catch (IOException e) {
+				throw e;
+			}
+			
+			try {
+				openWriterReader();
+			} catch (IOException e) {
+				throw e;
+			}
+			
+			
+			
+			for(int i=0; i<myTaskList.size(); i++) {
+				String tempLine = gson.toJson(myTaskList.get(i)); 
+			
+				try {
+					bw.write(tempLine);
+					bw.newLine();
+				}  catch (IOException e) {
+					throw e;
+				}
 			}
 		}
 		
 		try {
 			closeWriterReader();
+			System.gc();
 		} catch (IOException e) {
 			throw e;
 		}
+			
+		return editedTask;
 		
-		return myTaskList;
 	}
 
-	//returns list of specified tasks type
-	public ArrayList<Tasks> searchTaskType(int type) throws IOException {
-		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
-		
-		try {
-			openWriterReader();
-		} catch (IOException e) {
-			throw e;
-		}
-
-		
-		ArrayList<Tasks> tempList = null;
-		try {
-			tempList = getAllTasks();
-		} catch (IOException e) {
-			throw e;
-		}
-		
-		for(int i=0; i<tempList.size(); i++) {
-			if(tempList.get(i).getType() == type) {
-				myTaskList.add(tempList.get(i));
-			}
-		}
-		
-		try {
-			closeWriterReader();
-		} catch (IOException e) {
-			throw e;
-		}
-		
-		return myTaskList;
-	}
-	
 	//deletes the file and recreates it, returning all the deleted tasks
 	public ArrayList<Tasks> clear() throws IOException, InterruptedException {
 		
@@ -572,7 +486,7 @@ public class StorageLogic {
 		
 		//wait for garbage collector
 		try {
-			Thread.sleep(500);
+			Thread.sleep(200);
 		} catch (InterruptedException e) {
 			throw e;
 		}

@@ -65,15 +65,6 @@ public class Storage {
 		}		
 	}
 	
-	//search and returns entries with task description matching search String, null if no matches
-	public ArrayList<Tasks> SearchTask(String searchString) throws IOException{		
-		try {
-			return myLogic.searchDescription(searchString);
-		} catch (IOException e) {
-			throw e;
-		}		
-	}
-	
 	//replaces specified taskID with updated Tasks and returns "old" updated task
 	public Tasks UpdateTask(int taskID, Tasks updatedTask) throws Exception{
 		
@@ -90,20 +81,20 @@ public class Storage {
 		return oldTask;
 	}
 	
-	//search and returns list of completed/incomplete tasks based on boolean input
-	public ArrayList<Tasks> SearchCompleteStatus(boolean complete) throws IOException{		
+	//sets task as complete and returns the task
+	public Tasks SetCompleted(int taskID) throws Exception{		
 		try {
-			return myLogic.searchComplete(complete);
-		} catch (IOException e) {
+			return myLogic.setCompleted(taskID, true);
+		} catch (IOException | InterruptedException e) {
 			throw e;
 		}		
 	}
 	
-	//search and returns list of completed/incomplete tasks based on boolean input
-	public ArrayList<Tasks> SearchTaskType(int type) throws IOException{		
+	//sets task as incomplete and returns the task
+	public Tasks SetIncompleted(int taskID) throws Exception{		
 		try {
-			return myLogic.searchTaskType(type);
-		} catch (IOException e) {
+			return myLogic.setCompleted(taskID, false);
+		} catch (IOException | InterruptedException e) {
 			throw e;
 		}		
 	}
