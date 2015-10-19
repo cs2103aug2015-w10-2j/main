@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import Time4WorkParser.Command;
 import Time4WorkParser.Parser;
+import Time4WorkStorage.FilterTask;
 import Time4WorkStorage.Storage;
 import Time4WorkStorage.Tasks;
 
@@ -35,6 +36,7 @@ public class Logic {
     // =========================================================================
     
     private Storage storage;
+    private FilterTask myFilter = new FilterTask();
     private ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
     private ArrayList<Tasks> fullTaskList = new ArrayList<Tasks>();
     private CommandHistory commandHistory = new CommandHistory();
@@ -48,7 +50,7 @@ public class Logic {
     // Constructor
     public Logic() {
         try {
-            storage = new Storage();
+            storage = Storage.getInstance();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -337,7 +339,7 @@ public class Logic {
     
     private FeedbackMessage executeSearch(String keyword) throws IOException {
         logger.log(Level.INFO, "start processing search command");
-        ArrayList<Tasks> searchList = storage.SearchTask(keyword);
+        ArrayList<Tasks> searchList = myFilter.searchDescription(fullTaskList, keyword);
         
         if (searchList.size() != 0) {
             myTaskList = searchList;
