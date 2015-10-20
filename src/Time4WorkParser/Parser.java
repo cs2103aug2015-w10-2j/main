@@ -52,6 +52,8 @@ public class Parser {
       command = createClearCommand();
     } else if (userCommand.toUpperCase().equals("DONE")) {
       command = createDoneCommand(arguments);
+    } else if (userCommand.toUpperCase().equals("STORE")) {
+      command = createStoreCommand(arguments);
     } else if (userCommand.toUpperCase().equals("EXIT")) {
       command = createExitCommand();
     } else {
@@ -195,7 +197,12 @@ public class Parser {
     
     containsDash = checkIfContainsDash(arguments, argumentsLength);
     
-    command = getCommandForDelete(arguments, containsDash, argumentsLength);
+    if (argumentsLength == 1 && !containsDash){
+      int indexToBeDeleted = Integer.parseInt(arguments.get(0));
+      command = new Command("delete", indexToBeDeleted);
+    } else {
+      command = new Command("delete", getArrayListForDoneOrDelete(arguments, containsDash, argumentsLength));
+    }
     
     return command;
   }
@@ -207,21 +214,14 @@ public class Parser {
     return false;
   }
   
-  private Command getCommandForDelete(ArrayList<String> arguments, boolean containsDash, int argumentsLength) {
-    Command command;
+  private ArrayList<Integer> getArrayListForDoneOrDelete(ArrayList<String> arguments, boolean containsDash, int argumentsLength) {
+    ArrayList<Integer> indexOfItems = new ArrayList<Integer>();
+    
     if (argumentsLength > 1 && !containsDash) {
-      ArrayList<Integer> indexOfItemsToBeDeleted = new ArrayList<Integer>();
       for (int i = 0; i < argumentsLength; i++){
-        indexOfItemsToBeDeleted.add(Integer.parseInt(arguments.get(i)));
+        indexOfItems.add(Integer.parseInt(arguments.get(i)));
       }
-      command = new Command("delete", indexOfItemsToBeDeleted);
-    } else if (argumentsLength == 1 && !containsDash) {
-      int indexToBeDeleted = Integer.parseInt(arguments.get(0));
-      
-      command = new Command("delete", indexToBeDeleted);
     } else {
-      ArrayList<Integer> indexOfItemsToBeDeleted = new ArrayList<Integer>();
-      
       String[] strArray = arguments.get(0).trim().split("-");
       int startPoint = Integer.parseInt(strArray[0]);
       int endPoint = Integer.parseInt(strArray[1]);
@@ -231,11 +231,10 @@ public class Parser {
         endPoint = temp;
       }
       for (int i = startPoint; i <= endPoint; i++){
-        indexOfItemsToBeDeleted.add(i);
+        indexOfItems.add(i);
       }
-      command = new Command("delete", indexOfItemsToBeDeleted);
     }
-    return command;
+    return indexOfItems;
   }
   
   private Command createUpdateCommand(ArrayList<String> arguments) {
@@ -283,39 +282,22 @@ public class Parser {
     
     containsDash = checkIfContainsDash(arguments, argumentsLength);
     
-    command = getCommandForDone(arguments, containsDash, argumentsLength);
+    if (argumentsLength == 1 && !containsDash){
+      int indexToBeMarkedDone = Integer.parseInt(arguments.get(0));
+      command = new Command("done", indexToBeMarkedDone);
+    } else {
+      command = new Command("done", getArrayListForDoneOrDelete(arguments, containsDash, argumentsLength));
+    }
     
     return command;
   }
   
-  private Command getCommandForDone(ArrayList<String> arguments, boolean containsDash, int argumentsLength) {
-    Command command;
-    if (argumentsLength > 1 && !containsDash) {
-      ArrayList<Integer> indexOfItemsToBeMarkedDone = new ArrayList<Integer>();
-      for (int i = 0; i < argumentsLength; i++){
-        indexOfItemsToBeMarkedDone.add(Integer.parseInt(arguments.get(i)));
-      }
-      command = new Command("done", indexOfItemsToBeMarkedDone);
-    } else if (argumentsLength == 1 && !containsDash) {
-      int indexToBeMarkedDone = Integer.parseInt(arguments.get(0));
-      
-      command = new Command("done", indexToBeMarkedDone);
-    } else {
-      ArrayList<Integer> indexOfItemsToBeMarkedDone = new ArrayList<Integer>();
-      
-      String[] strArray = arguments.get(0).trim().split("-");
-      int startPoint = Integer.parseInt(strArray[0]);
-      int endPoint = Integer.parseInt(strArray[1]);
-      if (startPoint > endPoint){
-        int temp = startPoint;
-        startPoint = endPoint;
-        endPoint = temp;
-      }
-      for (int i = startPoint; i <= endPoint; i++){
-        indexOfItemsToBeMarkedDone.add(i);
-      }
-      command = new Command("done", indexOfItemsToBeMarkedDone);
-    }
+  private Command createStoreCommand(ArrayList<String> arguments){
+    String storageLocation = arguments.get(0);
+    String escapedStorageLocation = storageLocation.replace("\\", "\\\\");
+    
+    Command command = new Command("store", escapedStorageLocation);
+    
     return command;
   }
   
