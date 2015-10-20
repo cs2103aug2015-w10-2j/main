@@ -55,13 +55,13 @@ public class FilterTaskTest {
 		tempTask3 = new FloatingTask("I'm a floating task!");
 		myList.add(tempTask3);
 		
-		assertEquals(myFilter.searchCompleted(myList, true).size(), 0);
-		assertEquals(myFilter.searchCompleted(myList, false).size(), 3);
+		assertEquals(myFilter.searchCompleted(myList).size(), 0);
+		assertEquals(myFilter.searchNotCompleted(myList).size(), 3);
 		
 		myList.get(1).setCompleted(true);
 		
-		assertEquals(myFilter.searchCompleted(myList, true).size(), 1);
-		assertEquals(myFilter.searchCompleted(myList, false).size(), 2);
+		assertEquals(myFilter.searchCompleted(myList).size(), 1);
+		assertEquals(myFilter.searchNotCompleted(myList).size(), 2);
 	}
 	
 	@Test
