@@ -1,1 +1,52 @@
 
+.background {
+
+}
+
+.label {
+    -fx-font-size: 10pt;
+    -fx-font-family: "Verdana";
+}
+
+.label-bright {
+    -fx-font-size: 12pt;
+    -fx-font-family: "Verdana";
+}
+
+.label-header {
+    -fx-font-size: 11pt;
+    -fx-font-family: "Verdana";
+    -fx-opacity: 1;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: transparent;
+    -fx-padding: 3 3 3 3;
+}
+
+.table-view .column-header, .table-view .filler {
+    -fx-size: 11.5;
+    -fx-border-width: 0 0 1 0;
+    -fx-background-color: transparent;
+    -fx-border-color:
+        transparent
+        transparent
+        derive(-fx-base, 80%)
+        transparent;
+    -fx-border-insets: 0 10 1 0;
+}
+
+.table-view .column-header .label {
+    -fx-font-size: 11.5pt;
+    -fx-font-family: "Verdana";
+    -fx-alignment: center;
+}
+
+.table-view:focused .table-row-cell:filled:focused:selected {
+    -fx-background-color: -fx-focus-color;
+}
+
+.text-field {
+    -fx-font-size: 10pt;
+    -fx-font-family: "Georgia";
+}
