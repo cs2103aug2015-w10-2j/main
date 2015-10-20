@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -7,24 +8,25 @@
 
 <AnchorPane prefHeight="500.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Time4WorkUI.TaskController">
    <children>
-      <SplitPane dividerPositions="0.8313253012048193" layoutX="-126.0" layoutY="-260.0" orientation="VERTICAL" prefHeight="100.0" prefWidth="236.0" stylesheets="@application.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <BorderPane prefHeight="500.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <SplitPane dividerPositions="0.7911646586345381" layoutX="-126.0" layoutY="-260.0" orientation="VERTICAL" prefHeight="100.0" prefWidth="236.0" stylesheets="@application.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="452.0" prefWidth="598.0">
                <children>
                   <TableView fx:id="taskTable" layoutX="99.0" layoutY="66.0" prefHeight="411.0" prefWidth="598.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <columns>
-                      <TableColumn fx:id="indexCol" prefWidth="30.0" text="ID" />
-                      <TableColumn fx:id="descriptionCol" prefWidth="374.0" text="Task Description" />
-                        <TableColumn fx:id="fromCol" prefWidth="96.0" text="From" />
-                        <TableColumn fx:id="toCol" prefWidth="96.0" text="To" />
+                      <TableColumn fx:id="indexCol" maxWidth="51.0" minWidth="34.0" prefWidth="39.0" text="ID" />
+                      <TableColumn fx:id="descriptionCol" maxWidth="339.0" minWidth="322.0" prefWidth="350.0" text="Task Description" />
+                        <TableColumn fx:id="fromCol" maxWidth="108.0" minWidth="105.0" prefWidth="108.0" text="From" />
+                        <TableColumn fx:id="toCol" maxWidth="108.0" minWidth="105.0" prefWidth="108.0" text="To" />
                     </columns>
                   </TableView>
                </children>
             </AnchorPane>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="168.0" prefWidth="598.0">
+          <AnchorPane minHeight="90.0" minWidth="0.0" prefWidth="598.0" SplitPane.resizableWithParent="false">
                <children>
-                  <TextField fx:id="userCommand" layoutX="13.0" layoutY="41.0" prefHeight="31.0" prefWidth="570.0" />
-                  <Label fx:id="feedback" layoutX="14.0" layoutY="11.0" prefHeight="23.0" prefWidth="570.0" AnchorPane.bottomAnchor="47.0" />
+                  <TextField fx:id="userCommand" layoutX="13.0" layoutY="41.0" minHeight="37.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" />
+                  <Label fx:id="feedback" layoutX="14.0" layoutY="11.0" minHeight="29.0" prefHeight="29.0" prefWidth="29.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="5.0" />
                </children>
             </AnchorPane>
         </items>
