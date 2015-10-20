@@ -21,7 +21,7 @@ public class FilterTask {
 	}
 	
 	
-	public ArrayList<Tasks> searchCompleted(ArrayList<Tasks> myList, boolean completed) {
+	private ArrayList<Tasks> searchCompletion(ArrayList<Tasks> myList, boolean completed) {
 		
 		
 		ArrayList<Tasks> resultList = new ArrayList<Tasks>();
@@ -33,6 +33,14 @@ public class FilterTask {
 		}
 		
 		return resultList;
+	}
+	
+	public ArrayList<Tasks> searchCompleted(ArrayList<Tasks> myList) {
+		return searchCompletion(myList, true);
+	}
+	
+	public ArrayList<Tasks> searchNotCompleted(ArrayList<Tasks> myList) {
+		return searchCompletion(myList, false);
 	}
 	
 
