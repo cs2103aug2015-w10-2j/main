@@ -27,6 +27,7 @@ public class Logic {
     private static final String MESSAGE_DONE_ = "Mark task %1$s as done";
     private static final String MESSAGE_CLEAR = "All task cleared successfully!";
     private static final String MESSAGE_UNDO_ = "Undo %1$s!";
+    private static final String MESSAGE_CREATE_PATH_ = "Personalize storage path %1$s !";
     
     private static final String LOGIC_INIT = "Logic initialized";
     private static final Logger logger = Logger.getLogger(Logic.class.getName());
@@ -45,7 +46,7 @@ public class Logic {
     
     
     enum COMMAND_TYPE {
-        ADD, UPDATE, DELETE, SEARCH, SORT, INVALID, UNDO, DONE, CLEAR, EXIT
+        ADD, UPDATE, DELETE, SEARCH, SORT, STORE, INVALID, UNDO, DONE, CLEAR, EXIT
     };
     
     // Constructor
@@ -123,7 +124,9 @@ public class Logic {
                     userInputIndexes.add(userInputIndex);
                 }
                 return executeMarkTaskAsDone(userInputIndexes);
-                
+            case STORE:
+                String storagePath = parsedCommand.getSearchKeyword();
+                return executeCreatePath(storagePath);
             case INVALID :
                 return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "invalid"), myTaskList);
             case EXIT :
@@ -147,6 +150,8 @@ public class Logic {
             return COMMAND_TYPE.UNDO;
         } else if (commandTypeString.equalsIgnoreCase("search")) {
             return COMMAND_TYPE.SEARCH;
+        } else if (commandTypeString.equalsIgnoreCase("store")) {
+            return COMMAND_TYPE.STORE;
         } else if (commandTypeString.equalsIgnoreCase("done")) {
             return COMMAND_TYPE.DONE;
         } else if (commandTypeString.equalsIgnoreCase("clear")) {
@@ -464,6 +469,13 @@ public class Logic {
         
         logger.log(Level.INFO, "end of processing clear command");
         return new FeedbackMessage(MESSAGE_CLEAR, myTaskList);
+    }
+    
+    public FeedbackMessage executeCreatePath(String storagePath) throws IOException {
+        storage.setCustomPath(storagePath);
+        isFirstCommand = true;
+        return new FeedbackMessage(String.format(MESSAGE_CREATE_PATH_, "successfully"), myTaskList);
+        
     }
     
     // =========================================================================
