@@ -25,8 +25,8 @@ public class Display {
 		} else if (task instanceof FloatingTask) {
 			return "";
 		}
-		String date = taskDuration.getEndDate();
-		String time = taskDuration.getEndTime();
+		String date = taskDuration.getStartDate();
+		String time = taskDuration.getStartTime();
 		String dateDisplay = date.substring(0, 2) + "/" + date.substring(2, 4) + "/" + date.substring(4);
 
 		if (time.length() < 3) {
