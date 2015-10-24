@@ -1,4 +1,5 @@
 package Time4WorkParser;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -293,7 +294,7 @@ public class Parser {
   }
   
   private Command createStoreCommand(ArrayList<String> arguments){
-    String storageLocation = arguments.get(0);
+	String storageLocation = String.join(" ", arguments);
     String escapedStorageLocation = storageLocation.replace("\\", "\\\\");
     
     Command command = new Command("store", escapedStorageLocation);
