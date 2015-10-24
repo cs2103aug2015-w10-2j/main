@@ -55,6 +55,8 @@ public class Parser {
       command = createDoneCommand(arguments);
     } else if (userCommand.toUpperCase().equals("STORE")) {
       command = createStoreCommand(arguments);
+    } else if (userCommand.toUpperCase().equals("DISPLAY")) {
+      command = createDisplayCommand();
     } else if (userCommand.toUpperCase().equals("EXIT")) {
       command = createExitCommand();
     } else {
@@ -274,6 +276,12 @@ public class Parser {
     Command command = new Command("clear");
     
     return command;
+  }
+  
+  private Command createDisplayCommand(){
+	 Command command = new Command("display");
+	    
+	 return command;
   }
   
   private Command createDoneCommand(ArrayList<String> arguments){
