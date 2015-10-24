@@ -142,6 +142,7 @@ public class Parser {
   
   private String createDescription(ArrayList<String> parameters,int end){
     ArrayList<String> description = getDescriptionArray(parameters, end);
+    description.set(end, description.get(end).replaceAll(".$", ""));
     String descriptionString = String.join(" ", description);
     return descriptionString;
   }
@@ -149,7 +150,7 @@ public class Parser {
   private ArrayList<String> createNewListWithCombinedDescription(ArrayList<String> parameters){
     
     int lastWordIndex = findIndexOfLastWord(parameters);
-    String description = createDescription(parameters, lastWordIndex).replace(".", "");
+    String description = createDescription(parameters, lastWordIndex);
     ArrayList<String> timeArray = getTimeArray(parameters, lastWordIndex);
     ArrayList<String> resultArray = new ArrayList<String>();
     resultArray.add(description);
