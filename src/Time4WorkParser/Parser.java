@@ -142,19 +142,29 @@ public class Parser {
   
   private String createDescription(ArrayList<String> parameters,int end){
     ArrayList<String> description = getDescriptionArray(parameters, end);
-    String descriptionString = String.join(" ", description);
+    String descriptionString;
+    String lastWord = description.get(end);
+    if(lastWord.endsWith(".")){
+    	description.set(end, lastWord.replaceAll(".$", ""));
+    	descriptionString = String.join(" ", description);
+    } else {
+    	descriptionString = null;
+    }
     return descriptionString;
   }
   
   private ArrayList<String> createNewListWithCombinedDescription(ArrayList<String> parameters){
     
+	ArrayList<String> resultArray = new ArrayList<String>();
     int lastWordIndex = findIndexOfLastWord(parameters);
-    String description = createDescription(parameters, lastWordIndex).replace(".", "");
-    ArrayList<String> timeArray = getTimeArray(parameters, lastWordIndex);
-    ArrayList<String> resultArray = new ArrayList<String>();
-    resultArray.add(description);
-    resultArray.addAll(timeArray);
-    
+    String description = createDescription(parameters, lastWordIndex);
+    if (!description.equals(null)){
+    	ArrayList<String> timeArray = getTimeArray(parameters, lastWordIndex);
+    	resultArray.add(description);
+    	resultArray.addAll(timeArray);
+    } else {
+    	resultArray = null;
+    }
     return resultArray;
   }
   
@@ -179,7 +189,6 @@ public class Parser {
       Duration durationPeriod = new Duration(arguments.get(1), arguments.get(2), arguments.get(3), arguments.get(4));
       task = new DurationTask(descriptionOfTask, durationPeriod);
     }
-    
     return task;
   }
   
@@ -188,7 +197,11 @@ public class Parser {
     
     ArrayList<String> combinedDescriptionList = createNewListWithCombinedDescription(arguments);
     
-    command = new Command("add", createTaskListForAddingOrUpdating(combinedDescriptionList));
+    if (!combinedDescriptionList.equals(null)){
+    	command = new Command("add", createTaskListForAddingOrUpdating(combinedDescriptionList));
+    } else {
+    	command = createInvalidCommand();
+    }
     
     return command;
   }
@@ -249,11 +262,14 @@ public class Parser {
     
     ArrayList<String> combinedDescriptionList = createNewListWithCombinedDescription(withoutTaskIDArguments);
     
-    task = createTaskListForAddingOrUpdating(combinedDescriptionList);
-    task.setTaskID(taskID);
-    
-    command = new Command("update", task);
-    
+    if (!combinedDescriptionList.equals(null)){
+        task = createTaskListForAddingOrUpdating(combinedDescriptionList);
+        task.setTaskID(taskID);
+        command = new Command("update", task);
+    } else {
+    	command = createInvalidCommand();
+    }
+ 
     return command;
   }
   
