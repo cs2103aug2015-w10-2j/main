@@ -24,7 +24,7 @@ public class StorageLogic {
 	
 	private final int DeadlineType = 1;
 	private final int DurationType = 2;
-	private final int BlockedType = 3;
+	//private final int BlockedType = 3;
 	private final int FloatingType = 4;
 	private final String defPath = "myTasks.txt";
 	
@@ -44,15 +44,19 @@ public class StorageLogic {
 	//custom path and filename, path has to have escape characters
 	//eg. C:\\user\\Desktop\\myTasks.txt
 	public void createCustomFile(String path, boolean transfer) throws IOException {
-		
-		currentPath = path;
-		
+			
 		ArrayList<Tasks> tempList = new ArrayList<Tasks>();
 		
 		if(transfer) {
 			tempList = getAllTasks();
+			try {
+				deleteDataFile();
+			} catch (IOException e) {
+				throw e;
+			}
 		}
 		
+		currentPath = path;		
 		try {
 			createFile(currentPath);
 		} catch (IOException e) {
@@ -115,6 +119,14 @@ public class StorageLogic {
 	//reads and return all tasks in file
 	public ArrayList<Tasks> getAllTasks() throws IOException {
 		
+		if(!myFile.exists()) {
+			try {
+				createFile(currentPath);
+			} catch (IOException e) {
+				throw e;
+			}
+		}
+		
 		try {
 			openWriterReader();
 		} catch (IOException e) {
@@ -176,6 +188,14 @@ public class StorageLogic {
 	//adds new task at the end of file, generates taskID if not present
 	public Tasks addNewTask(Tasks newTask) throws IOException {
 		
+		if(!myFile.exists()) {
+			try {
+				createFile(currentPath);
+			} catch (IOException e) {
+				throw e;
+			}
+		}
+		
 		try {
 			openWriterReader();
 		} catch (IOException e) {
@@ -228,6 +248,15 @@ public class StorageLogic {
 		
 		int largestID = 0;
 		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
+		
+
+		if(!myFile.exists()) {
+			try {
+				createFile(currentPath);
+			} catch (IOException e) {
+				throw e;
+			}
+		}
 		
 		try {
 			openWriterReader();
@@ -292,6 +321,14 @@ public class StorageLogic {
 		Tasks deletedTask = null;
 		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
 		
+		if(!myFile.exists()) {
+			try {
+				createFile(currentPath);
+			} catch (IOException e) {
+				throw e;
+			}
+		}
+		
 		try {
 			openWriterReader();
 		} catch (IOException e) {
@@ -305,7 +342,7 @@ public class StorageLogic {
 			throw e;
 		}
 		
-		//find if taskID to be deleted is found
+
 		for(int i=0; i<myTaskList.size(); i++) {
 			if(myTaskList.get(i).getTaskID() == taskID) {
 				needDelete = true;
@@ -320,22 +357,14 @@ public class StorageLogic {
 			
 			try {
 				closeWriterReader();
-				System.gc();
 			} catch (IOException e) {
 				throw e;
 			}
-			
-			//wait for garbage collector
 			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e) {
+				deleteDataFile();
+			} catch (IOException e) {
 				throw e;
 			}
-			
-			//delete old file
-			if (!myFile.delete()) {
-		        System.out.println("Could not delete file");
-		    } 
 			
 			try {
 				createFile(currentPath);
@@ -365,7 +394,6 @@ public class StorageLogic {
 		
 		try {
 			closeWriterReader();
-			System.gc();
 		} catch (IOException e) {
 			throw e;
 		}
@@ -379,6 +407,14 @@ public class StorageLogic {
 		Tasks editedTask = null;
 		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
 		
+		if(!myFile.exists()) {
+			try {
+				createFile(currentPath);
+			} catch (IOException e) {
+				throw e;
+			}
+		}
+				
 		try {
 			openWriterReader();
 		} catch (IOException e) {
@@ -406,22 +442,14 @@ public class StorageLogic {
 			
 			try {
 				closeWriterReader();
-				System.gc();
 			} catch (IOException e) {
 				throw e;
 			}
-			
-			//wait for garbage collector
 			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e) {
+				deleteDataFile();
+			} catch (IOException e) {
 				throw e;
 			}
-			
-			//delete old file
-			if (!myFile.delete()) {
-		        System.out.println("Could not delete file");
-		    } 
 			
 			try {
 				createFile(currentPath);
@@ -451,7 +479,6 @@ public class StorageLogic {
 		
 		try {
 			closeWriterReader();
-			System.gc();
 		} catch (IOException e) {
 			throw e;
 		}
@@ -464,6 +491,15 @@ public class StorageLogic {
 	public ArrayList<Tasks> clear() throws IOException, InterruptedException {
 		
 		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
+		
+
+		if(!myFile.exists()) {
+			try {
+				createFile(currentPath);
+			} catch (IOException e) {
+				throw e;
+			}
+		}
 		
 		try {
 			openWriterReader();
@@ -479,22 +515,15 @@ public class StorageLogic {
 		
 		try {
 			closeWriterReader();
-			System.gc();
 		} catch (IOException e) {
 			throw e;
 		}
 		
-		//wait for garbage collector
 		try {
-			Thread.sleep(200);
-		} catch (InterruptedException e) {
+			deleteDataFile();
+		} catch (IOException e) {
 			throw e;
 		}
-		
-		//delete old file
-		if (!myFile.delete()) {
-	        throw new IOException("File cannot be deleted!");
-	    } 
 		
 		try {
 			createFile(currentPath);
@@ -504,5 +533,36 @@ public class StorageLogic {
 					
 		return myTaskList;
 		
-	}	
+	}
+	
+	public void deleteDataFile() throws IOException {
+		
+		try {
+			closeWriterReader();
+			fr.close();
+			br.close();
+		} catch (IOException e) {
+			throw e;
+		}
+		
+		System.gc();
+		
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		if (!myFile.delete()) {
+			throw new IOException("Could not delete file");
+	    } 
+	}
+	
+	public String getCurrentPath() {
+		return currentPath;
+	}
+
+	public void setCurrentPath(String currentPath) {
+		this.currentPath = currentPath;
+	}
+
 }

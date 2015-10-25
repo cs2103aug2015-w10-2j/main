@@ -120,4 +120,12 @@ public class Storage {
 		return theStorage;
 	}
 	
+	public void deleteCustomPathFile() throws IOException {
+		try {
+			myPath.deleteCustomPathFile();
+		} catch (IOException e) {
+			throw e;
+		}
+	}
+	
 }

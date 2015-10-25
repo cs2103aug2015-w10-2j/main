@@ -71,8 +71,32 @@ public class CustomPathLogic {
 				throw e;
 			}
 		} 
-		return savedPath;
+		return savedPath;		
+	}
+	
+	//delete path file
+	public void deleteCustomPathFile() throws IOException {
 		
+		try {
+			closeReader();
+			closeWriter();
+			fr.close();
+			br.close();
+		} catch (IOException e) {
+			throw e;
+		}
+		
+		System.gc();
+		
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		if (!pathFile.delete()) {
+			throw new IOException("Could not delete file");
+	    } 
 	}
 	
 	private void openWriter() throws IOException, FileNotFoundException{
@@ -93,8 +117,7 @@ public class CustomPathLogic {
 		} catch (FileNotFoundException e) {
 			throw new FileNotFoundException("Reader cannot be created. File may be is missing");
 		}
-	}
-	
+	}	
 
 	private void closeWriter() throws IOException {
 
@@ -112,6 +135,6 @@ public class CustomPathLogic {
 		} catch (IOException e) {
 			throw new IOException("Unable to close reader");
 		}
-}
+	}
 
 }

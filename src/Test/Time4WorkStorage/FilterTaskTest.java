@@ -16,7 +16,7 @@ import Time4WorkStorage.Tasks;
 public class FilterTaskTest {
 	
 	public ArrayList<Tasks> myList = new ArrayList<Tasks>();
-	public Tasks tempTask1, tempTask2, tempTask3 = null;
+	public Tasks tempTask1, tempTask2, tempTask3, tempTask4 = null;
 	public FilterTask myFilter = new FilterTask();
 	
 	@Test
@@ -39,6 +39,15 @@ public class FilterTaskTest {
 		
 		myList.add(tempTask1);
 		assertEquals(myFilter.searchDescription(myList, "DURATION").size(), 2);
+		
+		assertEquals(myFilter.searchDescription(myList, "i").size(), 4);
+		tempTask4 = new FloatingTask("This doesn't start with I but contains I");
+		myList.add(tempTask4);
+		
+		assertEquals(myFilter.searchDescription(myList, "i").size(), 4);
+		assertEquals(myFilter.searchDescription(myList, "i t").size(), 5);
+		assertEquals(myFilter.searchDescription(myList, "task DOESN'T").size(), 5);
+		assertEquals(myFilter.searchDescription(myList, "nonexistent DOESN'T").size(), 1);
 	}
 	
 	@Test
