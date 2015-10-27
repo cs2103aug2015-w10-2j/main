@@ -29,14 +29,12 @@ public class Display {
 		}
 		String date = taskDuration.getStartDate();
 		String time = taskDuration.getStartTime();
-		String dateDisplay = date.substring(0, 2) + "/" + date.substring(2, 4) + "/" + date.substring(4);
-
+		
 		if (time.length() < 3) {
 			time += "00";
 		}
 
-		String dateDisplay = dateFormatter(date);
-		startDuration += dateDisplay + "  " + timeDisplay;
+		startDuration += dateFormater(date + " " + time);
 		return startDuration;
 	}
 
@@ -59,16 +57,14 @@ public class Display {
 			time += "00";
 		}
 
-		String dateDisplay = dateFormatter(date);
-		String timeDisplay = time.substring(0, 2) + ":" + time.substring(2, 4);
-		endDuration += dateDisplay + "  " + timeDisplay;
+		endDuration += dateFormatter(date + " " + time);
 		return endDuration;
 	}
 
 	public String dateFormatter(String dateInString){
 		String dateFormatted = "";
-		SimpleDateFormat prevformatter = new SimpleDateFormat("ddMMyy");
-		SimpleDateFormat posformatter = new SimpleDateFormat("dd MMM yy");
+		SimpleDateFormat prevformatter = new SimpleDateFormat("ddMMyy HHmm");
+		SimpleDateFormat posformatter = new SimpleDateFormat("dd MMM yy, HH:mm");
 
 		try{
 			Date date = prevformatter.parse(dateInString);
