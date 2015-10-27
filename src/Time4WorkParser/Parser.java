@@ -1,5 +1,7 @@
 package Time4WorkParser;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -145,62 +147,108 @@ public class Parser {
     String descriptionString;
     String lastWord = description.get(end);
     if(lastWord.endsWith(".")){
-    	description.set(end, lastWord.replaceAll(".$", ""));
-    	descriptionString = String.join(" ", description);
+      description.set(end, lastWord.replaceAll(".$", ""));
+      descriptionString = String.join(" ", description);
     } else {
-    	descriptionString = null;
+      descriptionString = null;
     }
     return descriptionString;
   }
   
   private ArrayList<String> createNewListWithCombinedDescription(ArrayList<String> parameters){
     
-	ArrayList<String> resultArray = new ArrayList<String>();
+    ArrayList<String> resultArray = new ArrayList<String>();
     int lastWordIndex = findIndexOfLastWord(parameters);
     String description = createDescription(parameters, lastWordIndex);
     if (!description.equals(null)){
-    	ArrayList<String> timeArray = getTimeArray(parameters, lastWordIndex);
-    	resultArray.add(description);
-    	resultArray.addAll(timeArray);
+      ArrayList<String> timeArray = getTimeArray(parameters, lastWordIndex);
+      resultArray.add(description);
+      resultArray.addAll(timeArray);
     } else {
-    	resultArray = null;
+      resultArray = null;
     }
     return resultArray;
   }
   
   private Tasks createTaskListForAddingOrUpdating(ArrayList<String> arguments) {
-    Tasks task;
+    Tasks task = null;
     int numberOfArguments = arguments.size();
     assert numberOfArguments <= 5;
     String descriptionOfTask = arguments.get(0);
     
     if (numberOfArguments == 1) {
       task = new FloatingTask(descriptionOfTask);
-    } else if (numberOfArguments ==2){
-      Duration deadline = new Duration(arguments.get(1), "2359");
-      task = new DeadlineTask(descriptionOfTask, deadline);
+    } else if (numberOfArguments ==2) {
+      String endDate = arguments.get(1);
+      if(checkValidDate(endDate)){
+        Duration deadline = new Duration(endDate, "2359");
+        task = new DeadlineTask(descriptionOfTask, deadline);
+      }
     } else if (numberOfArguments == 3) {
-      Duration deadline = new Duration(arguments.get(1), arguments.get(2));
-      task = new DeadlineTask(descriptionOfTask, deadline);
+      String endDate = arguments.get(1);
+      String endTime = arguments.get(2);
+      if(checkValidDate(endDate) && checkValidTime(endTime)){
+        Duration deadline = new Duration(endDate, endTime);
+        task = new DeadlineTask(descriptionOfTask, deadline);
+      }
     } else if (numberOfArguments == 4) {
-      Duration durationPeriod = new Duration(arguments.get(1), arguments.get(2), arguments.get(1), arguments.get(3));
-      task = new DurationTask(descriptionOfTask, durationPeriod);
+      String date = arguments.get(1);
+      String startTime = arguments.get(2);
+      String endTime = arguments.get(3);
+      if (checkValidDate(date) && checkValidTime(startTime) && checkValidTime(endTime)){
+        Duration durationPeriod = new Duration(date, startTime, date, endTime);
+        task = new DurationTask(descriptionOfTask, durationPeriod);
+      }
     } else {
-      Duration durationPeriod = new Duration(arguments.get(1), arguments.get(2), arguments.get(3), arguments.get(4));
-      task = new DurationTask(descriptionOfTask, durationPeriod);
+      String startDate = arguments.get(1);
+      String startTime = arguments.get(2);
+      String endDate = arguments.get(3);
+      String endTime = arguments.get(4);
+      if (checkValidDate(startDate) && checkValidDate(endDate) && checkValidTime(startTime) && checkValidTime(endTime)){
+        Duration durationPeriod = new Duration(startDate, startTime, endDate, endTime);
+        task = new DurationTask(descriptionOfTask, durationPeriod);
+      }
     }
     return task;
   }
   
+  private boolean checkValidDate(String inputDate) {
+    SimpleDateFormat date = new SimpleDateFormat("ddMMyy");
+    date.setLenient(false);
+    try {
+      date.parse(inputDate);
+      return true;
+    } catch (ParseException e) {
+      return false;
+    }
+  }
+  
+  private boolean checkValidTime(String inputTime) {
+    int hour = Integer.parseInt(inputTime.substring(0,2));
+    int minute = Integer.parseInt(inputTime.substring(2,4));
+    
+    if ((hour >=0 && hour <= 23) && (minute >= 0 && minute <= 59)){
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
   private Command createAddCommand(ArrayList<String> arguments) {
     Command command;
+    Tasks task;
     
     ArrayList<String> combinedDescriptionList = createNewListWithCombinedDescription(arguments);
     
     if (!combinedDescriptionList.equals(null)){
-    	command = new Command("add", createTaskListForAddingOrUpdating(combinedDescriptionList));
+      task = createTaskListForAddingOrUpdating(combinedDescriptionList);
+      if(!task.equals(null)){
+        command = new Command("add", task);
+      } else {
+        command = createInvalidCommand();
+      }
     } else {
-    	command = createInvalidCommand();
+      command = createInvalidCommand();
     }
     
     return command;
@@ -263,13 +311,17 @@ public class Parser {
     ArrayList<String> combinedDescriptionList = createNewListWithCombinedDescription(withoutTaskIDArguments);
     
     if (!combinedDescriptionList.equals(null)){
-        task = createTaskListForAddingOrUpdating(combinedDescriptionList);
+      task = createTaskListForAddingOrUpdating(combinedDescriptionList);
+      if (!task.equals(null)){
         task.setTaskID(taskID);
         command = new Command("update", task);
+      } else {
+        command = createInvalidCommand();
+      }
     } else {
-    	command = createInvalidCommand();
+      command = createInvalidCommand();
     }
- 
+    
     return command;
   }
   
@@ -295,9 +347,9 @@ public class Parser {
   }
   
   private Command createDisplayCommand(){
-	 Command command = new Command("display");
-	    
-	 return command;
+    Command command = new Command("display");
+    
+    return command;
   }
   
   private Command createDoneCommand(ArrayList<String> arguments){
@@ -318,7 +370,7 @@ public class Parser {
   }
   
   private Command createStoreCommand(ArrayList<String> arguments){
-	String storageLocation = String.join(" ", arguments);
+    String storageLocation = String.join(" ", arguments);
     String escapedStorageLocation = storageLocation.replace("\\", "\\\\");
     
     Command command = new Command("store", escapedStorageLocation);
