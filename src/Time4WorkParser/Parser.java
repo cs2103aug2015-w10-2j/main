@@ -4,7 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -178,7 +178,7 @@ public class Parser {
     
     if (numberOfArguments == 1) {
       task = new FloatingTask(descriptionOfTask);
-    } else if (numberOfArguments ==2) {
+    } else if (numberOfArguments == 2) {
       String endDate = arguments.get(1);
       if(checkValidDate(endDate)){
         Duration deadline = new Duration(endDate, "2359");
@@ -205,8 +205,13 @@ public class Parser {
       String endDate = arguments.get(3);
       String endTime = arguments.get(4);
       if (checkValidDate(startDate) && checkValidDate(endDate) && checkValidTime(startTime) && checkValidTime(endTime)){
-        Duration durationPeriod = new Duration(startDate, startTime, endDate, endTime);
-        task = new DurationTask(descriptionOfTask, durationPeriod);
+        if (checkStartDateBeforeEndDate(startDate, endDate)){ //creates a Duration object for (start,start,end,end) if checkStartDateBeforeEndDate true
+          Duration durationPeriod = new Duration(startDate, startTime, endDate, endTime);
+          task = new DurationTask(descriptionOfTask, durationPeriod);
+        } else { //creates a Duration object for (end,end,start,start) if checkStartDateBeforeEndDate false
+          Duration durationPeriod = new Duration(endDate, endTime, startDate, startTime);
+          task = new DurationTask(descriptionOfTask, durationPeriod);
+        }
       }
     }
     return task;
@@ -227,7 +232,28 @@ public class Parser {
     int hour = Integer.parseInt(inputTime.substring(0,2));
     int minute = Integer.parseInt(inputTime.substring(2,4));
     
-    if ((hour >=0 && hour <= 23) && (minute >= 0 && minute <= 59)){
+    if ((hour >= 0 && hour <= 23) && (minute >= 0 && minute <= 59)){
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
+  private boolean checkStartDateBeforeEndDate(String startDate, String endDate) {
+    SimpleDateFormat date = new SimpleDateFormat("ddMMyy");
+    Date startingDate = null;
+    try {
+      startingDate = date.parse(startDate);
+    } catch (ParseException e) {
+      e.printStackTrace();
+    }
+    Date endingDate = null;
+    try {
+      endingDate = date.parse(endDate);
+    } catch (ParseException e) {
+      e.printStackTrace();
+    }
+    if (startingDate.before(endingDate)){
       return true;
     } else {
       return false;
