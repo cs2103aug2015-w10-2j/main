@@ -2,15 +2,14 @@ package Time4WorkStorage;
 
 import java.util.ArrayList;
 
-
 public class FilterTask {
 			
 	//filters task description for matching task
 	//single character will search for task with description starting with the character
-	//multiple words will match all containing each word
+	//multiple words will match all containing each word or near matches
 	public ArrayList<Tasks> searchDescription(ArrayList<Tasks> myList, String searchString) {
 		
-		
+		Levenshtein myLevenshtein = new Levenshtein();
 		ArrayList<Tasks> resultList = new ArrayList<Tasks>();
 		
 		String[] splitString = searchString.split("\\s+");
@@ -32,7 +31,6 @@ public class FilterTask {
 			
 			for(int j=0; j<startWith.size(); j++) {
 				if(myList.get(i).getDescription().substring(0,1).toUpperCase().equals(startWith.get(j).toUpperCase())) {
-					resultList.add(myList.get(i));
 					added = true;
 					break;
 				}
@@ -41,10 +39,34 @@ public class FilterTask {
 			if(!added) {
 				for(int j=0; j<words.size(); j++) {
 					if(myList.get(i).getDescription().toUpperCase().contains(words.get(j).toUpperCase())) {
-						resultList.add(myList.get(i));
+						added = true;
+						break;
+					} else {
+						String[] brokenDesc = myList.get(i).getDescription().split("\\s+");
+						
+						for(int k=0; k<brokenDesc.length; k++) {
+							for(int m=0; m<words.size(); m++) {
+								int closeMatch = myLevenshtein.distance(brokenDesc[k], words.get(m), brokenDesc[k].length()/2);
+								if(closeMatch != -1) {
+									added = true;
+									break;
+								}
+							}
+							if(added) {
+								break;
+							}
+						}
+						if(added) {
+							break;
+						}
 					}
 				}
 			}
+			
+			if(added) {
+				resultList.add(myList.get(i));
+			}
+			
 		}
 		
 		return resultList;
