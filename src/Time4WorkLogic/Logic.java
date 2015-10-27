@@ -22,6 +22,7 @@ public class Logic {
     private static final String MESSAGE_ADDED_ = "Task added %1$s !";
     private static final String MESSAGE_UPDATED_ = "Task updated %1$s !";
     private static final String MESSAGE_DELETED_ = "Task %1$s deleted %2$s !";
+    private static final String MESSAGE_DISPLAY = "Here are all the tasks";
     private static final String MESSAGE_SORTED = "Task sorted successfully!";
     private static final String MESSAGE_SEARCH_ = "Task searched %1$s";
     private static final String MESSAGE_DONE_ = "Mark task %1$s as done";
@@ -46,7 +47,7 @@ public class Logic {
     
     
     enum COMMAND_TYPE {
-        ADD, UPDATE, DELETE, SEARCH, SORT, STORE, INVALID, UNDO, DONE, CLEAR, EXIT
+        ADD, UPDATE, DELETE, SEARCH, DISPLAY, SORT, STORE, INVALID, UNDO, DONE, CLEAR, EXIT
     };
     
     // Constructor
@@ -118,6 +119,8 @@ public class Logic {
             case SEARCH :
                 String searchKeyword = parsedCommand.getSearchKeyword();
                 return executeSearch(searchKeyword);
+            case DISPLAY:
+                return executeDisplay();
             case DONE:
                 if (userInputIndexes.isEmpty()) {
                     int userInputIndex = parsedCommand.getSelectedIndexNumber();
@@ -128,12 +131,13 @@ public class Logic {
                 String storagePath = parsedCommand.getSearchKeyword();
                 return executeCreatePath(storagePath);
             case INVALID :
-                return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "invalid"), myTaskList);
+                return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "invalid command"), myTaskList);
             case EXIT :
                 logger.log(Level.INFO, "exit");
                 System.exit(0);
             default :
-                return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "invalid"), myTaskList);
+                return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "command does not exist")
+                                           ,myTaskList);
         }
     }
     
@@ -148,6 +152,8 @@ public class Logic {
             return COMMAND_TYPE.SORT;
         } else if (commandTypeString.equalsIgnoreCase("undo")) {
             return COMMAND_TYPE.UNDO;
+        } else if (commandTypeString.equalsIgnoreCase("display")) {
+            return (COMMAND_TYPE.DISPLAY);
         } else if (commandTypeString.equalsIgnoreCase("search")) {
             return COMMAND_TYPE.SEARCH;
         } else if (commandTypeString.equalsIgnoreCase("store")) {
@@ -177,6 +183,7 @@ public class Logic {
         }
         return fullTaskList;
     }
+    
     
     // =========================================================================
     // Execute Command
@@ -449,6 +456,11 @@ public class Logic {
             return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed!"), myTaskList);
         }
         
+    }
+    
+    public FeedbackMessage executeDisplay() throws Exception {
+        myTaskList = getFullTaskList();
+        return new FeedbackMessage(MESSAGE_DISPLAY, myTaskList);
     }
     
     public FeedbackMessage executeClear() throws Exception {
