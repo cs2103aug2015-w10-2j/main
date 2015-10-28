@@ -131,7 +131,7 @@ public class Logic {
                 String storagePath = parsedCommand.getSearchKeyword();
                 return executeCreatePath(storagePath);
             case INVALID :
-                return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "invalid command"), myTaskList);
+                return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "command is invalid"), myTaskList);
             case EXIT :
                 logger.log(Level.INFO, "exit");
                 System.exit(0);
@@ -365,6 +365,14 @@ public class Logic {
             searchList = myFilter.searchCompleted(myTaskList);
         } else if (keyword == "incomplete") {
             searchList = myFilter.searchNotCompleted(myTaskList);
+        } else if (keyword == "deadline") {
+            searchList = myFilter.searchType(myTaskList, 1);
+        } else if (keyword == "duration") {
+            searchList = myFilter.searchType(myTaskList, 2);
+        } else if (keyword == "blocked") {
+            searchList = myFilter.searchType(myTaskList, 3);
+        } else if (keyword == "floating") {
+            searchList = myFilter.searchType(myTaskList, 4);
         } else {
             searchList = myFilter.searchDescription(myTaskList, keyword);
         }
@@ -372,7 +380,7 @@ public class Logic {
         if (searchList.size() != 0) {
             myTaskList = searchList;
             logger.log(Level.INFO, "end of processing search command");
-            return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "successfully"), searchList);
+            return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "successfully"), myTaskList);
         } else {
             logger.log(Level.INFO, "end of processing search command");
             return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "failed: no such task"), myTaskList);

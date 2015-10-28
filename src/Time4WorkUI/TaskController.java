@@ -16,6 +16,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.VBox;
 
 public class TaskController {
 
@@ -24,7 +25,9 @@ public class TaskController {
 	// -----------------------------------------
 	// FXML variables
 	// -----------------------------------------
-
+	
+	@FXML
+	private VBox inputBox;
 	@FXML
 	private TextField userCommand;
 	@FXML
@@ -73,12 +76,14 @@ public class TaskController {
 		descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
 		fromCol.setCellValueFactory(new PropertyValueFactory<>("startDuration"));
 		toCol.setCellValueFactory(new PropertyValueFactory<>("endDuration"));
+		taskTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		initTaskList();
 		handleUserInput();
 	}
 
 	public void handleUserInput() {
 		userCommand.setPromptText(PROMPT_USERCOMMAND_TEXT);
+		feedback.setText("Commands: add, delete, update, display, search, undo, store");
 		userCommand.setOnKeyPressed(e -> {
 			if (e.getCode().equals(KeyCode.ENTER)) {
 				String userInput = userCommand.getText();
