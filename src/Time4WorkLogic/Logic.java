@@ -361,26 +361,27 @@ public class Logic {
     public FeedbackMessage executeSearch(String keyword) throws IOException {
         logger.log(Level.INFO, "start processing search command");
         ArrayList<Tasks> searchList = new ArrayList<Tasks>();
-        if (keyword == "complete") {
+        if (keyword.equals("complete")) {
             searchList = myFilter.searchCompleted(myTaskList);
-        } else if (keyword == "incomplete") {
+        } else if (keyword.equals("incomplete")) {
             searchList = myFilter.searchNotCompleted(myTaskList);
-        } else if (keyword == "deadline") {
+        } else if (keyword.equals("deadline")) {
             searchList = myFilter.searchType(myTaskList, 1);
-        } else if (keyword == "duration") {
+        } else if (keyword.equals("duration")) {
             searchList = myFilter.searchType(myTaskList, 2);
-        } else if (keyword == "blocked") {
+        } else if (keyword.equals("blocked")) {
             searchList = myFilter.searchType(myTaskList, 3);
-        } else if (keyword == "floating") {
+        } else if (keyword.equals("floating")) {
             searchList = myFilter.searchType(myTaskList, 4);
         } else {
             searchList = myFilter.searchDescription(myTaskList, keyword);
         }
         
+        
         if (searchList.size() != 0) {
             myTaskList = searchList;
             logger.log(Level.INFO, "end of processing search command");
-            return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "successfully"), myTaskList);
+            return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "successfully"), searchList);
         } else {
             logger.log(Level.INFO, "end of processing search command");
             return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "failed: no such task"), myTaskList);
