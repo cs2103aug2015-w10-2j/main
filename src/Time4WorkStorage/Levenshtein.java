@@ -1,7 +1,9 @@
 package Time4WorkStorage;
 
 public class Levenshtein {
-	 
+	
+	//returns the number of addition, substitution or removal required to make the strings match
+	//if exceeds the limit, returns -1
     public int distance(String data, String search, int limit) {
     	data = data.toUpperCase();
     	search = search.toUpperCase();

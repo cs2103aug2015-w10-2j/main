@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class FilterTask {
 			
 	//filters task description for matching task
-	//single character will search for task with description starting with the character
+	//single character will search for task with description starting with the character or matching single character description
 	//multiple words will match all containing each word or near matches
 	public ArrayList<Tasks> searchDescription(ArrayList<Tasks> myList, String searchString) {
 		
@@ -28,8 +28,9 @@ public class FilterTask {
 		for(int i=0; i<myList.size(); i++) {
 			
 			boolean added = false;
-			
+			System.out.println("checking this description " + myList.get(i).getDescription());
 			for(int j=0; j<startWith.size(); j++) {
+				//check starting with for single character searching
 				if(myList.get(i).getDescription().substring(0,1).toUpperCase().equals(startWith.get(j).toUpperCase())) {
 					added = true;
 					break;
@@ -38,31 +39,48 @@ public class FilterTask {
 			
 			if(!added) {
 				for(int j=0; j<words.size(); j++) {
+					//checks exact word matches
 					if(myList.get(i).getDescription().toUpperCase().contains(words.get(j).toUpperCase())) {
 						added = true;
 						break;
-					} else {
-						String[] brokenDesc = myList.get(i).getDescription().split("\\s+");
-						
-						for(int k=0; k<brokenDesc.length; k++) {
-							for(int m=0; m<words.size(); m++) {
-								int closeMatch = myLevenshtein.distance(brokenDesc[k], words.get(m), brokenDesc[k].length()/2);
-								if(closeMatch != -1) {
-									added = true;
-									break;
-								}
-							}
-							if(added) {
-								break;
-							}
-						}
-						if(added) {
-							break;
-						}
+					} 
+				}
+			}
+			
+			String[] brokenDesc = myList.get(i).getDescription().split("\\s+");
+			
+			if(!added) {	
+				outerloop:
+				for(int j=0; j<brokenDesc.length; j++) {					
+					for(int m=0; m<startWith.size(); m++) {
+						//checks single character matches with single description
+						if(brokenDesc[j].equalsIgnoreCase(startWith.get(m))) {
+							added = true;
+							break outerloop;
+						}									
 					}
 				}
 			}
 			
+			if(!added) {
+				outerloop:
+				for(int j=0; j<brokenDesc.length; j++) {	
+					for(int k=0; k<words.size(); k++) {
+						//checks near matches
+						int nearMatchLimit = words.get(k).length()/2;
+						if(nearMatchLimit <= 2) {
+							nearMatchLimit++;
+						}
+						
+						int isCloseMatch = myLevenshtein.distance(brokenDesc[j].toUpperCase(), words.get(k).toUpperCase(), nearMatchLimit);
+						if(isCloseMatch != -1) {
+							added = true;
+							break outerloop;
+						} 
+
+					}
+				}
+			}
 			if(added) {
 				resultList.add(myList.get(i));
 			}
