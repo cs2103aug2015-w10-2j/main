@@ -180,52 +180,67 @@ public class Parser {
       task = new FloatingTask(descriptionOfTask);
     } else if (numberOfArguments == 2) {
       String endDate = arguments.get(1);
-      if(checkValidDate(endDate)){
-        Duration deadline = new Duration(endDate, "2359");
-        task = new DeadlineTask(descriptionOfTask, deadline);
-      }
+      task = createDeadlineTaskForInputWithoutTime(task, descriptionOfTask, endDate);
     } else if (numberOfArguments == 3) {
       String endDate = arguments.get(1);
       String endTime = arguments.get(2);
-      if(checkValidDate(endDate) && checkValidTime(endTime)){
-        Duration deadline = new Duration(endDate, endTime);
-        task = new DeadlineTask(descriptionOfTask, deadline);
-      }
+      task = createDeadlineTaskForInputWithTime(task, descriptionOfTask, endDate, endTime);
     } else if (numberOfArguments == 4) {
       String date = arguments.get(1);
       String startTime = arguments.get(2);
       String endTime = arguments.get(3);
-      if (checkValidDate(date) && checkValidTime(startTime) && checkValidTime(endTime)){
-        if (checkStartTimeBeforeEndTime(startTime, endTime)){
-          Duration durationPeriod = new Duration(date, startTime, date, endTime);
-          task = new DurationTask(descriptionOfTask, durationPeriod);
-        } else {
-          Duration durationPeriod = new Duration(date, endTime, date, startTime);
-          task = new DurationTask(descriptionOfTask, durationPeriod);
-        }
-      }
+      task = createDurationTaskForSameDayEvent(task, descriptionOfTask, date, startTime, endTime);
     } else {
       String startDate = arguments.get(1);
       String startTime = arguments.get(2);
       String endDate = arguments.get(3);
       String endTime = arguments.get(4);
-      if (checkValidDate(startDate) && checkValidDate(endDate) && checkValidTime(startTime) && checkValidTime(endTime)){
-        if(startDate.equals(endDate)){
-          if (checkStartTimeBeforeEndTime(startTime, endTime)){
-            Duration durationPeriod = new Duration(startDate, startTime, endDate, endTime);
-            task = new DurationTask(descriptionOfTask, durationPeriod);
-          } else {
-            Duration durationPeriod = new Duration(startDate, endTime, endDate, startTime);
-            task = new DurationTask(descriptionOfTask, durationPeriod);
-          }
-        } else if (checkStartDateBeforeEndDate(startDate, endDate)){ //creates a Duration object for (start,start,end,end) if checkStartDateBeforeEndDate true
-          Duration durationPeriod = new Duration(startDate, startTime, endDate, endTime);
-          task = new DurationTask(descriptionOfTask, durationPeriod);
-        } else { //creates a Duration object for (end,end,start,start) if checkStartDateBeforeEndDate false
-          Duration durationPeriod = new Duration(endDate, endTime, startDate, startTime);
-          task = new DurationTask(descriptionOfTask, durationPeriod);
-        }
+      task = createDurationTaskForFullInputCommand(task, descriptionOfTask, startDate, startTime, endDate, endTime);
+    }
+    return task;
+  }
+  
+  private Tasks createDurationTaskForFullInputCommand(Tasks task, String descriptionOfTask, String startDate,
+                                                      String startTime, String endDate, String endTime) {
+    if (checkValidDate(startDate) && checkValidDate(endDate) && checkValidTime(startTime) && checkValidTime(endTime)){
+      if(startDate.equals(endDate)){ //creates a Duration object using createDurationTaskForSameDayEvent
+        task = createDurationTaskForSameDayEvent(task, descriptionOfTask, startDate, startTime, endTime);
+      } else if (checkStartDateBeforeEndDate(startDate, endDate)){ //creates a Duration object for (start,start,end,end) if checkStartDateBeforeEndDate true
+        Duration durationPeriod = new Duration(startDate, startTime, endDate, endTime);
+        task = new DurationTask(descriptionOfTask, durationPeriod);
+      } else { //creates a Duration object for (end,end,start,start) if checkStartDateBeforeEndDate false
+        Duration durationPeriod = new Duration(endDate, endTime, startDate, startTime);
+        task = new DurationTask(descriptionOfTask, durationPeriod);
       }
+    }
+    return task;
+  }
+  
+  private Tasks createDurationTaskForSameDayEvent(Tasks task, String descriptionOfTask, String date, String startTime, String endTime) {
+    if (checkValidDate(date) && checkValidTime(startTime) && checkValidTime(endTime)){
+      if (checkStartTimeBeforeEndTime(startTime, endTime)){
+        Duration durationPeriod = new Duration(date, startTime, date, endTime);
+        task = new DurationTask(descriptionOfTask, durationPeriod);
+      } else {
+        Duration durationPeriod = new Duration(date, endTime, date, startTime);
+        task = new DurationTask(descriptionOfTask, durationPeriod);
+      }
+    }
+    return task;
+  }
+  
+  private Tasks createDeadlineTaskForInputWithTime(Tasks task, String descriptionOfTask, String endDate, String endTime) {
+    if(checkValidDate(endDate) && checkValidTime(endTime)){
+      Duration deadline = new Duration(endDate, endTime);
+      task = new DeadlineTask(descriptionOfTask, deadline);
+    }
+    return task;
+  }
+  
+  private Tasks createDeadlineTaskForInputWithoutTime(Tasks task, String descriptionOfTask, String endDate) {
+    if(checkValidDate(endDate)){
+      Duration deadline = new Duration(endDate, "2359");
+      task = new DeadlineTask(descriptionOfTask, deadline);
     }
     return task;
   }
