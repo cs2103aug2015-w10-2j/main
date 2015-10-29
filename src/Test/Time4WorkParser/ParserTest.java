@@ -1,6 +1,16 @@
+package Test.Time4WorkParser;
+
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import Time4WorkParser.Command;
+import Time4WorkParser.Parser;
+import Time4WorkStorage.Duration;
+import Time4WorkStorage.DeadlineTask;
+import Time4WorkStorage.DurationTask;
+import Time4WorkStorage.FloatingTask;
+import Time4WorkStorage.Tasks;
 
 import java.util.ArrayList;
 
