@@ -117,7 +117,7 @@ public class Logic {
             case CLEAR :
                 return executeClear();
             case SEARCH :
-                String searchKeyword = parsedCommand.getSearchKeyword();
+                String searchKeyword = parsedCommand.getSearchOrStoragePath();
                 return executeSearch(searchKeyword);
             case DISPLAY:
                 return executeDisplay();
@@ -128,7 +128,7 @@ public class Logic {
                 }
                 return executeMarkTaskAsDone(userInputIndexes);
             case STORE:
-                String storagePath = parsedCommand.getSearchKeyword();
+                String storagePath = parsedCommand.getSearchOrStoragePath();
                 return executeCreatePath(storagePath);
             case INVALID :
                 return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "command is invalid"), myTaskList);
