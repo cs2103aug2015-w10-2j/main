@@ -196,8 +196,13 @@ public class Parser {
       String startTime = arguments.get(2);
       String endTime = arguments.get(3);
       if (checkValidDate(date) && checkValidTime(startTime) && checkValidTime(endTime)){
-        Duration durationPeriod = new Duration(date, startTime, date, endTime);
-        task = new DurationTask(descriptionOfTask, durationPeriod);
+        if (checkStartTimeBeforeEndTime(startTime, endTime)){
+          Duration durationPeriod = new Duration(date, startTime, date, endTime);
+          task = new DurationTask(descriptionOfTask, durationPeriod);
+        } else {
+          Duration durationPeriod = new Duration(date, endTime, date, startTime);
+          task = new DurationTask(descriptionOfTask, durationPeriod);
+        }
       }
     } else {
       String startDate = arguments.get(1);
@@ -205,7 +210,15 @@ public class Parser {
       String endDate = arguments.get(3);
       String endTime = arguments.get(4);
       if (checkValidDate(startDate) && checkValidDate(endDate) && checkValidTime(startTime) && checkValidTime(endTime)){
-        if (checkStartDateBeforeEndDate(startDate, endDate)){ //creates a Duration object for (start,start,end,end) if checkStartDateBeforeEndDate true
+        if(startDate.equals(endDate)){
+          if (checkStartTimeBeforeEndTime(startTime, endTime)){
+            Duration durationPeriod = new Duration(startDate, startTime, endDate, endTime);
+            task = new DurationTask(descriptionOfTask, durationPeriod);
+          } else {
+            Duration durationPeriod = new Duration(startDate, endTime, endDate, startTime);
+            task = new DurationTask(descriptionOfTask, durationPeriod);
+          }
+        } else if (checkStartDateBeforeEndDate(startDate, endDate)){ //creates a Duration object for (start,start,end,end) if checkStartDateBeforeEndDate true
           Duration durationPeriod = new Duration(startDate, startTime, endDate, endTime);
           task = new DurationTask(descriptionOfTask, durationPeriod);
         } else { //creates a Duration object for (end,end,start,start) if checkStartDateBeforeEndDate false
@@ -257,6 +270,25 @@ public class Parser {
       return true;
     } else {
       return false;
+    }
+  }
+  
+  private boolean checkStartTimeBeforeEndTime(String startTime, String endTime){
+    int startHour = Integer.parseInt(startTime.substring(0,2));
+    int startMinute = Integer.parseInt(startTime.substring(2,4));
+    int endHour = Integer.parseInt(endTime.substring(0,2));
+    int endMinute = Integer.parseInt(endTime.substring(2,4));
+    
+    if (startHour < endHour) {
+      return true;
+    } else if (startHour > endHour) {
+      return false;
+    } else {
+      if (startMinute < endMinute) {
+        return true;
+      } else {
+        return false;
+      }
     }
   }
   
