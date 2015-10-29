@@ -29,12 +29,18 @@ public class Storage {
 		if(myPath.savedPathExists()) {
 			customPath = myPath.readCustomPath();
 		}
-
+		
 		String newPath = path.replace("\\", "\\\\");
+		String pathChanged = "";
 		
 		if(!newPath.equalsIgnoreCase(customPath)) {
-			myLogic.createCustomFile(path, true);	
+			pathChanged = myLogic.createCustomFile(path, true);	
 			myPath.writeCustomPath(path);
+		}
+		
+		if(!pathChanged.equals(customPath) && !pathChanged.equals("")){
+			customPath = pathChanged;
+			myPath.writeCustomPath(customPath);
 		}
 	}
 	

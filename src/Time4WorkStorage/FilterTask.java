@@ -28,7 +28,6 @@ public class FilterTask {
 		for(int i=0; i<myList.size(); i++) {
 			
 			boolean added = false;
-			System.out.println("checking this description " + myList.get(i).getDescription());
 			for(int j=0; j<startWith.size(); j++) {
 				//check starting with for single character searching
 				if(myList.get(i).getDescription().substring(0,1).toUpperCase().equals(startWith.get(j).toUpperCase())) {

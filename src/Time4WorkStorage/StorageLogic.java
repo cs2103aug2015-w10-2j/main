@@ -43,8 +43,9 @@ public class StorageLogic {
 	
 	//custom path and filename, path has to have escape characters
 	//eg. C:\\user\\Desktop\\myTasks.txt
-	public void createCustomFile(String path, boolean transfer) throws IOException {
-			
+	//returns if default file name is appended
+	public String createCustomFile(String path, boolean transfer) throws IOException {
+		
 		ArrayList<Tasks> tempList = new ArrayList<Tasks>();
 		
 		if(transfer) {
@@ -63,12 +64,28 @@ public class StorageLogic {
 			throw e;
 		}
 		
+		if(myFile.isDirectory()) {
+			String lastChar = currentPath.substring(currentPath.length() - 1);
+			if(lastChar.equals("\\") || lastChar.equals("/")) {
+				currentPath = currentPath + defPath;
+			}
+			else {
+				currentPath = currentPath + "\\"+ defPath;
+			}
+			try {
+				createFile(currentPath);
+			} catch (IOException e) {
+				throw e;
+			}
+		}
+		
 		if(transfer) {
 			for(int i=0; i<tempList.size(); i++) {
 				addNewTask(tempList.get(i));
 			}
 		}
 		
+		return currentPath;	
 	}
 	
 	//if file doesn't exist, creates file and returns null
@@ -85,7 +102,6 @@ public class StorageLogic {
 		catch (IOException e) {
 			throw e;
 		}
-		
 		
 		if(myFile.exists() && myFile.isFile()) {
 			myTaskList = getAllTasks();
