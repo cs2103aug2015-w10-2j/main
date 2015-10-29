@@ -11,6 +11,7 @@ import Time4WorkStorage.FilterTask;
 import Time4WorkStorage.Storage;
 import Time4WorkStorage.Tasks;
 
+//@@author A0133894W
 public class Logic {
     
     // =========================================================================
@@ -42,6 +43,8 @@ public class Logic {
     private FilterTask myFilter = new FilterTask();
     private ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
     private ArrayList<Tasks> fullTaskList = new ArrayList<Tasks>();
+    private ArrayList<Tasks> completeList = new ArrayList<Tasks>();
+    private ArrayList<Tasks> incompleteList = new ArrayList<Tasks>();
     private CommandHistory commandHistory = new CommandHistory();
     private CommandHistory reversedCommandHistory = new CommandHistory();
     
@@ -73,11 +76,14 @@ public class Logic {
         
         if (isFirstCommand) {
             myTaskList = fullTaskList;
+            completeList = getCompleteTaskFromMytaskList(myTaskList);
+            incompleteList = getIncompleteTaskFromMytaskList(myTaskList);
         }
         isFirstCommand = false;
         
         if(checkIfEmptyString(userCommand)) {
-            return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, MESSAGE_EMPTY_COMMAND), myTaskList);
+            return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, MESSAGE_EMPTY_COMMAND),
+                                       completeList, incompleteList);
         }
         
         Parser parser = new Parser();
@@ -87,7 +93,8 @@ public class Logic {
         try{
             parsedCommand = parser.parse(userCommand);
         } catch (Exception NumberFormatException) {
-            return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "invalid input"), myTaskList);
+            return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "invalid input"),
+                                       completeList, incompleteList);
         }
         
         
@@ -131,13 +138,14 @@ public class Logic {
                 String storagePath = parsedCommand.getSearchOrStoragePath();
                 return executeCreatePath(storagePath);
             case INVALID :
-                return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "command is invalid"), myTaskList);
+                return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "command is invalid"),
+                                           completeList, incompleteList);
             case EXIT :
                 logger.log(Level.INFO, "exit");
                 System.exit(0);
             default :
-                return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "command does not exist")
-                                           ,myTaskList);
+                return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "command does not exist"),
+                                           completeList, incompleteList);
         }
     }
     
@@ -173,18 +181,29 @@ public class Logic {
         return userCommand.trim().equals("");
     }
     
-    
+    // =========================================================================
+    // Useful method for UI to get task list
+    // =========================================================================
     public ArrayList<Tasks> getFullTaskList() {
         try {
             return storage.readFile();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return fullTaskList;
     }
     
+    public ArrayList<Tasks> getCompleteTaskList() {
+        fullTaskList = getFullTaskList();
+        completeList = myFilter.searchCompleted(fullTaskList);
+        return completeList;
+    }
     
+    public ArrayList<Tasks> getInompleteTaskList() {
+        fullTaskList = getFullTaskList();
+        incompleteList = myFilter.searchNotCompleted(fullTaskList);
+        return incompleteList;
+    }
     // =========================================================================
     // Execute Command
     // =========================================================================
@@ -194,26 +213,27 @@ public class Logic {
             storage.appendTask(newTask);
         } catch (IOException e) {
             logger.log(Level.WARNING, "add error");
-            return new FeedbackMessage(String.format(MESSAGE_ADDED_, "failed"), myTaskList);
+            return new FeedbackMessage(String.format(MESSAGE_ADDED_, "failed"),
+                                       completeList, incompleteList);
         }
-        
-        myTaskList = getFullTaskList();
+        incompleteList.add(newTask);
         
         // Set up for undo operation
-        int taskListSize = myTaskList.size();
-        int newTaskID = myTaskList.get(taskListSize - 1).getTaskID();
+        int taskListSize = incompleteList.size();
+        int newTaskID = incompleteList.get(taskListSize - 1).getTaskID();
         Command reversedCommand = new Command("delete", newTaskID); //only can store taskID here
         reversedCommandHistory.addReversedCommand(reversedCommand);
-        
         commandHistory.addCommand(new Command("add", newTask));
+        
         logger.log(Level.INFO, "end of processing add command");
-        return new FeedbackMessage(String.format(MESSAGE_ADDED_, "successfully"), myTaskList);
+        return new FeedbackMessage(String.format(MESSAGE_ADDED_, "successfully"),
+                                   completeList, incompleteList);
     }
     
     public FeedbackMessage executeDelete(ArrayList<Integer> userInputIndexes) throws IOException {
         logger.log(Level.INFO, "start processing delete command");
         
-        int taskListSize = myTaskList.size();
+        int taskListSize = incompleteList.size();
         int numToBeDeleted = userInputIndexes.size();
         int deletedTaskNum = 0;
         
@@ -233,7 +253,7 @@ public class Logic {
                 indexDeletedFailed += String.valueOf(userInputIndex + " ");
             } else {
                 int taskID = getTaskIDFromUserInput(userInputIndex);
-                Tasks deletedTask = getTaskFromTaskID(myTaskList, taskID); //store the task to be deleted
+                Tasks deletedTask = getTaskFromTaskID(incompleteList, taskID); //store the task to be deleted
                 
                 try {
                     storage.deleteTask(taskID);
@@ -241,7 +261,7 @@ public class Logic {
                     logger.log(Level.WARNING, "delete error");
                     e.printStackTrace();
                 }
-                myTaskList.remove(userInputIndex - 1);
+                incompleteList.remove(userInputIndex - 1);
                 
                 // Set up for undo operation
                 Command reversedCommand = new Command("add", deletedTask);
@@ -254,19 +274,19 @@ public class Logic {
         }
         
         if (indexDeletedSuccessfully.isEmpty()) {
-            return new FeedbackMessage(String.format(MESSAGE_DELETED_, indexDeletedFailed, "failed")
-                                       , myTaskList);
+            return new FeedbackMessage(String.format(MESSAGE_DELETED_, indexDeletedFailed, "failed"),
+                                       completeList, incompleteList);
         } else {
             commandHistory.addCommand(new Command("delete", deletedTaskNum));
-            return new FeedbackMessage(String.format(MESSAGE_DELETED_, indexDeletedSuccessfully, "successfully")
-                                       , myTaskList);
+            return new FeedbackMessage(String.format(MESSAGE_DELETED_, indexDeletedSuccessfully, "successfully"),
+                                       completeList, incompleteList);
         }
         
     }
     public FeedbackMessage executeMarkTaskAsDone(ArrayList<Integer> userInputIndexes) throws Exception {
         logger.log(Level.INFO, "start processing mark command");
         
-        int taskListSize = myTaskList.size();
+        int taskListSize = incompleteList.size();
         int numToBeMarked = userInputIndexes.size();
         int markedTaskNum = 0;
         
@@ -286,15 +306,16 @@ public class Logic {
                 indexMarkedFailed += String.valueOf(userInputIndex + " ");
             } else {
                 int taskID = getTaskIDFromUserInput(userInputIndex);
-                Tasks markedTask = getTaskFromTaskID(myTaskList, taskID); //store the task to be deleted
+                Tasks markedTask = getTaskFromTaskID(incompleteList, taskID); //store the task to be deleted
                 
                 try {
                     storage.SetCompleted(taskID);
+                    incompleteList.remove(userInputIndex - 1);
+                    completeList.add(markedTask);
                 } catch (InterruptedException e) {
                     logger.log(Level.WARNING, "mark error");
                     e.printStackTrace();
                 }
-                myTaskList.remove(userInputIndex - 1);
                 
                 // Set up for undo operation
                 Command reversedCommand = new Command("done", markedTask);
@@ -307,23 +328,24 @@ public class Logic {
         }
         
         if (indexMarkedSuccessfully.isEmpty()) {
-            return new FeedbackMessage(String.format(MESSAGE_DONE_, indexMarkedFailed, "failed")
-                                       , myTaskList);
+            return new FeedbackMessage(String.format(MESSAGE_DONE_, indexMarkedFailed, "failed"),
+                                       completeList, incompleteList);
         } else {
             commandHistory.addCommand(new Command("done", markedTaskNum));
-            return new FeedbackMessage(String.format(MESSAGE_DONE_, indexMarkedSuccessfully, "successfully")
-                                       , myTaskList);
+            return new FeedbackMessage(String.format(MESSAGE_DONE_, indexMarkedSuccessfully, "successfully"),
+                                       completeList, incompleteList);
         }
         
     }
     
     public FeedbackMessage executeUpdate(Tasks task) throws IOException {
         logger.log(Level.INFO, "start processing update command");
-        int taskListSize = myTaskList.size();
+        int taskListSize = incompleteList.size();
         int indexToBeDeleted = task.getTaskID();   // get index to be deleted by retrieving taskID
         
         if (taskListSize < indexToBeDeleted || indexToBeDeleted < 1) {
-            return new FeedbackMessage(String.format(MESSAGE_UPDATED_, "failed"), myTaskList);
+            return new FeedbackMessage(String.format(MESSAGE_UPDATED_, "failed"),
+                                       completeList, incompleteList);
         } else {
             int taskIDToBeDeleted = getTaskIDFromUserInput(indexToBeDeleted);
             task.setTaskID(taskIDToBeDeleted);
@@ -335,8 +357,8 @@ public class Logic {
                 logger.log(Level.WARNING, "update error");
                 e.printStackTrace();
             }
-            myTaskList.remove(indexToBeDeleted - 1);
-            myTaskList.add(task);
+            incompleteList.remove(indexToBeDeleted - 1);
+            incompleteList.add(task);
             
             // Set up for undo operation
             Command reversedCommand = new Command("add", taskBeforeUpdated); // add the original one back
@@ -346,7 +368,8 @@ public class Logic {
             commandHistory.addCommand(new Command("update", task));
             
             logger.log(Level.INFO, "end of processing update command");
-            return new FeedbackMessage(String.format(MESSAGE_UPDATED_, "successfully"), myTaskList);
+            return new FeedbackMessage(String.format(MESSAGE_UPDATED_, "successfully"),
+                                       completeList, incompleteList);
         }
         
     }
@@ -354,37 +377,41 @@ public class Logic {
     public FeedbackMessage executeSort() throws IOException {
         logger.log(Level.INFO, "start processing sort command");
         myTaskList.sort(null);
+        completeList = getCompleteTaskFromMytaskList(myTaskList);
+        incompleteList = getIncompleteTaskFromMytaskList(myTaskList);
         logger.log(Level.INFO, "end of processing sort command");
-        return new FeedbackMessage(MESSAGE_SORTED, myTaskList);
+        return new FeedbackMessage(MESSAGE_SORTED, completeList, incompleteList);
     }
     
     public FeedbackMessage executeSearch(String keyword) throws IOException {
         logger.log(Level.INFO, "start processing search command");
         ArrayList<Tasks> searchList = new ArrayList<Tasks>();
         if (keyword.equals("complete")) {
-            searchList = myFilter.searchCompleted(myTaskList);
+            searchList = myFilter.searchCompleted(fullTaskList);
         } else if (keyword.equals("incomplete")) {
-            searchList = myFilter.searchNotCompleted(myTaskList);
+            searchList = myFilter.searchNotCompleted(fullTaskList);
         } else if (keyword.equals("deadline")) {
-            searchList = myFilter.searchType(myTaskList, 1);
+            searchList = myFilter.searchType(incompleteList, 1);
         } else if (keyword.equals("duration")) {
-            searchList = myFilter.searchType(myTaskList, 2);
+            searchList = myFilter.searchType(incompleteList, 2);
         } else if (keyword.equals("blocked")) {
-            searchList = myFilter.searchType(myTaskList, 3);
+            searchList = myFilter.searchType(incompleteList, 3);
         } else if (keyword.equals("floating")) {
-            searchList = myFilter.searchType(myTaskList, 4);
+            searchList = myFilter.searchType(incompleteList, 4);
         } else {
-            searchList = myFilter.searchDescription(myTaskList, keyword);
+            searchList = myFilter.searchDescription(incompleteList, keyword);
         }
         
         
         if (searchList.size() != 0) {
-            myTaskList = searchList;
+            incompleteList = searchList;
             logger.log(Level.INFO, "end of processing search command");
-            return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "successfully"), searchList);
+            return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "successfully"),
+                                       completeList, incompleteList);
         } else {
             logger.log(Level.INFO, "end of processing search command");
-            return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "failed: no such task"), myTaskList);
+            return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "failed: no such task"),
+                                       completeList, incompleteList);
         }
     }
     
@@ -393,7 +420,8 @@ public class Logic {
         boolean undoSuccessfully = false;
         if (commandHistory.isEmpty()) {
             logger.log(Level.INFO, "end of processing undo command");
-            return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed: no more command for undo"), myTaskList);
+            return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed: no more command for undo"),
+                                       completeList, incompleteList);
         } else {
             Command lastCommand = commandHistory.getLastCommand();
             String lastCommandType = lastCommand.getCommand();
@@ -406,8 +434,8 @@ public class Logic {
                     logger.log(Level.WARNING, "undo error");
                     e.printStackTrace();
                 }
-                int indexInPreviouslist = getIndexFromTaskID(myTaskList, taskIDToBeDeleted);
-                myTaskList.remove(indexInPreviouslist);
+                int indexInPreviouslist = getIndexFromTaskID(incompleteList, taskIDToBeDeleted);
+                incompleteList.remove(indexInPreviouslist);
                 undoSuccessfully = true;
             } else if (lastCommandType == "delete"){ //undo delete task
                 int undoDeleteNum = lastCommand.getSelectedIndexNumber();
@@ -415,7 +443,7 @@ public class Logic {
                     Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
                     Tasks task = commandToUndo.getTask();
                     storage.appendTask(task);
-                    myTaskList.add(task);
+                    incompleteList.add(task);
                 }
                 undoSuccessfully = true;
             } else if (lastCommandType == "update"){  // undo update operation
@@ -427,12 +455,12 @@ public class Logic {
                     logger.log(Level.WARNING, "undo error");
                     e.printStackTrace();
                 }
-                int indexInPreviousList = getIndexFromTaskID(myTaskList, taskIDToBeDeleted);
-                myTaskList.remove(indexInPreviousList);
+                int indexInPreviousList = getIndexFromTaskID(incompleteList, taskIDToBeDeleted);
+                incompleteList.remove(indexInPreviousList);
                 
                 commandToUndo = reversedCommandHistory.getLastReversedCommand();
                 storage.appendTask(commandToUndo.getTask());
-                myTaskList.add(commandToUndo.getTask());
+                incompleteList.add(commandToUndo.getTask());
                 undoSuccessfully = true;
             } else if (lastCommandType == "clear") {  // undo clear operation
                 int clearedTaskNum = lastCommand.getSelectedIndexNumber();
@@ -440,7 +468,11 @@ public class Logic {
                     Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
                     Tasks task = commandToUndo.getTask();
                     storage.appendTask(task);
-                    myTaskList.add(task);
+                    if (task.isCompleted()) {
+                        completeList.add(task);
+                    } else {
+                        incompleteList.add(task);
+                    }
                 }
                 undoSuccessfully = true;
             } else if (lastCommandType == "done") {  //undo done operation
@@ -450,7 +482,8 @@ public class Logic {
                     Tasks task = commandToUndo.getTask();
                     int taskID = task.getTaskID();
                     storage.SetIncompleted(taskID);
-                    myTaskList.add(task);
+                    incompleteList.add(task);
+                    completeList.remove(task);
                 }
                 undoSuccessfully = true;
             }
@@ -459,17 +492,21 @@ public class Logic {
         
         if (undoSuccessfully) {
             logger.log(Level.INFO, "end of processing undo command");
-            return new FeedbackMessage(String.format(MESSAGE_UNDO_, "successfully!"), myTaskList);
+            return new FeedbackMessage(String.format(MESSAGE_UNDO_, "successfully!"),
+                                       completeList, incompleteList);
         } else {
             logger.log(Level.WARNING, "end of processing undo command: previous command cannot undo");
-            return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed!"), myTaskList);
+            return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed!"),
+                                       completeList, incompleteList);
         }
         
     }
     
     public FeedbackMessage executeDisplay() throws Exception {
         myTaskList = getFullTaskList();
-        return new FeedbackMessage(MESSAGE_DISPLAY, myTaskList);
+        completeList = getCompleteTaskFromMytaskList(myTaskList);
+        incompleteList = getIncompleteTaskFromMytaskList(myTaskList);
+        return new FeedbackMessage(MESSAGE_DISPLAY, completeList, incompleteList);
     }
     
     public FeedbackMessage executeClear() throws Exception {
@@ -487,15 +524,19 @@ public class Logic {
         }
         
         myTaskList.clear();
-        
+        completeList.clear();
+        incompleteList.clear();
         logger.log(Level.INFO, "end of processing clear command");
-        return new FeedbackMessage(MESSAGE_CLEAR, myTaskList);
+        return new FeedbackMessage(MESSAGE_CLEAR, completeList, incompleteList);
     }
     
     public FeedbackMessage executeCreatePath(String storagePath) throws IOException {
         storage.setCustomPath(storagePath);
         isFirstCommand = true;
-        return new FeedbackMessage(String.format(MESSAGE_CREATE_PATH_, "successfully"), myTaskList);
+        completeList = getCompleteTaskFromMytaskList(myTaskList);
+        incompleteList = getIncompleteTaskFromMytaskList(myTaskList);
+        return new FeedbackMessage(String.format(MESSAGE_CREATE_PATH_, "successfully"),
+                                   completeList, incompleteList);
         
     }
     
@@ -536,5 +577,17 @@ public class Logic {
     public ArrayList<Tasks> getMyTaskList() {
         return myTaskList;
     }
+    
+    
+    private ArrayList<Tasks> getCompleteTaskFromMytaskList(ArrayList<Tasks> myTaskList) {
+        ArrayList<Tasks> completeTask = myFilter.searchCompleted(myTaskList);
+        return completeTask;
+    }
+    
+    private ArrayList<Tasks> getIncompleteTaskFromMytaskList(ArrayList<Tasks> myTaskList) {
+        ArrayList<Tasks> incompleteTask = myFilter.searchNotCompleted(myTaskList);
+        return incompleteTask;
+    }
+    
     
 }
