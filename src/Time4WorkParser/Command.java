@@ -7,7 +7,7 @@ public class Command {
   
   private Tasks task;
   private String command;
-  private String searchKeyword;
+  private String searchOrStoragePath;
   private int selectedIndexNumber;
   private ArrayList<Integer> selectedIndexNumbers = new ArrayList<Integer>();
   
@@ -17,47 +17,47 @@ public class Command {
     this.task = task;
   }
   
-  //for searching
-  public Command(String command, String searchKeyword){
-	  this.command = command;
-	  this.searchKeyword = searchKeyword;
+  //for searching and storing
+  public Command(String command, String searchOrStoragePath){
+   this.command = command;
+   this.searchOrStoragePath = searchOrStoragePath;
   }
   
   //for deleting 1 task or marking 1 task as done
   public Command(String command, int selectedIndexNumber){
-	  this.command = command;
-	  this.selectedIndexNumber = selectedIndexNumber;
+   this.command = command;
+   this.selectedIndexNumber = selectedIndexNumber;
   }
   
   //for deleting multiple tasks or marking multiple tasks as done
   public Command(String command, ArrayList<Integer> selectedIndexNumbers){
-	  this.command = command;
-	  this.selectedIndexNumbers = selectedIndexNumbers;
+   this.command = command;
+   this.selectedIndexNumbers = selectedIndexNumbers;
   }
   
   
   //for exit and invalid commands
   public Command(String command){
-	  this.command = command;
+   this.command = command;
   }
   
   public Tasks getTask(){
-	  return task;
+   return task;
   }
   
   public String getCommand(){
-	  return command;
+   return command;
   }
   
-  public String getSearchKeyword() {
-	  return searchKeyword;
+  public String getSearchOrStoragePath() {
+   return searchOrStoragePath;
   }
 
   public int getSelectedIndexNumber() {
-	  return selectedIndexNumber;
+   return selectedIndexNumber;
   }
   
   public ArrayList<Integer> getSelectedIndexNumbers(){
-	  return selectedIndexNumbers;
-	  }
+   return selectedIndexNumbers;
+   }
 }
