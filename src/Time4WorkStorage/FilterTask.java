@@ -2,7 +2,15 @@ package Time4WorkStorage;
 
 import java.util.ArrayList;
 
+import Time4WorkStorage.Tasks.TaskType;
+
 public class FilterTask {
+	
+	private final int NEARMATCH_MAX = 3;
+	private final String SPLITTER = "\\s";
+	private static final int DeadlineType = TaskType.DeadlineType.getTaskType();
+	private static final int DurationType = TaskType.DurationType.getTaskType();
+	private static final int FloatingType = TaskType.FloatingType.getTaskType();
 			
 	//filters task description for matching task
 	//single character will search for task with description starting with the character or matching single character description
@@ -12,7 +20,7 @@ public class FilterTask {
 		Levenshtein myLevenshtein = new Levenshtein();
 		ArrayList<Tasks> resultList = new ArrayList<Tasks>();
 		
-		String[] splitString = searchString.split("\\s+");
+		String[] splitString = searchString.split(SPLITTER);
 		ArrayList<String> startWith = new ArrayList<String>();
 		ArrayList<String> words = new ArrayList<String>();
 		
@@ -46,7 +54,7 @@ public class FilterTask {
 				}
 			}
 			
-			String[] brokenDesc = myList.get(i).getDescription().split("\\s+");
+			String[] brokenDesc = myList.get(i).getDescription().split(SPLITTER);
 			
 			if(!added) {	
 				outerloop:
@@ -67,10 +75,9 @@ public class FilterTask {
 					for(int k=0; k<words.size(); k++) {
 						//checks near matches
 						int nearMatchLimit = words.get(k).length()/2;
-						if(nearMatchLimit <= 2) {
-							nearMatchLimit++;
+						if(nearMatchLimit > NEARMATCH_MAX) {
+							nearMatchLimit = NEARMATCH_MAX;
 						}
-						
 						int isCloseMatch = myLevenshtein.distance(brokenDesc[j].toUpperCase(), words.get(k).toUpperCase(), nearMatchLimit);
 						if(isCloseMatch != -1) {
 							added = true;
@@ -112,8 +119,20 @@ public class FilterTask {
 		return searchCompletion(myList, false);
 	}
 	
+	public ArrayList<Tasks> searchFloating(ArrayList<Tasks> myList) {
+		return searchType(myList, FloatingType);
+	}
+	
+	public ArrayList<Tasks> searchDeadline(ArrayList<Tasks> myList) {
+		return searchType(myList, DeadlineType);
+	}
+	
+	public ArrayList<Tasks> searchDuration(ArrayList<Tasks> myList) {
+		return searchType(myList, DurationType);
+	}
+	
 
-	public ArrayList<Tasks> searchType(ArrayList<Tasks> myList, int searchType) {
+	private ArrayList<Tasks> searchType(ArrayList<Tasks> myList, int searchType) {
 		
 		
 		ArrayList<Tasks> resultList = new ArrayList<Tasks>();

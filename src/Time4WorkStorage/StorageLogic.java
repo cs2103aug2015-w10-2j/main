@@ -12,9 +12,26 @@ import java.util.ArrayList;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+import Time4WorkStorage.Tasks.TaskType;
+
 public class StorageLogic {
-		
-	private String currentPath = "";
+			
+	private static final int DeadlineType = TaskType.DeadlineType.getTaskType();
+	private static final int DurationType = TaskType.DurationType.getTaskType();
+	private static final int FloatingType = TaskType.FloatingType.getTaskType();
+	
+	private static final String MSG_FILECREATION_FAILED = "File already exists or directory not made";
+	private static final String MSG_DIRCREATION_FAILED = "Unable to create directories";
+	private static final String MSG_WRITEROPEN_FAILED = "Unable to create writer for file";
+	private static final String MSG_READEROPEN_FAILED = "Unable to create reader for file";
+	private static final String MSG_WRITERCLOSE_FAILED = "Unable to close writer";
+	private static final String MSG_READERCLOSE_FAILED = "Unable to close reader";
+	private static final String MSG_FILEDELETION_FAILED = "Unable to delete file";
+	
+	private static final String defPath = "myTasks.txt";
+	private static final String TYPE_SPLITTER = "\"type\":";
+	private static final String BACKSLASH = "\\";
+	private static final String FORWARDSLASH = "/";
 	
 	private File myFile;
 	private FileWriter fw;
@@ -22,12 +39,7 @@ public class StorageLogic {
 	private BufferedWriter bw;
 	private BufferedReader br;
 	
-	private final int DeadlineType = 1;
-	private final int DurationType = 2;
-	//private final int BlockedType = 3;
-	private final int FloatingType = 4;
-	private final String defPath = "myTasks.txt";
-	
+	private String currentPath = "";	
 	Gson gson = new Gson(); 
 	
 	//creates file at default directory, <local directory>/myTasks.txt
@@ -66,11 +78,11 @@ public class StorageLogic {
 		
 		if(myFile.isDirectory()) {
 			String lastChar = currentPath.substring(currentPath.length() - 1);
-			if(lastChar.equals("\\") || lastChar.equals("/")) {
+			if(lastChar.equals(BACKSLASH) || lastChar.equals(FORWARDSLASH)) {
 				currentPath = currentPath + defPath;
 			}
 			else {
-				currentPath = currentPath + "\\"+ defPath;
+				currentPath = currentPath + BACKSLASH+ defPath;
 			}
 			try {
 				createFile(currentPath);
@@ -109,7 +121,7 @@ public class StorageLogic {
 			try {
 				myFile.createNewFile();
 			} catch (IOException e) {
-				throw new IOException("File already exists or directory not made");
+				throw new IOException(MSG_FILECREATION_FAILED);
 			}
 		}
 		
@@ -126,7 +138,7 @@ public class StorageLogic {
 		if(parentFile != null) {
 			if(!parentFile.mkdirs()) {
 				if(!parentFile.exists()) {
-					throw new IOException("Unable to create directories.");
+					throw new IOException(MSG_DIRCREATION_FAILED);
 				}
 			}
 		}
@@ -159,19 +171,19 @@ public class StorageLogic {
 			while ((tempLine = br.readLine()) != null) {
 				int type = getTypeFromGsonString(tempLine);
 				
-				switch(type) {
-					case DeadlineType: 	tempTask = gson.fromJson(tempLine, DeadlineTask.class);
-										break;
-					case DurationType: 	tempTask = gson.fromJson(tempLine, DurationTask.class);
-										break;
-					case FloatingType: 	tempTask = gson.fromJson(tempLine, FloatingTask.class);
-										break;
-					/*case BlockedType: 	tempTask = gson.fromJson(tempLine, BlockedTask.class);
-										break;*/
-					default:			tempTask = null;
-										break;
+				if (type == DeadlineType) {
+					tempTask = gson.fromJson(tempLine, DeadlineTask.class);
+				} else if (type == DurationType) {
+					tempTask = gson.fromJson(tempLine, DurationTask.class);
+				} else if (type == FloatingType) {
+					tempTask = gson.fromJson(tempLine, FloatingTask.class);
+				} else {
+					tempTask = null;
 				}
-				myTaskList.add(tempTask);
+				
+				if(tempTask != null ) {
+					myTaskList.add(tempTask);
+				}
 			}
 		} catch (JsonSyntaxException e) {
 			throw e;
@@ -192,9 +204,8 @@ public class StorageLogic {
 	private int getTypeFromGsonString(String gsonString) {
 		
 		int type = 0;
-		String splitter = "\"type\":";
 		
-		int startIndex = gsonString.indexOf(splitter)+splitter.length();
+		int startIndex = gsonString.indexOf(TYPE_SPLITTER)+TYPE_SPLITTER.length();
 		type = Integer.parseInt( gsonString.substring(startIndex, startIndex+1));
 		
 		return type;
@@ -307,13 +318,13 @@ public class StorageLogic {
 			fw = new FileWriter(myFile.getAbsoluteFile(),true);
 			bw = new BufferedWriter(fw);
 		} catch (IOException e) {
-			throw new IOException("Unable to create writer for file");
+			throw new IOException(MSG_WRITEROPEN_FAILED);
 		}
 		try {
 			fr = new FileReader(myFile.getAbsoluteFile());
 			br = new BufferedReader(fr);
 		} catch (FileNotFoundException e) {
-			throw new FileNotFoundException("Reader cannot be created. File may be is missing");
+			throw new FileNotFoundException(MSG_READEROPEN_FAILED);
 		}
 	}
 	
@@ -323,12 +334,12 @@ public class StorageLogic {
 			try {
 				bw.close();
 			} catch (IOException e) {
-				throw new IOException("Unable to close writer");
+				throw new IOException(MSG_WRITERCLOSE_FAILED);
 			}
 			try {
 				br.close();
 			} catch (IOException e) {
-				throw new IOException("Unable to close reader");
+				throw new IOException(MSG_READERCLOSE_FAILED);
 			}
 	}
 
@@ -569,7 +580,7 @@ public class StorageLogic {
 			e.printStackTrace();
 		}
 		if (!myFile.delete()) {
-			throw new IOException("Could not delete file");
+			throw new IOException(MSG_FILEDELETION_FAILED);
 	    } 
 	}
 	

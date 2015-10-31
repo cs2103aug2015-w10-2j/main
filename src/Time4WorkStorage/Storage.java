@@ -8,6 +8,8 @@ public class Storage {
 	private static Storage theStorage; 
 	private StorageLogic myLogic = new StorageLogic();
 	private CustomPathLogic myPath = new CustomPathLogic();
+	
+	private static final String BACKSLASH = "\\";
 
 	//use storage default path, <local directory>/myTasks.txt unless there's a previous saved path
 	private Storage() throws IOException {
@@ -30,7 +32,7 @@ public class Storage {
 			customPath = myPath.readCustomPath();
 		}
 		
-		String newPath = path.replace("\\", "\\\\");
+		String newPath = path.replace(BACKSLASH, BACKSLASH+BACKSLASH);
 		String pathChanged = "";
 		
 		if(!newPath.equalsIgnoreCase(customPath)) {

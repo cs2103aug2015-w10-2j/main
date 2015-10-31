@@ -6,10 +6,18 @@ public abstract class Tasks {
 	private boolean completed = false;
 	private int type = 0;
 	
-	protected final int DeadlineType = 1;
-	protected final int DurationType = 2;
-	protected final int BlockedType = 3;
-	protected final int FloatingType = 4;
+	public enum TaskType {
+		DeadlineType(1), DurationType(2), FloatingType(3);
+		private int myType = 0;
+		
+		private TaskType(int thisType) {
+			this.myType = thisType;
+		}
+		
+		public int getTaskType() {
+	        return myType;
+	    }
+	}
 	
 	public int getTaskID() {
 		return taskID;

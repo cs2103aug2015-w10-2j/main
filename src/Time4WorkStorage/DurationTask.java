@@ -3,6 +3,7 @@ package Time4WorkStorage;
 public class DurationTask extends Tasks{
 	
 	private Duration durationDetails = null;	
+	private static final int DurationType = TaskType.DurationType.getTaskType();
 	
 	public DurationTask(int taskID, String desc, Duration duration) {
 		super.setTaskID(taskID);
