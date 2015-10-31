@@ -75,7 +75,6 @@ public class FilterTaskTest {
 	@Test
 	public void testSearchCompleted() {
 		
-		
 		assertEquals(myFilter.searchCompleted(myList).size(), 0);
 		assertEquals(myFilter.searchNotCompleted(myList).size(), 3);
 		

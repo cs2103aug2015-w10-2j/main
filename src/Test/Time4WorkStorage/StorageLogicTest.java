@@ -28,10 +28,10 @@ public class StorageLogicTest {
 	final String testFile = "testFile.txt";
 	final Tasks tempTask1 = new FloatingTask(1, "I'm a floating task!");
 	final String tempTask1String = gson.toJson(tempTask1);
-	Duration tempDeadLine2 = new Duration("300915", "1800" , "300915", "2000");
+	final Duration tempDeadLine2 = new Duration("300915", "1800" , "300915", "2000");
 	final Tasks tempTask2 = new DurationTask(2, "I'm a duration task!", tempDeadLine2 );
 	final String tempTask2String = gson.toJson(tempTask2);
-	Duration tempDeadLine3 = new Duration("310915", "1200");
+	final Duration tempDeadLine3 = new Duration("310915", "1200");
 	final Tasks tempTask3 = new DeadlineTask(3, "I'm a deadLine task!", tempDeadLine3 );
 	final String tempTask3String = gson.toJson(tempTask3);
 	
@@ -42,7 +42,6 @@ public class StorageLogicTest {
 	
 	@Before
 	public void setUp() {
-		System.out.println("Setting up");
 		
 		myFile = null;
 		fr = null;
@@ -176,7 +175,6 @@ public class StorageLogicTest {
 	
 	@After
 	public void cleanUp() throws InterruptedException {
-		System.out.println("Cleaning up");
 		try {
 			br.close();
 			fr.close();

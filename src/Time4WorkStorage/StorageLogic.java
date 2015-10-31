@@ -53,9 +53,9 @@ public class StorageLogic {
 		}
 	}	
 	
-	//custom path and filename, path has to have escape characters
+	//custom path, path has to have escape characters for backslash
 	//eg. C:\\user\\Desktop\\myTasks.txt
-	//returns if default file name is appended
+	//returns if a default file name is appended due to path not containing filename
 	public String createCustomFile(String path, boolean transfer) throws IOException {
 		
 		ArrayList<Tasks> tempList = new ArrayList<Tasks>();
@@ -82,7 +82,7 @@ public class StorageLogic {
 				currentPath = currentPath + defPath;
 			}
 			else {
-				currentPath = currentPath + BACKSLASH+ defPath;
+				currentPath = currentPath + BACKSLASH + defPath;
 			}
 			try {
 				createFile(currentPath);
@@ -104,8 +104,7 @@ public class StorageLogic {
 	//if file exists, read and return contents
 	private ArrayList<Tasks> createFile(String currentPath) throws IOException {
 		
-		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
-		
+		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();		
 		myFile = new File(currentPath);
 		
 		try {
@@ -132,8 +131,7 @@ public class StorageLogic {
 	//Creates whole path if it's a path. Returns true on success file+directory creation
 	private void CreateDirectories(File theFile) throws IOException {
 		
-		File parentFile = theFile.getParentFile();
-		
+		File parentFile = theFile.getParentFile();		
 
 		if(parentFile != null) {
 			if(!parentFile.mkdirs()) {
@@ -160,8 +158,7 @@ public class StorageLogic {
 		} catch (IOException e) {
 			throw e;
 		}
-		
-		
+				
 		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
 		String tempLine = "";
 		Tasks tempTask;
@@ -248,20 +245,8 @@ public class StorageLogic {
 		
 		try {
 			openWriterReader();
-		} catch (IOException e) {
-			throw e;
-		}
-		
-
-		try {
 			bw.write(tempLine);
 			bw.newLine();
-		} catch (IOException e) {
-			throw e;
-		}
-		
-
-		try {
 			closeWriterReader();
 		} catch (IOException e) {
 			throw e;
@@ -276,7 +261,6 @@ public class StorageLogic {
 		int largestID = 0;
 		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
 		
-
 		if(!myFile.exists()) {
 			try {
 				createFile(currentPath);
@@ -287,15 +271,11 @@ public class StorageLogic {
 		
 		try {
 			openWriterReader();
-		} catch (IOException e) {
-			throw e;
-		}
-		
-		try {
 			myTaskList = getAllTasks();
 		} catch (IOException e) {
 			throw e;
 		}
+		
 		for(int i=0; i<myTaskList.size(); i++) {
 			if(myTaskList.get(i).getTaskID() > largestID) {
 				largestID = myTaskList.get(i).getTaskID();
@@ -345,6 +325,7 @@ public class StorageLogic {
 
 	//searches and deletes the indicated taskID, if not found, returns null, if deleted returns deleted task 
 	public Tasks delete(int taskID) throws IOException, InterruptedException {
+		
 		Tasks deletedTask = null;
 		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
 		
@@ -358,17 +339,12 @@ public class StorageLogic {
 		
 		try {
 			openWriterReader();
-		} catch (IOException e) {
-			throw e;
-		}
-		
-		boolean needDelete = false;
-		try {
 			myTaskList = getAllTasks();
 		} catch (IOException e) {
 			throw e;
 		}
 		
+		boolean needDelete = false;
 
 		for(int i=0; i<myTaskList.size(); i++) {
 			if(myTaskList.get(i).getTaskID() == taskID) {
@@ -384,29 +360,13 @@ public class StorageLogic {
 			
 			try {
 				closeWriterReader();
-			} catch (IOException e) {
-				throw e;
-			}
-			try {
 				deleteDataFile();
-			} catch (IOException e) {
-				throw e;
-			}
-			
-			try {
 				createFile(currentPath);
-			} catch (IOException e) {
-				throw e;
-			}
-			
-			try {
 				openWriterReader();
 			} catch (IOException e) {
 				throw e;
 			}
-			
-			
-			
+						
 			for(int i=0; i<myTaskList.size(); i++) {
 				String tempLine = gson.toJson(myTaskList.get(i)); 
 			
@@ -425,12 +385,12 @@ public class StorageLogic {
 			throw e;
 		}
 			
-		return deletedTask;
-		
+		return deletedTask;		
 	}
 
 	//sets task as completed, returns the target task
 	public Tasks setCompleted(int taskID, boolean status) throws IOException, InterruptedException {
+		
 		Tasks editedTask = null;
 		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
 		
@@ -469,28 +429,12 @@ public class StorageLogic {
 			
 			try {
 				closeWriterReader();
-			} catch (IOException e) {
-				throw e;
-			}
-			try {
 				deleteDataFile();
-			} catch (IOException e) {
-				throw e;
-			}
-			
-			try {
 				createFile(currentPath);
-			} catch (IOException e) {
-				throw e;
-			}
-			
-			try {
 				openWriterReader();
 			} catch (IOException e) {
 				throw e;
 			}
-			
-			
 			
 			for(int i=0; i<myTaskList.size(); i++) {
 				String tempLine = gson.toJson(myTaskList.get(i)); 
@@ -530,29 +474,9 @@ public class StorageLogic {
 		
 		try {
 			openWriterReader();
-		} catch (IOException e) {
-			throw e;
-		}
-		
-		try {
 			myTaskList = getAllTasks();
-		} catch (IOException e) {
-			throw e;
-		}
-		
-		try {
 			closeWriterReader();
-		} catch (IOException e) {
-			throw e;
-		}
-		
-		try {
 			deleteDataFile();
-		} catch (IOException e) {
-			throw e;
-		}
-		
-		try {
 			createFile(currentPath);
 		} catch (IOException e) {
 			throw e;

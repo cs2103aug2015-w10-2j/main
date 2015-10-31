@@ -83,31 +83,26 @@ public class FilterTask {
 							added = true;
 							break outerloop;
 						} 
-
 					}
 				}
 			}
 			if(added) {
 				resultList.add(myList.get(i));
-			}
-			
-		}
-		
+			}			
+		}		
 		return resultList;
 	}
 	
 	
 	private ArrayList<Tasks> searchCompletion(ArrayList<Tasks> myList, boolean completed) {
-		
-		
+				
 		ArrayList<Tasks> resultList = new ArrayList<Tasks>();
 		
 		for(int i=0; i<myList.size(); i++) {
 			if(myList.get(i).isCompleted() == completed) {
 				resultList.add(myList.get(i));
 			}
-		}
-		
+		}		
 		return resultList;
 	}
 	
@@ -133,16 +128,14 @@ public class FilterTask {
 	
 
 	private ArrayList<Tasks> searchType(ArrayList<Tasks> myList, int searchType) {
-		
-		
+				
 		ArrayList<Tasks> resultList = new ArrayList<Tasks>();
 		
 		for(int i=0; i<myList.size(); i++) {
 			if(myList.get(i).getType() == searchType) {
 				resultList.add(myList.get(i));
 			}
-		}
-		
+		}		
 		return resultList;
 	}
 }
