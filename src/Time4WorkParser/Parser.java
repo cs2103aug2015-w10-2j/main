@@ -64,7 +64,7 @@ public class Parser {
     } else if (userCommand.toUpperCase().equals("STORE")) {
       command = createStoreCommand(arguments);
     } else if (userCommand.toUpperCase().equals("DISPLAY")) {
-      command = createDisplayCommand();
+      command = createDisplayCommand(arguments);
     } else if (userCommand.toUpperCase().equals("EXIT")) {
       command = createExitCommand();
     } else {
@@ -444,8 +444,15 @@ public class Parser {
     return command;
   }
   
-  private Command createDisplayCommand(){
-    Command command = new Command("display");
+  private Command createDisplayCommand(ArrayList<String> arguments){
+    String typeToDisplay = null;
+    
+    if (arguments.isEmpty()){
+      ;
+    } else {
+      typeToDisplay = arguments.get(0);
+    }
+    Command command = new Command("display", typeToDisplay);
     
     return command;
   }
