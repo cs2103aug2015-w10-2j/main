@@ -19,6 +19,8 @@ public class Parser {
   private static final int POSITION_PARAM_COMMAND = 0;
   private static final int POSITION_FIRST_PARAM_ARGUMENT = 1;
   
+  private ArrayList<String> VALID_DISPLAY_COMMANDS = new ArrayList<String>(Arrays.asList("archive", "floating", "deadline", "duration"));
+  
   private static final String KEYWORD_FRONT_CAPS_BY = "By";
   private static final String KEYWORD_SMALL_BY = "by";
   private static final String KEYWORD_FRONT_CAPS_FROM = "From";
@@ -448,9 +450,11 @@ public class Parser {
     String typeToDisplay = null;
     
     if (arguments.isEmpty()){
-      ;
+    	;
+    } else if (VALID_DISPLAY_COMMANDS.contains(arguments.get(0))) {
+    	typeToDisplay = arguments.get(0);
     } else {
-      typeToDisplay = arguments.get(0);
+    	;
     }
     Command command = new Command("display", typeToDisplay);
     
