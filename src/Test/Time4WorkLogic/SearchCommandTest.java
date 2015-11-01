@@ -29,8 +29,8 @@ public class SearchCommandTest {
 		FeedbackMessage feedbackMessage = logic.executeSearch("r");
 		assertEquals(String.format(MESSAGE_SEARCH_, "successfully"), feedbackMessage.getFeedback());
 		
-		assertEquals(2, logic.getMyTaskList().size());
-		assertFalse(logic.getMyTaskList().contains(task3));
+		assertEquals(3, logic.getIncompleteTaskList().size());
+		assertFalse(logic.getIncompleteTaskList().contains(task3));
 		
 	}
 	 /*This is the test for search task failed*/
@@ -49,7 +49,7 @@ public class SearchCommandTest {
 		FeedbackMessage feedbackMessage = logic.executeSearch("dsfgdigoogjd");
 		assertEquals(String.format(MESSAGE_SEARCH_, "failed: no such task"), feedbackMessage.getFeedback());
 		
-		assertEquals(3, logic.getMyTaskList().size());
+		assertEquals(3, logic.getIncompleteTaskList().size());
 		
 	}
 	

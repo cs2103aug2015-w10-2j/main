@@ -33,13 +33,13 @@ public class DeleteCommandTest {
 		FeedbackMessage feedbackMessage = logic.executeDelete(indexToBeDeleted);
 		assertEquals("Task 2  deleted successfully !", feedbackMessage.getFeedback());
 		
-		assertEquals(2, logic.getMyTaskList().size());
-		assertFalse(logic.getMyTaskList().contains(task2));
+		assertEquals(2, logic.getIncompleteTaskList().size());
+		assertFalse(logic.getIncompleteTaskList().contains(task2));
 		
 		//test undo
 		feedbackMessage = logic.executeUndo();
 		assertEquals(String.format(MESSAGE_UNDO_, "successfully!"), feedbackMessage.getFeedback());
-		assertEquals(3, feedbackMessage.getTaskList().size());
+		assertEquals(3, feedbackMessage.getIncompleteTaskList().size());
 	}
 	
 	/*Test for delete multiple tasks*/
@@ -60,14 +60,14 @@ public class DeleteCommandTest {
 		FeedbackMessage feedbackMessage = logic.executeDelete(indexToBeDeleted);
 		assertEquals("Task 2 3  deleted successfully !", feedbackMessage.getFeedback());
 		
-		assertEquals(1, logic.getMyTaskList().size());
-		assertFalse(logic.getMyTaskList().contains(task2));
-		assertFalse(logic.getMyTaskList().contains(task3));
+		assertEquals(1, logic.getIncompleteTaskList().size());
+		assertFalse(logic.getIncompleteTaskList().contains(task2));
+		assertFalse(logic.getIncompleteTaskList().contains(task3));
 		
 		//test undo 
 		feedbackMessage = logic.executeUndo();
 		assertEquals(String.format(MESSAGE_UNDO_, "successfully!"), feedbackMessage.getFeedback());
-		assertEquals(3, feedbackMessage.getTaskList().size());
+		assertEquals(3, feedbackMessage.getIncompleteTaskList().size());
 	}
 	
 	/*Test for delete failed (index out of range)*/
@@ -87,7 +87,7 @@ public class DeleteCommandTest {
 		FeedbackMessage feedbackMessage = logic.executeDelete(indexToBeDeleted);
 		assertEquals("Task 5  deleted failed !", feedbackMessage.getFeedback());
 		
-		assertEquals(3, logic.getMyTaskList().size());
+		assertEquals(3, logic.getIncompleteTaskList().size());
 		
 	}
 	

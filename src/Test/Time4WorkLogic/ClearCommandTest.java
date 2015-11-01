@@ -30,12 +30,12 @@ public class ClearCommandTest {
 		FeedbackMessage feedbackMessage = logic.executeClear();
 		
 		assertEquals(String.format(MESSAGE_CLEAR, "successfully"), feedbackMessage.getFeedback());
-		assertEquals(0, logic.getMyTaskList().size());
+		assertEquals(0, logic.getIncompleteTaskList().size());
 		
 		//test undo
 		feedbackMessage = logic.executeUndo();
 		assertEquals(String.format(MESSAGE_UNDO_, "successfully!"), feedbackMessage.getFeedback());
-		assertEquals(3, feedbackMessage.getTaskList().size());
+		assertEquals(3, feedbackMessage.getIncompleteTaskList().size());
 	}
 	
 }

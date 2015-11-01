@@ -25,12 +25,12 @@ public class UpdateCommandTest {
 		FeedbackMessage feedbackMessage = logic.executeUpdate(task);
 		assertEquals(String.format(MESSAGE_UPDATED_, "successfully"), feedbackMessage.getFeedback());
 		
-		assertEquals("sleeping", logic.getMyTaskList().get(0).getDescription());
+		assertEquals("sleeping", logic.getIncompleteTaskList().get(0).getDescription());
 		
 		//test undo
 		feedbackMessage = logic.executeUndo();
 		assertEquals(String.format(MESSAGE_UNDO_, "successfully!"), feedbackMessage.getFeedback());
-		assertEquals("reading", logic.getMyTaskList().get(0).getDescription());
+		assertEquals("reading", logic.getIncompleteTaskList().get(0).getDescription());
 	}
 	
 }
