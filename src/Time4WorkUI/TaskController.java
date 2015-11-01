@@ -26,7 +26,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 
-public class controllerTemp {
+public class TaskController {
 
 	private static Logic logic = new Logic();
 
@@ -210,8 +210,8 @@ public class controllerTemp {
 	}
 
 	public void initGUI() {
-		currentToDoList = logic.getIncompleteTaskFromMytaskList(logic.getFullTaskList());
-		currentCompletedList = logic.getCompleteTaskFromMytaskList(logic.getFullTaskList());
+		currentToDoList = logic.getIncompleteTaskList();
+		currentCompletedList = logic.getCompleteTaskList();
 
 
 		toDoTaskTable.setItems(getTaskList(currentToDoList));
