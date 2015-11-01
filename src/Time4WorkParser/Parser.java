@@ -180,18 +180,26 @@ public class Parser {
     Tasks task = null;
     String descriptionOfTask = arguments.get(0);
     ArrayList<String> timeArray = getTimeArray(arguments, 0);
-    timeArray.set(0, timeArray.get(0).toLowerCase());
     int numberOfArguments = timeArray.size();
     
     if (numberOfArguments == 0) {
       task = new FloatingTask(descriptionOfTask);
-    } else if (timeArray.contains(KEYWORD_BY)) {
-      timeArray.remove(KEYWORD_BY);
-      task = createDeadlineTask(task, descriptionOfTask, timeArray);
-    } else if (timeArray.contains(KEYWORD_FROM) && timeArray.contains(KEYWORD_TO)) {
-      timeArray.remove(KEYWORD_FROM);
-      timeArray.remove(KEYWORD_TO);
-      task = createDurationTask(task, descriptionOfTask, timeArray);
+    } else if (timeArray.contains(KEYWORD_BY) || timeArray.contains(KEYWORD_FROM) || timeArray.contains(KEYWORD_TO)){
+      timeArray.set(0, timeArray.get(0).toLowerCase());
+      if (timeArray.contains(KEYWORD_BY)) {
+        timeArray.remove(KEYWORD_BY);
+        task = createDeadlineTask(task, descriptionOfTask, timeArray);
+      } else if (timeArray.contains(KEYWORD_FROM) && timeArray.contains(KEYWORD_TO)) {
+        timeArray.remove(KEYWORD_FROM);
+        timeArray.remove(KEYWORD_TO);
+        task = createDurationTask(task, descriptionOfTask, timeArray);
+      }
+    } else {
+      if (numberOfArguments == 1 || numberOfArguments == 2){
+        task = createDeadlineTask(task, descriptionOfTask, timeArray);
+      } else {
+        task = createDurationTask(task, descriptionOfTask, timeArray);
+      }
     }
     return task;
   }
@@ -447,11 +455,11 @@ public class Parser {
     String typeToDisplay = null;
     
     if (arguments.isEmpty()){
-    	;
+      ;
     } else if (VALID_DISPLAY_COMMANDS.contains(arguments.get(0))) {
-    	typeToDisplay = arguments.get(0);
+      typeToDisplay = arguments.get(0);
     } else {
-    	;
+      ;
     }
     Command command = new Command("display", typeToDisplay);
     
