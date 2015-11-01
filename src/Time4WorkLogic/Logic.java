@@ -26,7 +26,7 @@ public class Logic {
     private static final String MESSAGE_DISPLAY = "Here are all the tasks";
     private static final String MESSAGE_SORTED = "Task sorted successfully!";
     private static final String MESSAGE_SEARCH_ = "Task searched %1$s";
-    private static final String MESSAGE_DONE_ = "Mark task %1$s as done";
+    private static final String MESSAGE_DONE_ = "Mark task %1$s as done %2$s";
     private static final String MESSAGE_CLEAR = "All task cleared successfully!";
     private static final String MESSAGE_UNDO_ = "Undo %1$s!";
     private static final String MESSAGE_CREATE_PATH_ = "Personalize storage path %1$s !";
@@ -41,7 +41,6 @@ public class Logic {
     private boolean isFirstCommand = true;
     private Storage storage;
     private FilterTask myFilter = new FilterTask();
-    private ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
     private ArrayList<Tasks> fullTaskList = new ArrayList<Tasks>();
     private ArrayList<Tasks> completeList = new ArrayList<Tasks>();
     private ArrayList<Tasks> incompleteList = new ArrayList<Tasks>();
@@ -75,9 +74,8 @@ public class Logic {
         fullTaskList = getFullTaskList();
         
         if (isFirstCommand) {
-            myTaskList = fullTaskList;
-            completeList = getCompleteTaskFromMytaskList(myTaskList);
-            incompleteList = getIncompleteTaskFromMytaskList(myTaskList);
+            completeList = getCompleteTaskFromMytaskList(fullTaskList);
+            incompleteList = getIncompleteTaskFromMytaskList(fullTaskList);
         }
         isFirstCommand = false;
         
@@ -199,7 +197,7 @@ public class Logic {
         return completeList;
     }
     
-    public ArrayList<Tasks> getInompleteTaskList() {
+    public ArrayList<Tasks> getIncompleteTaskList() {
         fullTaskList = getFullTaskList();
         incompleteList = myFilter.searchNotCompleted(fullTaskList);
         return incompleteList;
@@ -328,11 +326,11 @@ public class Logic {
         }
         
         if (indexMarkedSuccessfully.isEmpty()) {
-            return new FeedbackMessage(String.format(MESSAGE_DONE_, indexMarkedFailed, "failed"),
+            return new FeedbackMessage(String.format(MESSAGE_DONE_, indexMarkedFailed, "failed !"),
                                        completeList, incompleteList);
         } else {
             commandHistory.addCommand(new Command("done", markedTaskNum));
-            return new FeedbackMessage(String.format(MESSAGE_DONE_, indexMarkedSuccessfully, "successfully"),
+            return new FeedbackMessage(String.format(MESSAGE_DONE_, indexMarkedSuccessfully, "successfully !"),
                                        completeList, incompleteList);
         }
         
@@ -376,9 +374,7 @@ public class Logic {
     
     public FeedbackMessage executeSort() throws IOException {
         logger.log(Level.INFO, "start processing sort command");
-        myTaskList.sort(null);
-        completeList = getCompleteTaskFromMytaskList(myTaskList);
-        incompleteList = getIncompleteTaskFromMytaskList(myTaskList);
+        incompleteList.sort(null);
         logger.log(Level.INFO, "end of processing sort command");
         return new FeedbackMessage(MESSAGE_SORTED, completeList, incompleteList);
     }
@@ -483,7 +479,8 @@ public class Logic {
                     int taskID = task.getTaskID();
                     storage.SetIncompleted(taskID);
                     incompleteList.add(task);
-                    completeList.remove(task);
+                    int taskIndexInCompleteList = getIndexFromTaskID(completeList, taskID);
+                    completeList.remove(taskIndexInCompleteList);
                 }
                 undoSuccessfully = true;
             }
@@ -503,9 +500,9 @@ public class Logic {
     }
     
     public FeedbackMessage executeDisplay() throws Exception {
-        myTaskList = getFullTaskList();
-        completeList = getCompleteTaskFromMytaskList(myTaskList);
-        incompleteList = getIncompleteTaskFromMytaskList(myTaskList);
+    	fullTaskList = getFullTaskList();
+        completeList = getCompleteTaskFromMytaskList(fullTaskList);
+        incompleteList = getIncompleteTaskFromMytaskList(fullTaskList);
         return new FeedbackMessage(MESSAGE_DISPLAY, completeList, incompleteList);
     }
     
@@ -523,7 +520,6 @@ public class Logic {
             reversedCommandHistory.addReversedCommand(reversedCommand);
         }
         
-        myTaskList.clear();
         completeList.clear();
         incompleteList.clear();
         logger.log(Level.INFO, "end of processing clear command");
@@ -533,8 +529,9 @@ public class Logic {
     public FeedbackMessage executeCreatePath(String storagePath) throws IOException {
         storage.setCustomPath(storagePath);
         isFirstCommand = true;
-        completeList = getCompleteTaskFromMytaskList(myTaskList);
-        incompleteList = getIncompleteTaskFromMytaskList(myTaskList);
+        fullTaskList = getFullTaskList();
+        completeList = getCompleteTaskFromMytaskList(fullTaskList);
+        incompleteList = getIncompleteTaskFromMytaskList(fullTaskList);
         return new FeedbackMessage(String.format(MESSAGE_CREATE_PATH_, "successfully"),
                                    completeList, incompleteList);
         
@@ -545,7 +542,7 @@ public class Logic {
     // =========================================================================
     
     private int getTaskIDFromUserInput(int userInput) {
-        Tasks requriedTask = myTaskList.get(userInput - 1);
+        Tasks requriedTask = incompleteList.get(userInput - 1);
         int taskID = requriedTask.getTaskID();
         return taskID;
     }
@@ -563,21 +560,16 @@ public class Logic {
     }
     
     private int getIndexFromTaskID(ArrayList<Tasks> taskList, int taskID) {
-        myTaskList = taskList;
         int index = -1;
-        for  (int i = 0; i < myTaskList.size(); i++) {
-            if (myTaskList.get(i).getTaskID() == taskID) {
+        for  (int i = 0; i < taskList.size(); i++) {
+            if (taskList.get(i).getTaskID() == taskID) {
                 index = i;
                 break;
             }
         }
         return index;
     }
-    
-    public ArrayList<Tasks> getMyTaskList() {
-        return myTaskList;
-    }
-    
+
     
     private ArrayList<Tasks> getCompleteTaskFromMytaskList(ArrayList<Tasks> myTaskList) {
         ArrayList<Tasks> completeTask = myFilter.searchCompleted(myTaskList);
