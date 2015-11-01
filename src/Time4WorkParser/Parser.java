@@ -21,10 +21,8 @@ public class Parser {
   
   private ArrayList<String> VALID_DISPLAY_COMMANDS = new ArrayList<String>(Arrays.asList("archive", "floating", "deadline", "duration"));
   
-  private static final String KEYWORD_FRONT_CAPS_BY = "By";
-  private static final String KEYWORD_SMALL_BY = "by";
-  private static final String KEYWORD_FRONT_CAPS_FROM = "From";
-  private static final String KEYWORD_SMALL_FROM = "from";
+  private static final String KEYWORD_BY = "by";
+  private static final String KEYWORD_FROM = "from";
   private static final String KEYWORD_TO = "to";
   
   private static final String REGEX_WHITESPACES = "[\\s,]+";
@@ -182,17 +180,16 @@ public class Parser {
     Tasks task = null;
     String descriptionOfTask = arguments.get(0);
     ArrayList<String> timeArray = getTimeArray(arguments, 0);
+    timeArray.set(0, timeArray.get(0).toLowerCase());
     int numberOfArguments = timeArray.size();
     
     if (numberOfArguments == 0) {
       task = new FloatingTask(descriptionOfTask);
-    } else if (timeArray.contains(KEYWORD_FRONT_CAPS_BY) || timeArray.contains(KEYWORD_SMALL_BY)) {
-      timeArray.remove(KEYWORD_FRONT_CAPS_BY);
-      timeArray.remove(KEYWORD_SMALL_BY);
+    } else if (timeArray.contains(KEYWORD_BY)) {
+      timeArray.remove(KEYWORD_BY);
       task = createDeadlineTask(task, descriptionOfTask, timeArray);
-    } else if ((timeArray.contains(KEYWORD_FRONT_CAPS_FROM) || timeArray.contains(KEYWORD_SMALL_FROM)) && timeArray.contains(KEYWORD_TO)) {
-      timeArray.remove(KEYWORD_FRONT_CAPS_FROM);
-      timeArray.remove(KEYWORD_SMALL_FROM);
+    } else if (timeArray.contains(KEYWORD_FROM) && timeArray.contains(KEYWORD_TO)) {
+      timeArray.remove(KEYWORD_FROM);
       timeArray.remove(KEYWORD_TO);
       task = createDurationTask(task, descriptionOfTask, timeArray);
     }
