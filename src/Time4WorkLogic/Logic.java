@@ -125,7 +125,12 @@ public class Logic {
                 String searchKeyword = parsedCommand.getSearchOrStoragePath();
                 return executeSearch(searchKeyword);
             case DISPLAY:
-                String displayType = parsedCommand.getSearchOrStoragePath();
+                String displayType;
+                if (parsedCommand.getSearchOrStoragePath() != null) {
+                    displayType = parsedCommand.getSearchOrStoragePath();
+                } else {
+                    displayType = "all";
+                }
                 return executeDisplay(displayType);
             case DONE:
                 if (userInputIndexes.isEmpty()) {
@@ -183,14 +188,7 @@ public class Logic {
     // =========================================================================
     // Useful method for UI to get task list
     // =========================================================================
-    public ArrayList<Tasks> getFullTaskList() {
-        try {
-            return storage.readFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return fullTaskList;
-    }
+    
     
     public ArrayList<Tasks> getCompleteTaskList() {
         fullTaskList = getFullTaskList();
@@ -273,7 +271,7 @@ public class Logic {
         }
         
         if (indexDeletedSuccessfully.isEmpty()) {
-            return new FeedbackMessage(String.format(MESSAGE_DELETED_, indexDeletedFailed, "failed"),
+            return new FeedbackMessage(String.format(MESSAGE_DELETED_, indexDeletedFailed, "failed: index out of range"),
                                        completeList, incompleteList);
         } else {
             commandHistory.addCommand(new Command("delete", deletedTaskNum));
@@ -343,7 +341,7 @@ public class Logic {
         int indexToBeDeleted = task.getTaskID();   // get index to be deleted by retrieving taskID
         
         if (taskListSize < indexToBeDeleted || indexToBeDeleted < 1) {
-            return new FeedbackMessage(String.format(MESSAGE_UPDATED_, "failed"),
+            return new FeedbackMessage(String.format(MESSAGE_UPDATED_, "failed: index out of range"),
                                        completeList, incompleteList);
         } else {
             int taskIDToBeDeleted = getTaskIDFromUserInput(indexToBeDeleted);
@@ -490,12 +488,13 @@ public class Logic {
         
         ArrayList<Tasks> displayList = new ArrayList<Tasks>();
         
+        
         if (displayType.equals("archive")) {
             fullTaskList = getFullTaskList();
             completeList = getCompleteTaskFromMytaskList(fullTaskList);
             
             displayList = myFilter.searchCompleted(fullTaskList);
-        } else if (displayType.equals("incomplete")) {
+        } else if (displayType.equals("all") || displayType.equals("incomplete")) {
             fullTaskList = getFullTaskList();
             incompleteList = getIncompleteTaskFromMytaskList(fullTaskList);
             displayList = myFilter.searchNotCompleted(fullTaskList);
@@ -594,6 +593,15 @@ public class Logic {
     private ArrayList<Tasks> getIncompleteTaskFromMytaskList(ArrayList<Tasks> myTaskList) {
         ArrayList<Tasks> incompleteTask = myFilter.searchNotCompleted(myTaskList);
         return incompleteTask;
+    }
+    
+    private ArrayList<Tasks> getFullTaskList() {
+        try {
+            return storage.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return fullTaskList;
     }
     
     
