@@ -387,13 +387,11 @@ public class Logic {
         } else if (keyword.equals("incomplete")) {
             searchList = myFilter.searchNotCompleted(fullTaskList);
         } else if (keyword.equals("deadline")) {
-            searchList = myFilter.searchType(incompleteList, 1);
+            searchList = myFilter.searchDeadline(incompleteList);
         } else if (keyword.equals("duration")) {
-            searchList = myFilter.searchType(incompleteList, 2);
-        } else if (keyword.equals("blocked")) {
-            searchList = myFilter.searchType(incompleteList, 3);
+            searchList = myFilter.searchDuration(incompleteList);
         } else if (keyword.equals("floating")) {
-            searchList = myFilter.searchType(incompleteList, 4);
+            searchList = myFilter.searchFloating(incompleteList);
         } else {
             searchList = myFilter.searchDescription(incompleteList, keyword);
         }
