@@ -19,6 +19,12 @@ public class Parser {
   private static final int POSITION_PARAM_COMMAND = 0;
   private static final int POSITION_FIRST_PARAM_ARGUMENT = 1;
   
+  private static final String KEYWORD_FRONT_CAPS_BY = "By";
+  private static final String KEYWORD_SMALL_BY = "by";
+  private static final String KEYWORD_FRONT_CAPS_FROM = "From";
+  private static final String KEYWORD_SMALL_FROM = "from";
+  private static final String KEYWORD_TO = "to";
+  
   private static final String REGEX_WHITESPACES = "[\\s,]+";
   
   private static final Logger logger = Logger.getLogger(Parser.class.getName());
@@ -172,30 +178,49 @@ public class Parser {
   
   private Tasks createTaskListForAddingOrUpdating(ArrayList<String> arguments) {
     Tasks task = null;
-    int numberOfArguments = arguments.size();
-    assert numberOfArguments <= 5;
     String descriptionOfTask = arguments.get(0);
+    ArrayList<String> timeArray = getTimeArray(arguments, 0);
+    int numberOfArguments = timeArray.size();
     
-    if (numberOfArguments == 1) {
+    if (numberOfArguments == 0) {
       task = new FloatingTask(descriptionOfTask);
-    } else if (numberOfArguments == 2) {
-      String endDate = arguments.get(1);
-      task = createDeadlineTaskForInputWithoutTime(task, descriptionOfTask, endDate);
-    } else if (numberOfArguments == 3) {
-      String endDate = arguments.get(1);
-      String endTime = arguments.get(2);
-      task = createDeadlineTaskForInputWithTime(task, descriptionOfTask, endDate, endTime);
-    } else if (numberOfArguments == 4) {
-      String date = arguments.get(1);
-      String startTime = arguments.get(2);
-      String endTime = arguments.get(3);
+    } else if (timeArray.contains(KEYWORD_FRONT_CAPS_BY) || timeArray.contains(KEYWORD_SMALL_BY)) {
+      timeArray.remove(KEYWORD_FRONT_CAPS_BY);
+      timeArray.remove(KEYWORD_SMALL_BY);
+      task = createDeadlineTask(task, descriptionOfTask, timeArray);
+    } else if ((timeArray.contains(KEYWORD_FRONT_CAPS_FROM) || timeArray.contains(KEYWORD_SMALL_FROM)) && timeArray.contains(KEYWORD_TO)) {
+      timeArray.remove(KEYWORD_FRONT_CAPS_FROM);
+      timeArray.remove(KEYWORD_SMALL_FROM);
+      timeArray.remove(KEYWORD_TO);
+      task = createDurationTask(task, descriptionOfTask, timeArray);
+    }
+    return task;
+  }
+  
+  private Tasks createDurationTask(Tasks task, String descriptionOfTask, ArrayList<String> timeArray) {
+    if (timeArray.size() == 3){
+      String date = timeArray.get(0);
+      String startTime = timeArray.get(1);
+      String endTime = timeArray.get(2);
       task = createDurationTaskForSameDayEvent(task, descriptionOfTask, date, startTime, endTime);
     } else {
-      String startDate = arguments.get(1);
-      String startTime = arguments.get(2);
-      String endDate = arguments.get(3);
-      String endTime = arguments.get(4);
+      String startDate = timeArray.get(0);
+      String startTime = timeArray.get(1);
+      String endDate = timeArray.get(2);
+      String endTime = timeArray.get(3);
       task = createDurationTaskForFullInputCommand(task, descriptionOfTask, startDate, startTime, endDate, endTime);
+    }
+    return task;
+  }
+  
+  private Tasks createDeadlineTask(Tasks task, String descriptionOfTask, ArrayList<String> timeArray) {
+    if (timeArray.size() == 1){
+      String endDate = timeArray.get(0);
+      task = createDeadlineTaskForInputWithoutTime(task, descriptionOfTask, endDate);
+    } else {
+      String endDate = timeArray.get(0);
+      String endTime = timeArray.get(1);
+      task = createDeadlineTaskForInputWithTime(task, descriptionOfTask, endDate, endTime);
     }
     return task;
   }
