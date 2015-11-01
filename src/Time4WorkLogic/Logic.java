@@ -487,23 +487,25 @@ public class Logic {
         logger.log(Level.INFO, "start processing display command");
         
         ArrayList<Tasks> displayList = new ArrayList<Tasks>();
+        fullTaskList = getFullTaskList();
+        
+        ArrayList<Tasks> fullIncompleteTask = new ArrayList<Tasks>();
+        fullIncompleteTask = getIncompleteTaskFromMytaskList(fullTaskList);
         
         
         if (displayType.equals("archive")) {
-            fullTaskList = getFullTaskList();
             completeList = getCompleteTaskFromMytaskList(fullTaskList);
             
             displayList = myFilter.searchCompleted(fullTaskList);
         } else if (displayType.equals("all") || displayType.equals("incomplete")) {
-            fullTaskList = getFullTaskList();
-            incompleteList = getIncompleteTaskFromMytaskList(fullTaskList);
-            displayList = myFilter.searchNotCompleted(fullTaskList);
+            displayList = myFilter.searchNotCompleted(fullIncompleteTask);
         } else if (displayType.equals("deadline")) {
-            displayList = myFilter.searchDeadline(incompleteList);
+            displayList = myFilter.searchDeadline(fullIncompleteTask);
         } else if (displayType.equals("duration")) {
-            displayList = myFilter.searchDuration(incompleteList);
+            displayList = myFilter.searchDuration(fullIncompleteTask);
         } else if (displayType.equals("floating")) {
-            displayList = myFilter.searchFloating(incompleteList);
+            displayList = myFilter.searchFloating(fullIncompleteTask);
+            
         }
         
         
@@ -597,7 +599,7 @@ public class Logic {
     
     private ArrayList<Tasks> getFullTaskList() {
         try {
-            return storage.readFile();
+            fullTaskList = storage.readFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
