@@ -23,7 +23,7 @@ public class Logic {
     private static final String MESSAGE_ADDED_ = "Task added %1$s !";
     private static final String MESSAGE_UPDATED_ = "Task updated %1$s !";
     private static final String MESSAGE_DELETED_ = "Task %1$s deleted %2$s !";
-    private static final String MESSAGE_DISPLAY = "Here are all the tasks";
+    private static final String MESSAGE_DISPLAY = "Here are all the %1$s tasks";
     private static final String MESSAGE_SORTED = "Task sorted successfully!";
     private static final String MESSAGE_SEARCH_ = "Task searched %1$s";
     private static final String MESSAGE_DONE_ = "Mark task %1$s as done %2$s";
@@ -125,7 +125,8 @@ public class Logic {
                 String searchKeyword = parsedCommand.getSearchOrStoragePath();
                 return executeSearch(searchKeyword);
             case DISPLAY:
-                return executeDisplay();
+                String displayType = parsedCommand.getSearchOrStoragePath();
+                return executeDisplay(displayType);
             case DONE:
                 if (userInputIndexes.isEmpty()) {
                     int userInputIndex = parsedCommand.getSelectedIndexNumber();
@@ -382,20 +383,7 @@ public class Logic {
     public FeedbackMessage executeSearch(String keyword) throws IOException {
         logger.log(Level.INFO, "start processing search command");
         ArrayList<Tasks> searchList = new ArrayList<Tasks>();
-        if (keyword.equals("complete")) {
-            searchList = myFilter.searchCompleted(fullTaskList);
-        } else if (keyword.equals("incomplete")) {
-            searchList = myFilter.searchNotCompleted(fullTaskList);
-        } else if (keyword.equals("deadline")) {
-            searchList = myFilter.searchDeadline(incompleteList);
-        } else if (keyword.equals("duration")) {
-            searchList = myFilter.searchDuration(incompleteList);
-        } else if (keyword.equals("floating")) {
-            searchList = myFilter.searchFloating(incompleteList);
-        } else {
-            searchList = myFilter.searchDescription(incompleteList, keyword);
-        }
-        
+        searchList = myFilter.searchDescription(incompleteList, keyword);
         
         if (searchList.size() != 0) {
             incompleteList = searchList;
@@ -497,12 +485,41 @@ public class Logic {
         
     }
     
-    public FeedbackMessage executeDisplay() throws Exception {
-    	fullTaskList = getFullTaskList();
-        completeList = getCompleteTaskFromMytaskList(fullTaskList);
-        incompleteList = getIncompleteTaskFromMytaskList(fullTaskList);
-        return new FeedbackMessage(MESSAGE_DISPLAY, completeList, incompleteList);
+    public FeedbackMessage executeDisplay(String displayType) throws Exception {
+        logger.log(Level.INFO, "start processing display command");
+        
+        ArrayList<Tasks> displayList = new ArrayList<Tasks>();
+        
+        if (displayType.equals("archive")) {
+            fullTaskList = getFullTaskList();
+            completeList = getCompleteTaskFromMytaskList(fullTaskList);
+            
+            displayList = myFilter.searchCompleted(fullTaskList);
+        } else if (displayType.equals("incomplete")) {
+            fullTaskList = getFullTaskList();
+            incompleteList = getIncompleteTaskFromMytaskList(fullTaskList);
+            displayList = myFilter.searchNotCompleted(fullTaskList);
+        } else if (displayType.equals("deadline")) {
+            displayList = myFilter.searchDeadline(incompleteList);
+        } else if (displayType.equals("duration")) {
+            displayList = myFilter.searchDuration(incompleteList);
+        } else if (displayType.equals("floating")) {
+            displayList = myFilter.searchFloating(incompleteList);
+        }
+        
+        
+        if (displayList.size() != 0) {
+            incompleteList = displayList;
+            logger.log(Level.INFO, "end of processing search command");
+            return new FeedbackMessage(String.format(MESSAGE_DISPLAY, displayType),
+                                       completeList, incompleteList);
+        } else {
+            logger.log(Level.INFO, "end of processing search command");
+            return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "failed: no such task"),
+                                       completeList, incompleteList);
+        }
     }
+    
     
     public FeedbackMessage executeClear() throws Exception {
         logger.log(Level.INFO, "start processing clear command");
@@ -567,7 +584,7 @@ public class Logic {
         }
         return index;
     }
-
+    
     
     private ArrayList<Tasks> getCompleteTaskFromMytaskList(ArrayList<Tasks> myTaskList) {
         ArrayList<Tasks> completeTask = myFilter.searchCompleted(myTaskList);
