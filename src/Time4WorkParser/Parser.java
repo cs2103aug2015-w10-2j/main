@@ -185,21 +185,32 @@ public class Parser {
     if (numberOfArguments == 0) {
       task = new FloatingTask(descriptionOfTask);
     } else if (timeArray.contains(KEYWORD_BY) || timeArray.contains(KEYWORD_FROM) || timeArray.contains(KEYWORD_TO)){
-      timeArray.set(0, timeArray.get(0).toLowerCase());
-      if (timeArray.contains(KEYWORD_BY)) {
-        timeArray.remove(KEYWORD_BY);
-        task = createDeadlineTask(task, descriptionOfTask, timeArray);
-      } else if (timeArray.contains(KEYWORD_FROM) && timeArray.contains(KEYWORD_TO)) {
-        timeArray.remove(KEYWORD_FROM);
-        timeArray.remove(KEYWORD_TO);
-        task = createDurationTask(task, descriptionOfTask, timeArray);
-      }
+      task = createKeywordTask(task, descriptionOfTask, timeArray);
     } else {
-      if (numberOfArguments == 1 || numberOfArguments == 2){
-        task = createDeadlineTask(task, descriptionOfTask, timeArray);
-      } else {
-        task = createDurationTask(task, descriptionOfTask, timeArray);
-      }
+      task = createNoKeywordTask(task, descriptionOfTask, timeArray, numberOfArguments);
+    }
+    return task;
+  }
+  
+  private Tasks createNoKeywordTask(Tasks task, String descriptionOfTask, ArrayList<String> timeArray,
+                                    int numberOfArguments) {
+    if (numberOfArguments == 1 || numberOfArguments == 2){
+      task = createDeadlineTask(task, descriptionOfTask, timeArray);
+    } else {
+      task = createDurationTask(task, descriptionOfTask, timeArray);
+    }
+    return task;
+  }
+  
+  private Tasks createKeywordTask(Tasks task, String descriptionOfTask, ArrayList<String> timeArray) {
+    timeArray.set(0, timeArray.get(0).toLowerCase());
+    if (timeArray.contains(KEYWORD_BY)) {
+      timeArray.remove(KEYWORD_BY);
+      task = createDeadlineTask(task, descriptionOfTask, timeArray);
+    } else if (timeArray.contains(KEYWORD_FROM) && timeArray.contains(KEYWORD_TO)) {
+      timeArray.remove(KEYWORD_FROM);
+      timeArray.remove(KEYWORD_TO);
+      task = createDurationTask(task, descriptionOfTask, timeArray);
     }
     return task;
   }
