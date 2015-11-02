@@ -498,6 +498,7 @@ public class Logic {
             
             displayList = myFilter.searchCompleted(fullTaskList);
         } else if (displayType.equals("all") || displayType.equals("incomplete")) {
+            displayType = "incomplete";
             displayList = myFilter.searchNotCompleted(fullIncompleteTask);
         } else if (displayType.equals("deadline")) {
             displayList = myFilter.searchDeadline(fullIncompleteTask);
