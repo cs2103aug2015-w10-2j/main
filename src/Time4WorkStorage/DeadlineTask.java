@@ -1,5 +1,7 @@
 package Time4WorkStorage;
 
+/* @@author A0125495Y */
+
 public class DeadlineTask extends Tasks{
 	
 	private Duration durationDetails = null;

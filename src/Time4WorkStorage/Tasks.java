@@ -1,5 +1,7 @@
 package Time4WorkStorage;
 
+/* @@author A0125495Y */
+
 public abstract class Tasks {
 	private int taskID;
 	private String description = "";		 

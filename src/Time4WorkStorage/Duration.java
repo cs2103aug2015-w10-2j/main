@@ -2,6 +2,8 @@ package Time4WorkStorage;
 
 import Time4WorkStorage.Tasks.TaskType;
 
+/* @@author A0125495Y */
+
 public class Duration {
 	
 	private String startDate = "";		//date format is “DDMMYY”

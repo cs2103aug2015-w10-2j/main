@@ -14,6 +14,8 @@ import com.google.gson.JsonSyntaxException;
 
 import Time4WorkStorage.Tasks.TaskType;
 
+/* @@author A0125495Y */
+
 public class StorageLogic {
 			
 	private static final int DeadlineType = TaskType.DeadlineType.getTaskType();
@@ -30,8 +32,6 @@ public class StorageLogic {
 	
 	private static final String defPath = "myTasks.txt";
 	private static final String TYPE_SPLITTER = "\"type\":";
-	//private static final String BACKSLASH = "\\";
-	//private static final String FORWARDSLASH = "/";
 	
 	private File myFile;
 	private FileWriter fw;
@@ -78,23 +78,6 @@ public class StorageLogic {
 			return currentPath;
 			//throw e;
 		}
-		
-		/*
-		if(myFile.isDirectory()) {
-			String lastChar = currentPath.substring(currentPath.length() - 1);
-			if(lastChar.equals(BACKSLASH) || lastChar.equals(FORWARDSLASH)) {
-				currentPath = currentPath + defPath;
-			}
-			else {
-				currentPath = currentPath + BACKSLASH + defPath;
-			}
-			try {
-				createFile(currentPath);
-			} catch (IOException e) {
-				throw e;
-			}
-		}
-		*/
 		
 		if(transfer) {
 			for(int i=0; i<tempList.size(); i++) {

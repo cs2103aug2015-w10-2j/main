@@ -8,6 +8,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+/* @@author A0125495Y */
+
 import Time4WorkStorage.Tasks.TaskType;
 
 public class FilterTask {
@@ -167,7 +169,9 @@ public class FilterTask {
 		targetDate = cal.getTime();
 		
 		for(int i=0; i<myList.size(); i++) {
+			
 			int taskType = myList.get(i).getType();
+			
 			if(taskType == DeadlineType) {
 				DeadlineTask tempTask = (DeadlineTask) myList.get(i);
 				Date myDate = format.parse(tempTask.getDate());

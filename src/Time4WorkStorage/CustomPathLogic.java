@@ -8,6 +8,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/* @@author A0125495Y */
+
 public class CustomPathLogic {
 	
 	private final String defPath = "pathcustom.txt";
