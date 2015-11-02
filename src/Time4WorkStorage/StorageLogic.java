@@ -30,8 +30,8 @@ public class StorageLogic {
 	
 	private static final String defPath = "myTasks.txt";
 	private static final String TYPE_SPLITTER = "\"type\":";
-	private static final String BACKSLASH = "\\";
-	private static final String FORWARDSLASH = "/";
+	//private static final String BACKSLASH = "\\";
+	//private static final String FORWARDSLASH = "/";
 	
 	private File myFile;
 	private FileWriter fw;
@@ -58,6 +58,7 @@ public class StorageLogic {
 	//returns if a default file name is appended due to path not containing filename
 	public String createCustomFile(String path, boolean transfer) throws IOException {
 		
+		String oldPath = currentPath;
 		ArrayList<Tasks> tempList = new ArrayList<Tasks>();
 		
 		if(transfer) {
@@ -73,9 +74,12 @@ public class StorageLogic {
 		try {
 			createFile(currentPath);
 		} catch (IOException e) {
-			throw e;
+			currentPath = oldPath;
+			return currentPath;
+			//throw e;
 		}
 		
+		/*
 		if(myFile.isDirectory()) {
 			String lastChar = currentPath.substring(currentPath.length() - 1);
 			if(lastChar.equals(BACKSLASH) || lastChar.equals(FORWARDSLASH)) {
@@ -90,6 +94,7 @@ public class StorageLogic {
 				throw e;
 			}
 		}
+		*/
 		
 		if(transfer) {
 			for(int i=0; i<tempList.size(); i++) {
@@ -132,7 +137,7 @@ public class StorageLogic {
 	private void CreateDirectories(File theFile) throws IOException {
 		
 		File parentFile = theFile.getParentFile();		
-
+		
 		if(parentFile != null) {
 			if(!parentFile.mkdirs()) {
 				if(!parentFile.exists()) {

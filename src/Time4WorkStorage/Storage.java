@@ -8,8 +8,10 @@ public class Storage {
 	private static Storage theStorage; 
 	private StorageLogic myLogic = new StorageLogic();
 	private CustomPathLogic myPath = new CustomPathLogic();
+	private static final String defFile = "myTasks.txt";
 	
 	private static final String BACKSLASH = "\\";
+	private static final String FORWARDSLASH = "/";
 
 	//use storage default path, <local directory>/myTasks.txt unless there's a previous saved path
 	private Storage() throws IOException {
@@ -23,13 +25,28 @@ public class Storage {
 		}
 	}
 	
-	//custom path and filename, path has to have escape characters
+	//custom path, path has to have escape characters
 	//eg. C:\\user\\Desktop\\myTasks.txt
 	public void setCustomPath(String path) throws IOException {
 		
 		String customPath = "";
 		if(myPath.savedPathExists()) {
 			customPath = myPath.readCustomPath();
+		}
+		
+		File tempFile = new File(path);
+		String tempPath = tempFile.toString();
+		String parentPath = tempFile.getParentFile().toString();	
+		String lastArgs = tempPath.substring(parentPath.length(), tempPath.length());
+		System.out.println("last args is" + lastArgs);
+		if(!lastArgs.contains(".")) {
+			String lastChar = path.substring(path.length() - 1);
+			if(lastChar.equals(BACKSLASH) || lastChar.equals(FORWARDSLASH)) {
+				path = path + defFile;
+			}
+			else {
+				path = path + BACKSLASH + defFile;
+			}
 		}
 		
 		String newPath = path.replace(BACKSLASH, BACKSLASH+BACKSLASH);
