@@ -1,6 +1,33 @@
 
-.background {
+/*
+ * ================================================================
+ * TitleBar Styling
+ * ================================================================
+ */
 
+.titleBar {
+    -fx-spacing: 10;
+    -fx-background-color: white;
+    -fx-font: 16px FontAwesome;
+}
+
+.titleBar #close {
+    -fx-label-padding: 0 0 0 0;
+}
+
+/*
+ * ================================================================
+ * TableView Styling
+ * ================================================================
+ */
+
+
+.align-center {
+  -fx-alignment: CENTER;
+}
+
+.align-right {
+  -fx-alignment: CENTER-RIGHT;
 }
 
 .label {
@@ -25,7 +52,7 @@
 }
 
 .table-view .column-header, .table-view .filler {
-    -fx-size: 11.5;
+    -fx-size: 11;
     -fx-border-width: 0 0 1 0;
     -fx-background-color: transparent;
     -fx-border-color:
@@ -37,7 +64,7 @@
 }
 
 .table-view .column-header .label {
-    -fx-font-size: 11.5pt;
+    -fx-font-size: 11pt;
     -fx-font-family: "Verdana";
     -fx-alignment: center;
 }
