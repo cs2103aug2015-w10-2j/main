@@ -1,6 +1,12 @@
 package Time4WorkStorage;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import Time4WorkStorage.Tasks.TaskType;
 
@@ -127,6 +133,59 @@ public class FilterTask {
 	}
 	
 
+	public ArrayList<Tasks> searchDate(ArrayList<Tasks> myList, String date) {
+		
+		ArrayList<Tasks> resultList = new ArrayList<Tasks>();
+		
+		for(int i=0; i<myList.size(); i++) {
+			int taskType = myList.get(i).getType();
+			if(taskType == DeadlineType) {
+				DeadlineTask tempTask = (DeadlineTask) myList.get(i);
+				if(tempTask.getDate().equals(date)) {
+					resultList.add(myList.get(i));
+				}
+			} else if (taskType == DurationType) {
+				DurationTask tempTask = (DurationTask) myList.get(i);
+				if(tempTask.getStartDate().equals(date)) {
+					resultList.add(myList.get(i));
+				}
+			} 		
+		}		
+		return resultList;
+	}
+	
+	public ArrayList<Tasks> searchBeforeDate(ArrayList<Tasks> myList, String date) throws ParseException {
+		
+		ArrayList<Tasks> resultList = new ArrayList<Tasks>();
+		
+		Date targetDate = null;
+		DateFormat format = new SimpleDateFormat("ddMMyy", Locale.ENGLISH);		
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(format.parse(date));
+		cal.add( Calendar.DATE, 1 );
+		
+		targetDate = cal.getTime();
+		
+		for(int i=0; i<myList.size(); i++) {
+			int taskType = myList.get(i).getType();
+			if(taskType == DeadlineType) {
+				DeadlineTask tempTask = (DeadlineTask) myList.get(i);
+				Date myDate = format.parse(tempTask.getDate());
+				if(myDate.before(targetDate)) {
+					resultList.add(myList.get(i));
+				}
+			} else if (taskType == DurationType) {
+				DurationTask tempTask = (DurationTask) myList.get(i);
+				Date myDate = format.parse(tempTask.getStartDate());
+				if(myDate.before(targetDate)) {
+					resultList.add(myList.get(i));
+				}
+			} 		
+		}		
+		return resultList;
+	}
+	
+
 	private ArrayList<Tasks> searchType(ArrayList<Tasks> myList, int searchType) {
 				
 		ArrayList<Tasks> resultList = new ArrayList<Tasks>();
@@ -138,5 +197,6 @@ public class FilterTask {
 		}		
 		return resultList;
 	}
+	
 }
 		

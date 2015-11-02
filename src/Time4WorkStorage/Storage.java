@@ -38,7 +38,7 @@ public class Storage {
 		String tempPath = tempFile.toString();
 		String parentPath = tempFile.getParentFile().toString();	
 		String lastArgs = tempPath.substring(parentPath.length(), tempPath.length());
-		System.out.println("last args is" + lastArgs);
+		
 		if(!lastArgs.contains(".")) {
 			String lastChar = path.substring(path.length() - 1);
 			if(lastChar.equals(BACKSLASH) || lastChar.equals(FORWARDSLASH)) {

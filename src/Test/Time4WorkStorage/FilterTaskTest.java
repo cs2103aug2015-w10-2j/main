@@ -2,6 +2,7 @@ package Test.Time4WorkStorage;
 
 import static org.junit.Assert.*;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 
 import org.junit.Before;
@@ -91,6 +92,31 @@ public class FilterTaskTest {
 		assertEquals(myFilter.searchFloating(myList).size(), 1);
 		assertEquals(myFilter.searchDeadline(myList).size(), 1);		
 		assertEquals(myFilter.searchDuration(myList).size(), 1);
+	}
+	
+	@Test
+	public void testSearchDate() {
+		String dateMatch = "300915";
+		String dateNotMatch = "300920";
+		assertEquals(myFilter.searchDate(myList, dateMatch).size(), 1);
+		assertEquals(myFilter.searchDate(myList, dateNotMatch).size(), 0);
+	}
+	
+	@Test
+	public void testSearchBeforeDate() {
+		String dateMatch = "300915";
+		String date2Match = "310915";
+		String dateAllMatch = "300920";
+		String dateNoMatch = "300914";
+		try {
+			assertEquals(myFilter.searchBeforeDate(myList, dateMatch).size(), 1);
+			assertEquals(myFilter.searchBeforeDate(myList, date2Match).size(), 2);
+			assertEquals(myFilter.searchBeforeDate(myList, dateAllMatch).size(), 2);
+			assertEquals(myFilter.searchBeforeDate(myList, dateNoMatch).size(), 0);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 }
