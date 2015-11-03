@@ -117,7 +117,8 @@ public class TaskController {
 				FeedbackMessage output;
 				try {
 					output = getOutputFromLogic(userInput);
-					currentList = output.getIncompleteTaskList();
+					currentList = logic.getIncompleteTaskList();
+
 					if(userInput.toLowerCase().startsWith("display archive")){
 						currentList = output.getCompleteTaskList();
 						taskTitle.setText(TITLE_COMPLETED_TASK);
@@ -125,6 +126,7 @@ public class TaskController {
 						currentList = output.getIncompleteTaskList();
 						taskTitle.setText(TITLE_TODO_TASK);
 					}
+
 					taskTable.setItems(getTaskList(currentList));
 					feedback.setText(output.getFeedback());
 				} catch (Exception e1) {
