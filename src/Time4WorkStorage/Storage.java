@@ -37,8 +37,13 @@ public class Storage {
 		}
 		
 		File tempFile = new File(path);
+		path = tempFile.getAbsolutePath();
+		
 		String tempPath = tempFile.toString();
-		String parentPath = tempFile.getParentFile().toString();	
+		String parentPath = "";
+		if(tempFile.getParentFile() != null) {
+			parentPath = tempFile.getParentFile().toString();
+		}
 		String lastArgs = tempPath.substring(parentPath.length(), tempPath.length());
 		
 		if(!lastArgs.contains(".")) {
