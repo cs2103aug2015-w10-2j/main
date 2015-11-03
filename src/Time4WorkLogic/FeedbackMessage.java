@@ -3,12 +3,12 @@ import java.util.ArrayList;
 
 import Time4WorkStorage.Tasks;
 
-//@@author A0133894W
 public class FeedbackMessage {
     private String feedback;
     private ArrayList<Tasks> completeList;
     private ArrayList<Tasks> incompleteList;
     
+    //@@author A0133894W
     public FeedbackMessage(String feedback, ArrayList<Tasks> completeList,
                            ArrayList<Tasks> incompleteList) {
         this.feedback = feedback;

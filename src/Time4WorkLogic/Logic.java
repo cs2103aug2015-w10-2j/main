@@ -24,7 +24,6 @@ public class Logic {
     private static final String MESSAGE_UPDATED_ = "Task updated %1$s !";
     private static final String MESSAGE_DELETED_ = "Task %1$s deleted %2$s !";
     private static final String MESSAGE_DISPLAY = "Here are all the %1$s tasks";
-    private static final String MESSAGE_SORTED = "Task sorted successfully!";
     private static final String MESSAGE_SEARCH_ = "Task searched %1$s";
     private static final String MESSAGE_DONE_ = "Mark task %1$s as done %2$s";
     private static final String MESSAGE_CLEAR = "All task cleared successfully!";
@@ -49,7 +48,7 @@ public class Logic {
     
     
     enum COMMAND_TYPE {
-        ADD, UPDATE, DELETE, SEARCH, DISPLAY, SORT, STORE, INVALID, UNDO, DONE, CLEAR, EXIT
+        ADD, UPDATE, DELETE, SEARCH, DISPLAY, STORE, INVALID, UNDO, DONE, CLEAR, EXIT
     };
     
     // Constructor
@@ -76,6 +75,7 @@ public class Logic {
         if (isFirstCommand) {
             completeList = getCompleteTaskFromMytaskList(fullTaskList);
             incompleteList = getIncompleteTaskFromMytaskList(fullTaskList);
+            
         }
         isFirstCommand = false;
         
@@ -115,8 +115,6 @@ public class Logic {
                     userInputIndexes.add(userInputIndex);
                 }
                 return executeDelete(userInputIndexes);
-            case SORT :
-                return executeSort();
             case UNDO :
                 return executeUndo();
             case CLEAR :
@@ -129,7 +127,7 @@ public class Logic {
                 if (parsedCommand.getSearchOrStoragePath() != null) {
                     displayType = parsedCommand.getSearchOrStoragePath();
                 } else {
-                    displayType = "all";
+                    displayType = "incomplete";
                 }
                 return executeDisplay(displayType);
             case DONE:
@@ -160,8 +158,6 @@ public class Logic {
             return COMMAND_TYPE.DELETE;
         } else if (commandTypeString.equalsIgnoreCase("update")) {
             return COMMAND_TYPE.UPDATE;
-        } else if (commandTypeString.equalsIgnoreCase("sort")) {
-            return COMMAND_TYPE.SORT;
         } else if (commandTypeString.equalsIgnoreCase("undo")) {
             return COMMAND_TYPE.UNDO;
         } else if (commandTypeString.equalsIgnoreCase("display")) {
@@ -180,7 +176,6 @@ public class Logic {
             return COMMAND_TYPE.INVALID;
         }
     }
-    
     private static boolean checkIfEmptyString(String userCommand) {
         return userCommand.trim().equals("");
     }
@@ -189,16 +184,17 @@ public class Logic {
     // Useful method for UI to get task list
     // =========================================================================
     
-    
-    public ArrayList<Tasks> getCompleteTaskList() {
+    public ArrayList<Tasks> getCompleteTaskList() throws IOException {
         fullTaskList = getFullTaskList();
         completeList = myFilter.searchCompleted(fullTaskList);
+        completeList = sortCompleteTask(completeList);
         return completeList;
     }
     
-    public ArrayList<Tasks> getIncompleteTaskList() {
+    public ArrayList<Tasks> getIncompleteTaskList() throws IOException {
         fullTaskList = getFullTaskList();
         incompleteList = myFilter.searchNotCompleted(fullTaskList);
+        incompleteList = sortIncompleteTask(incompleteList);
         return incompleteList;
     }
     // =========================================================================
@@ -222,6 +218,8 @@ public class Logic {
         reversedCommandHistory.addReversedCommand(reversedCommand);
         commandHistory.addCommand(new Command("add", newTask));
         
+        completeList = sortCompleteTask(completeList);
+        incompleteList = sortIncompleteTask(incompleteList);
         logger.log(Level.INFO, "end of processing add command");
         return new FeedbackMessage(String.format(MESSAGE_ADDED_, "successfully"),
                                    completeList, incompleteList);
@@ -270,6 +268,8 @@ public class Logic {
             }
         }
         
+        completeList = sortCompleteTask(completeList);
+        incompleteList = sortIncompleteTask(incompleteList);
         if (indexDeletedSuccessfully.isEmpty()) {
             return new FeedbackMessage(String.format(MESSAGE_DELETED_, indexDeletedFailed, "failed: index out of range"),
                                        completeList, incompleteList);
@@ -324,6 +324,8 @@ public class Logic {
             }
         }
         
+        completeList = sortCompleteTask(completeList);
+        incompleteList = sortIncompleteTask(incompleteList);
         if (indexMarkedSuccessfully.isEmpty()) {
             return new FeedbackMessage(String.format(MESSAGE_DONE_, indexMarkedFailed, "failed !"),
                                        completeList, incompleteList);
@@ -364,6 +366,8 @@ public class Logic {
             reversedCommandHistory.addReversedCommand(reversedCommand);
             commandHistory.addCommand(new Command("update", task));
             
+            completeList = sortCompleteTask(completeList);
+            incompleteList = sortIncompleteTask(incompleteList);
             logger.log(Level.INFO, "end of processing update command");
             return new FeedbackMessage(String.format(MESSAGE_UPDATED_, "successfully"),
                                        completeList, incompleteList);
@@ -371,20 +375,17 @@ public class Logic {
         
     }
     
-    public FeedbackMessage executeSort() throws IOException {
-        logger.log(Level.INFO, "start processing sort command");
-        incompleteList.sort(null);
-        logger.log(Level.INFO, "end of processing sort command");
-        return new FeedbackMessage(MESSAGE_SORTED, completeList, incompleteList);
-    }
     
     public FeedbackMessage executeSearch(String keyword) throws IOException {
         logger.log(Level.INFO, "start processing search command");
         ArrayList<Tasks> searchList = new ArrayList<Tasks>();
         searchList = myFilter.searchDescription(incompleteList, keyword);
         
+        
         if (searchList.size() != 0) {
             incompleteList = searchList;
+            completeList = sortCompleteTask(completeList);
+            incompleteList = sortIncompleteTask(incompleteList);
             logger.log(Level.INFO, "end of processing search command");
             return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "successfully"),
                                        completeList, incompleteList);
@@ -471,6 +472,8 @@ public class Logic {
             
         }
         
+        completeList = sortCompleteTask(completeList);
+        incompleteList = sortIncompleteTask(incompleteList);
         if (undoSuccessfully) {
             logger.log(Level.INFO, "end of processing undo command");
             return new FeedbackMessage(String.format(MESSAGE_UNDO_, "successfully!"),
@@ -497,8 +500,7 @@ public class Logic {
             completeList = getCompleteTaskFromMytaskList(fullTaskList);
             
             displayList = myFilter.searchCompleted(fullTaskList);
-        } else if (displayType.equals("all") || displayType.equals("incomplete")) {
-            displayType = "incomplete";
+        } else if (displayType.equals("incomplete")) {
             displayList = myFilter.searchNotCompleted(fullIncompleteTask);
         } else if (displayType.equals("deadline")) {
             displayList = myFilter.searchDeadline(fullIncompleteTask);
@@ -512,6 +514,8 @@ public class Logic {
         
         if (displayList.size() != 0) {
             incompleteList = displayList;
+            completeList = sortCompleteTask(completeList);
+            incompleteList = sortIncompleteTask(incompleteList);
             logger.log(Level.INFO, "end of processing search command");
             return new FeedbackMessage(String.format(MESSAGE_DISPLAY, displayType),
                                        completeList, incompleteList);
@@ -549,6 +553,8 @@ public class Logic {
         fullTaskList = getFullTaskList();
         completeList = getCompleteTaskFromMytaskList(fullTaskList);
         incompleteList = getIncompleteTaskFromMytaskList(fullTaskList);
+        completeList = sortCompleteTask(completeList);
+        incompleteList = sortIncompleteTask(incompleteList);
         return new FeedbackMessage(String.format(MESSAGE_CREATE_PATH_, "successfully"),
                                    completeList, incompleteList);
         
@@ -605,6 +611,22 @@ public class Logic {
             e.printStackTrace();
         }
         return fullTaskList;
+    }
+    
+    private ArrayList<Tasks> sortIncompleteTask(ArrayList<Tasks> taskList) throws IOException {
+        logger.log(Level.INFO, "start processing incomplete sort");
+        TaskSorter taskSorter = new TaskSorter(taskList);
+        taskList = taskSorter.sortTask(true);
+        logger.log(Level.INFO, "end of processing incomplete sort");
+        return incompleteList;
+    }
+    
+    private ArrayList<Tasks> sortCompleteTask(ArrayList<Tasks> taskList) throws IOException {
+        logger.log(Level.INFO, "start processing complete sort");
+        TaskSorter taskSorter = new TaskSorter(taskList);
+        taskList = taskSorter.sortTask(false);
+        logger.log(Level.INFO, "end of processing complete sort");
+        return taskList;
     }
     
     
