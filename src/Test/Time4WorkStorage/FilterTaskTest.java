@@ -118,7 +118,31 @@ public class FilterTaskTest {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Test
+	public void testSearchOverdue() {
 		
+		Duration tempDeadLine = new Duration("300920", "2000");
+		tempTask4 = new DeadlineTask("This doesn't fail until 2020", tempDeadLine);
+		myList.add(tempTask4);		
+		
+		try {
+			assertEquals(myFilter.searchOverDue(myList).size(), 2);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		
+		tempDeadLine = new Duration("300912", "2000");
+		tempTask4 = new DeadlineTask("This has long overdue since 2012", tempDeadLine);
+		myList.add(tempTask4);
+		
+		try {
+			assertEquals(myFilter.searchOverDue(myList).size(), 3);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
