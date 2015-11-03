@@ -160,7 +160,6 @@ public class TaskController {
 		taskTitle.setText(TITLE_TODO_TASK);
 		currentList = logic.getIncompleteTaskList();
 		taskTable.setItems(getTaskList(currentList));
-		logger.log(Level.INFO, "currentLIst size(init) is " + this.currentList.size());
 	}
 
 	public FeedbackMessage getOutputFromLogic(String userCommand) throws Exception {
@@ -168,7 +167,6 @@ public class TaskController {
 	}
 
 	public static ArrayList<Tasks> getDisplayedList() {
-		logger.log(Level.INFO, "currentLIst size is " + currentList.size());
 		return currentList;
 	}
 
