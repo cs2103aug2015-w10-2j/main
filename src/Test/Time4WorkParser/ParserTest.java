@@ -298,7 +298,8 @@ public class ParserTest {
 		//test search for a single keyword
 		Command result = tester.parse("search homework");
 		assertEquals("search", result.getCommand());
-		assertEquals("homework", result.getSearchOrStoragePath());
+		assertEquals(false, result.getIsDateSearch());
+		assertEquals("homework", result.getSearchKeyword());
 	}
 	
 	@Test
@@ -306,7 +307,7 @@ public class ParserTest {
 		//test search for a string
 		Command result = tester.parse("search homework for CS2103");
 		assertEquals("search", result.getCommand());
-		assertEquals("homework for CS2103", result.getSearchOrStoragePath());
+		assertEquals("homework for CS2103", result.getSearchKeyword());
 	}
 	
 	@Test
@@ -315,7 +316,7 @@ public class ParserTest {
 		Command result = tester.parse("store C:\\Users\\XXXX\\Desktop\\myfile.txt");
 		assertEquals("store", result.getCommand());
 		//final string of directory has added backslashes to account for escaping
-		assertEquals("C:\\\\Users\\\\XXXX\\\\Desktop\\\\myfile.txt", result.getSearchOrStoragePath());
+		assertEquals("C:\\\\Users\\\\XXXX\\\\Desktop\\\\myfile.txt", result.getDisplayTypeOrStoragePath());
 	}
 	
 	@Test
@@ -351,6 +352,6 @@ public class ParserTest {
 	@Test
 	public void testStoreForwardSlash(){
 		Command result = tester.parse("store C:/Users/alan/Downloads");
-		assertEquals("C:/Users/alan/Downloads", result.getSearchOrStoragePath());
+		assertEquals("C:/Users/alan/Downloads", result.getDisplayTypeOrStoragePath());
 	}
 }
