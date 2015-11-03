@@ -1,12 +1,16 @@
 package Time4WorkParser;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.joestelmach.natty.*;
 
 import Time4WorkStorage.DeadlineTask;
 import Time4WorkStorage.Duration;
@@ -28,6 +32,8 @@ public class Parser {
   private static final String REGEX_WHITESPACES = "[\\s,]+";
   
   private static final Logger logger = Logger.getLogger(Parser.class.getName());
+    
+  private static final com.joestelmach.natty.Parser dateParser = new com.joestelmach.natty.Parser();
   
   public Parser() {
   }
@@ -185,7 +191,7 @@ public class Parser {
     if (numberOfArguments == 0) {
       task = new FloatingTask(descriptionOfTask);
     } else if (timeArray.contains(KEYWORD_BY) || timeArray.contains(KEYWORD_FROM) || timeArray.contains(KEYWORD_TO)){
-      task = createKeywordTask(task, descriptionOfTask, timeArray);
+    	task = createKeywordTask(task, descriptionOfTask, timeArray);
     } else {
       task = createNoKeywordTask(task, descriptionOfTask, timeArray, numberOfArguments);
     }
@@ -445,8 +451,14 @@ public class Parser {
     Command command;
     String keyword = String.join(" ", arguments);
     
-    command = new Command("search", keyword);
-    
+    try {
+      SimpleDateFormat date = new SimpleDateFormat("ddMMyy");
+      date.parse(keyword);
+      command = new Command("search", true, keyword);
+    } catch (ParseException e) {
+      command = new Command("search", false, keyword);
+    }
+        
     return command;
   }
   
