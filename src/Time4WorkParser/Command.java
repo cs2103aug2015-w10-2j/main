@@ -7,9 +7,11 @@ public class Command {
   
   private Tasks task;
   private String command;
-  private String searchOrStoragePath;
+  private String displayOrStoragePath;
   private int selectedIndexNumber;
   private ArrayList<Integer> selectedIndexNumbers = new ArrayList<Integer>();
+  private boolean isDateSearch;
+  private String searchKeyword;
   
   //for adding and updating
   public Command(String command, Tasks task) {
@@ -17,10 +19,17 @@ public class Command {
     this.task = task;
   }
   
-  //for searching and storing
-  public Command(String command, String searchOrStoragePath){
+  //for storing and alternate display functions
+  public Command(String command, String displayOrStoragePath){
    this.command = command;
-   this.searchOrStoragePath = searchOrStoragePath;
+   this.displayOrStoragePath = displayOrStoragePath;
+  }
+  
+  //search command
+  public Command(String command, boolean isDateSearch, String searchKeyword){
+	this.command = command;
+	this.isDateSearch = isDateSearch;
+	this.searchKeyword = searchKeyword;
   }
   
   //for deleting 1 task or marking 1 task as done
@@ -35,7 +44,6 @@ public class Command {
    this.selectedIndexNumbers = selectedIndexNumbers;
   }
   
-  
   //for exit and invalid commands
   public Command(String command){
    this.command = command;
@@ -49,10 +57,18 @@ public class Command {
    return command;
   }
   
-  public String getSearchOrStoragePath() {
-   return searchOrStoragePath;
+  public String getDisplayTypeOrStoragePath() {
+   return displayOrStoragePath;
   }
 
+  public boolean getIsDateSearch() {
+	  return isDateSearch;
+  }
+  
+  public String getSearchKeyword() {
+	  return searchKeyword;
+  }
+  
   public int getSelectedIndexNumber() {
    return selectedIndexNumber;
   }
