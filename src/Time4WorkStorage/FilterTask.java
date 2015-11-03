@@ -189,6 +189,37 @@ public class FilterTask {
 		return resultList;
 	}
 	
+	public ArrayList<Tasks> searchOverDue(ArrayList<Tasks> myList, String date) throws ParseException {
+		
+		ArrayList<Tasks> resultList = new ArrayList<Tasks>();
+		
+		Calendar today = Calendar.getInstance();
+		today.set(Calendar.HOUR_OF_DAY, 0);
+		DateFormat format = new SimpleDateFormat("ddMMyy", Locale.ENGLISH);		
+		today.add( Calendar.DATE, 1 );
+		Date tomorrow = today.getTime();
+		
+		for(int i=0; i<myList.size(); i++) {
+			
+			int taskType = myList.get(i).getType();
+			
+			if(taskType == DeadlineType) {
+				DeadlineTask tempTask = (DeadlineTask) myList.get(i);
+				Date myDate = format.parse(tempTask.getDate());
+				if(myDate.before(tomorrow)) {
+					resultList.add(myList.get(i));
+				}
+			} else if (taskType == DurationType) {
+				DurationTask tempTask = (DurationTask) myList.get(i);
+				Date myDate = format.parse(tempTask.getStartDate());
+				if(myDate.before(tomorrow)) {
+					resultList.add(myList.get(i));
+				}
+			} 		
+		}		
+		return resultList;
+	}
+	
 
 	private ArrayList<Tasks> searchType(ArrayList<Tasks> myList, int searchType) {
 				
