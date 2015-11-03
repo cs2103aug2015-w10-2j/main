@@ -52,6 +52,7 @@ public class Logic {
     };
     
     // Constructor
+    //@@author A0133894W
     public Logic() {
         try {
             storage = Storage.getInstance();
@@ -73,8 +74,8 @@ public class Logic {
         fullTaskList = getFullTaskList();
         
         if (isFirstCommand) {
-            completeList = getCompleteTaskFromMytaskList(fullTaskList);
-            incompleteList = getIncompleteTaskFromMytaskList(fullTaskList);
+            completeList = getCompleteTaskList();
+            incompleteList = getIncompleteTaskList();
             
         }
         isFirstCommand = false;
@@ -120,12 +121,17 @@ public class Logic {
             case CLEAR :
                 return executeClear();
             case SEARCH :
-                String searchKeyword = parsedCommand.getSearchOrStoragePath();
-                return executeSearch(searchKeyword);
+                String searchKeyword = parsedCommand.getSearchKeyword();
+                if (parsedCommand.getIsDateSearch() == false) {
+                    return executeSearchDescription(searchKeyword);
+                } else {
+                    return executeSearchDate(searchKeyword);
+                }
+                
             case DISPLAY:
                 String displayType;
-                if (parsedCommand.getSearchOrStoragePath() != null) {
-                    displayType = parsedCommand.getSearchOrStoragePath();
+                if (parsedCommand.getDisplayTypeOrStoragePath() != null) {
+                    displayType = parsedCommand.getDisplayTypeOrStoragePath();
                 } else {
                     displayType = "incomplete";
                 }
@@ -137,7 +143,7 @@ public class Logic {
                 }
                 return executeMarkTaskAsDone(userInputIndexes);
             case STORE:
-                String storagePath = parsedCommand.getSearchOrStoragePath();
+                String storagePath = parsedCommand.getDisplayTypeOrStoragePath();
                 return executeCreatePath(storagePath);
             case INVALID :
                 return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "command is invalid"),
@@ -376,9 +382,32 @@ public class Logic {
     }
     
     
-    public FeedbackMessage executeSearch(String keyword) throws IOException {
+    public FeedbackMessage executeSearchDescription(String keyword) throws IOException {
         logger.log(Level.INFO, "start processing search command");
         ArrayList<Tasks> searchList = new ArrayList<Tasks>();
+        incompleteList = getIncompleteTaskList();
+        
+        searchList = myFilter.searchDescription(incompleteList, keyword);
+        
+        
+        if (searchList.size() != 0) {
+            incompleteList = searchList;
+            completeList = sortCompleteTask(completeList);
+            incompleteList = sortIncompleteTask(incompleteList);
+            logger.log(Level.INFO, "end of processing search command");
+            return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "successfully"),
+                                       completeList, incompleteList);
+        } else {
+            logger.log(Level.INFO, "end of processing search command");
+            return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "failed: no such task"),
+                                       completeList, incompleteList);
+        }
+    }
+    
+    public FeedbackMessage executeSearchDate(String keyword) throws IOException {
+        logger.log(Level.INFO, "start processing search command");
+        ArrayList<Tasks> searchList = new ArrayList<Tasks>();
+        incompleteList = getIncompleteTaskList();
         searchList = myFilter.searchDescription(incompleteList, keyword);
         
         
@@ -493,11 +522,11 @@ public class Logic {
         fullTaskList = getFullTaskList();
         
         ArrayList<Tasks> fullIncompleteTask = new ArrayList<Tasks>();
-        fullIncompleteTask = getIncompleteTaskFromMytaskList(fullTaskList);
+        fullIncompleteTask = getIncompleteTaskList();
         
         
         if (displayType.equals("archive")) {
-            completeList = getCompleteTaskFromMytaskList(fullTaskList);
+            completeList = getCompleteTaskList();
             
             displayList = myFilter.searchCompleted(fullTaskList);
         } else if (displayType.equals("incomplete")) {
@@ -551,8 +580,8 @@ public class Logic {
         storage.setCustomPath(storagePath);
         isFirstCommand = true;
         fullTaskList = getFullTaskList();
-        completeList = getCompleteTaskFromMytaskList(fullTaskList);
-        incompleteList = getIncompleteTaskFromMytaskList(fullTaskList);
+        completeList = getCompleteTaskList();
+        incompleteList = getIncompleteTaskList();
         completeList = sortCompleteTask(completeList);
         incompleteList = sortIncompleteTask(incompleteList);
         return new FeedbackMessage(String.format(MESSAGE_CREATE_PATH_, "successfully"),
@@ -585,7 +614,8 @@ public class Logic {
     private int getIndexFromTaskID(ArrayList<Tasks> taskList, int taskID) {
         int index = -1;
         for  (int i = 0; i < taskList.size(); i++) {
-            if (taskList.get(i).getTaskID() == taskID) {
+            boolean isSameTaskID = checkIsSameTaskID(taskList.get(i), taskID);
+            if (isSameTaskID) {
                 index = i;
                 break;
             }
@@ -593,15 +623,12 @@ public class Logic {
         return index;
     }
     
-    
-    private ArrayList<Tasks> getCompleteTaskFromMytaskList(ArrayList<Tasks> myTaskList) {
-        ArrayList<Tasks> completeTask = myFilter.searchCompleted(myTaskList);
-        return completeTask;
-    }
-    
-    private ArrayList<Tasks> getIncompleteTaskFromMytaskList(ArrayList<Tasks> myTaskList) {
-        ArrayList<Tasks> incompleteTask = myFilter.searchNotCompleted(myTaskList);
-        return incompleteTask;
+    private boolean checkIsSameTaskID (Tasks task, int taskID) {
+        boolean isSameTaskID = false;
+        if (task.getTaskID() == taskID) {
+            isSameTaskID = true;
+        }
+        return isSameTaskID;
     }
     
     private ArrayList<Tasks> getFullTaskList() {
