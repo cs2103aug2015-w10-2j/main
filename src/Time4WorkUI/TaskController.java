@@ -122,7 +122,7 @@ public class TaskController {
 					if(userInput.toLowerCase().startsWith("display archive")){
 						currentList = output.getCompleteTaskList();
 						taskTitle.setText(TITLE_COMPLETED_TASK);
-					} else if (userInput.toLowerCase().startsWith("display incomplete")) {
+					} else {
 						currentList = output.getIncompleteTaskList();
 						taskTitle.setText(TITLE_TODO_TASK);
 					}
