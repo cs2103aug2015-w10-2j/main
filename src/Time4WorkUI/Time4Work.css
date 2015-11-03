@@ -1,3 +1,6 @@
+.background {
+    -fx-background-color: #FCFCFC;
+}
 
 /*
  * ================================================================
@@ -8,7 +11,7 @@
 .titleBar {
     -fx-spacing: 10;
     -fx-background-color: white;
-    -fx-font: 16px FontAwesome;
+    -fx-font: 16px ;
 }
 
 .titleBar #close {
@@ -22,6 +25,7 @@
  */
 
 
+
 .align-center {
   -fx-alignment: CENTER;
 }
@@ -31,19 +35,24 @@
 }
 
 .label {
-    -fx-font-size: 10pt;
-    -fx-font-family: "Verdana";
-}
-
-.label-bright {
-    -fx-font-size: 12pt;
-    -fx-font-family: "Verdana";
-}
-
-.label-header {
     -fx-font-size: 11pt;
+    -fx-text-fill: #2B236F;
     -fx-font-family: "Verdana";
-    -fx-opacity: 1;
+}
+
+.table-view {
+    -fx-table-cell-border-color: #F9F9FA;
+    /*-fx-table-header-border-color: aliceblue;*/
+    -fx-padding: 5;
+}
+
+.table-cell {
+    -fx-font-size: 13px;
+   /* -fx-font-family: ;*/
+}
+
+.table-row-cell {
+    -fx-cell-size: 30px;
 }
 
 .table-view .column-header-background {
@@ -59,7 +68,7 @@
         transparent
         transparent
         derive(-fx-base, 80%)
-        transparent;
+        aliceblue;
     -fx-border-insets: 0 10 1 0;
 }
 
@@ -67,6 +76,7 @@
     -fx-font-size: 11pt;
     -fx-font-family: "Verdana";
     -fx-alignment: center;
+     -fx-text-fill: #1E184D;
 }
 
 .table-view:focused .table-row-cell:filled:focused:selected {
@@ -74,6 +84,6 @@
 }
 
 .text-field {
-    -fx-font-size: 10pt;
+    -fx-font-size: 11pt;
     -fx-font-family: "Georgia";
 }
