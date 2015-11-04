@@ -11,7 +11,7 @@ import Time4WorkLogic.Logic;
 import Time4WorkStorage.Tasks;
 import Time4WorkUI.DateDisplay;
 
-public class TestDateDisplay {
+public class DateDisplayTest {
 	private DateDisplay display = new DateDisplay();
 	private Logic logic= new Logic();
 
