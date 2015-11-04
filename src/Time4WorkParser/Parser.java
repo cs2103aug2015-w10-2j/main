@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.joestelmach.natty.*;
 
 import Time4WorkStorage.DeadlineTask;
 import Time4WorkStorage.Duration;
@@ -33,8 +32,6 @@ public class Parser {
   
   private static final Logger logger = Logger.getLogger(Parser.class.getName());
     
-  private static final com.joestelmach.natty.Parser dateParser = new com.joestelmach.natty.Parser();
-  
   public Parser() {
   }
   
