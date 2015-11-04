@@ -1,6 +1,7 @@
 package Time4WorkLogic;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -190,14 +191,14 @@ public class Logic {
     // Useful method for UI to get task list
     // =========================================================================
     
-    public ArrayList<Tasks> getCompleteTaskList() throws IOException {
+    public ArrayList<Tasks> getCompleteTaskList() throws IOException, ParseException {
         fullTaskList = getFullTaskList();
         completeList = myFilter.searchCompleted(fullTaskList);
         completeList = sortCompleteTask(completeList);
         return completeList;
     }
     
-    public ArrayList<Tasks> getIncompleteTaskList() throws IOException {
+    public ArrayList<Tasks> getIncompleteTaskList() throws IOException, ParseException {
         fullTaskList = getFullTaskList();
         incompleteList = myFilter.searchNotCompleted(fullTaskList);
         incompleteList = sortIncompleteTask(incompleteList);
@@ -206,7 +207,7 @@ public class Logic {
     // =========================================================================
     // Execute Command
     // =========================================================================
-    public FeedbackMessage executeAdd(Tasks newTask) throws IOException {
+    public FeedbackMessage executeAdd(Tasks newTask) throws IOException, ParseException {
         try{
             logger.log(Level.INFO, "start processing add command");
             storage.appendTask(newTask);
@@ -231,7 +232,7 @@ public class Logic {
                                    completeList, incompleteList);
     }
     
-    public FeedbackMessage executeDelete(ArrayList<Integer> userInputIndexes) throws IOException {
+    public FeedbackMessage executeDelete(ArrayList<Integer> userInputIndexes) throws IOException, ParseException {
         logger.log(Level.INFO, "start processing delete command");
         
         int taskListSize = incompleteList.size();
@@ -343,7 +344,7 @@ public class Logic {
         
     }
     
-    public FeedbackMessage executeUpdate(Tasks task) throws IOException {
+    public FeedbackMessage executeUpdate(Tasks task) throws IOException, ParseException {
         logger.log(Level.INFO, "start processing update command");
         int taskListSize = incompleteList.size();
         int indexToBeDeleted = task.getTaskID();   // get index to be deleted by retrieving taskID
@@ -382,7 +383,7 @@ public class Logic {
     }
     
     
-    public FeedbackMessage executeSearchDescription(String keyword) throws IOException {
+    public FeedbackMessage executeSearchDescription(String keyword) throws IOException, ParseException {
         logger.log(Level.INFO, "start processing search command");
         ArrayList<Tasks> searchList = new ArrayList<Tasks>();
         incompleteList = getIncompleteTaskList();
@@ -404,7 +405,7 @@ public class Logic {
         }
     }
     
-    public FeedbackMessage executeSearchDate(String keyword) throws IOException {
+    public FeedbackMessage executeSearchDate(String keyword) throws IOException, ParseException {
         logger.log(Level.INFO, "start processing search command");
         ArrayList<Tasks> searchList = new ArrayList<Tasks>();
         incompleteList = getIncompleteTaskList();
@@ -576,7 +577,7 @@ public class Logic {
         return new FeedbackMessage(MESSAGE_CLEAR, completeList, incompleteList);
     }
     
-    public FeedbackMessage executeCreatePath(String storagePath) throws IOException {
+    public FeedbackMessage executeCreatePath(String storagePath) throws IOException, ParseException {
         storage.setCustomPath(storagePath);
         isFirstCommand = true;
         fullTaskList = getFullTaskList();
@@ -640,7 +641,7 @@ public class Logic {
         return fullTaskList;
     }
     
-    private ArrayList<Tasks> sortIncompleteTask(ArrayList<Tasks> taskList) throws IOException {
+    private ArrayList<Tasks> sortIncompleteTask(ArrayList<Tasks> taskList) throws IOException, ParseException {
         logger.log(Level.INFO, "start processing incomplete sort");
         TaskSorter taskSorter = new TaskSorter(taskList);
         taskList = taskSorter.sortTask(true);
@@ -648,7 +649,7 @@ public class Logic {
         return incompleteList;
     }
     
-    private ArrayList<Tasks> sortCompleteTask(ArrayList<Tasks> taskList) throws IOException {
+    private ArrayList<Tasks> sortCompleteTask(ArrayList<Tasks> taskList) throws IOException, ParseException {
         logger.log(Level.INFO, "start processing complete sort");
         TaskSorter taskSorter = new TaskSorter(taskList);
         taskList = taskSorter.sortTask(false);

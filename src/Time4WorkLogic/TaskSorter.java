@@ -1,7 +1,10 @@
 package Time4WorkLogic;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-
+import java.util.Date;
 import Time4WorkStorage.DeadlineTask;
 import Time4WorkStorage.DurationTask;
 import Time4WorkStorage.FloatingTask;
@@ -19,7 +22,7 @@ public class TaskSorter {
     }
     
     
-    public ArrayList<Tasks> sortTask (boolean sortIncomplete) {
+    public ArrayList<Tasks> sortTask (boolean sortIncomplete) throws ParseException {
         ArrayList<Tasks> floatingTaskList = new ArrayList<Tasks>();
         ArrayList<Tasks> tempTaskList = new ArrayList<Tasks>();
         int taskListSize = taskList.size();
@@ -65,17 +68,17 @@ public class TaskSorter {
      * compare two task and return an ArrayList of task.
      * The first one will be the earlier task.
      */
-    private ArrayList<Tasks> compareTask (Tasks taskA, Tasks taskB) {
+    private ArrayList<Tasks> compareTask (Tasks taskA, Tasks taskB) throws ParseException {
         ArrayList<Tasks> comparedTaskList = new ArrayList<Tasks>();
-        ArrayList<Integer> taskDateAndTimeA = getTaskDateAndTimeForCompare(taskA);
-        ArrayList<Integer> taskDateAndTimeB = getTaskDateAndTimeForCompare(taskB);
+        ArrayList<Date> taskDateAndTimeA = getTaskDateAndTimeForCompare(taskA);
+        ArrayList<Date> taskDateAndTimeB = getTaskDateAndTimeForCompare(taskB);
         
-        int taskDateA = taskDateAndTimeA.get(0);
-        int taskTimeA = taskDateAndTimeA.get(1);
-        int taskDateB = taskDateAndTimeB.get(0);
-        int taskTimeB = taskDateAndTimeB.get(1);
+        Date taskDateA = taskDateAndTimeA.get(0);
+        Date taskTimeA = taskDateAndTimeA.get(1);
+        Date taskDateB = taskDateAndTimeB.get(0);
+        Date taskTimeB = taskDateAndTimeB.get(1);
         
-        if (taskDateA < taskDateB || (taskDateA == taskDateB && taskTimeA < taskTimeB)) {
+        if (taskDateA.before(taskDateB) || (taskDateA.equals(taskDateB) && taskTimeA.before(taskTimeB))) {
             comparedTaskList.add(taskA);
             comparedTaskList.add(taskB);
         } else {
@@ -87,11 +90,15 @@ public class TaskSorter {
         
     }
     
-    private ArrayList<Integer> getTaskDateAndTimeForCompare (Tasks task) {
-        ArrayList<Integer> taskDateAndTime = new ArrayList<Integer>();
+    private ArrayList<Date> getTaskDateAndTimeForCompare (Tasks task) throws ParseException {
+        ArrayList<Date> taskDateAndTime = new ArrayList<Date>();
         String taskDateInString = "";
         String taskTimeInString = "";
+        Date taskDate = null;
+        Date taskTime = null;
         
+        DateFormat dateFormat = new SimpleDateFormat("ddMMyy");
+        DateFormat timeFormat = new SimpleDateFormat("HHmm");
         if (task instanceof DeadlineTask) {
             DeadlineTask classifiedTask = (DeadlineTask) task;
             taskDateInString = classifiedTask.getDate();
@@ -102,10 +109,8 @@ public class TaskSorter {
             taskTimeInString = classifiedTask.getStartTime();
         }
         
-        taskDateInString = new StringBuffer(taskDateInString).reverse().toString();
-        
-        int taskDate = Integer.parseInt(taskDateInString);
-        int taskTime = Integer.parseInt(taskTimeInString);
+        taskDate = dateFormat.parse(taskDateInString);
+        taskTime = timeFormat.parse(taskTimeInString);
         
         taskDateAndTime.add(taskDate);
         taskDateAndTime.add(taskTime);
