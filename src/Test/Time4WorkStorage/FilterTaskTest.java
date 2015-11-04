@@ -2,8 +2,13 @@ package Test.Time4WorkStorage;
 
 import static org.junit.Assert.*;
 
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,11 +37,11 @@ public class FilterTaskTest {
 		tempTask3 = null;
 		tempTask4 = null;
 		
-		Duration tempDeadLine = new Duration("300915", "1800" , "300915", "2000");
+		Duration tempDeadLine = new Duration("290915", "1800" , "300915", "2000");
 		tempTask1 = new DurationTask("I'm a duration task", tempDeadLine );
 		myList.add(tempTask1);
 		
-		tempDeadLine = new Duration("310915", "1200");
+		tempDeadLine = new Duration("300915", "1200");
 		tempTask2 = new DeadlineTask("I'm a deadLine task", tempDeadLine );
 		myList.add(tempTask2);
 		
@@ -98,7 +103,7 @@ public class FilterTaskTest {
 	
 	@Test
 	public void testSearchDate() {
-		String dateMatch = "300915";
+		String dateMatch = "290915";
 		String dateNotMatch = "300920";
 		assertEquals(myFilter.searchDate(myList, dateMatch).size(), 1);
 		assertEquals(myFilter.searchDate(myList, dateNotMatch).size(), 0);
@@ -106,9 +111,9 @@ public class FilterTaskTest {
 	
 	@Test
 	public void testSearchBeforeDate() {
-		String dateMatch = "300915";
-		String date2Match = "310915";
-		String dateAllMatch = "300920";
+		String dateMatch = "290915";
+		String date2Match = "300915";
+		String dateAllMatch = "290920";
 		String dateNoMatch = "300914";
 		try {
 			assertEquals(myFilter.searchBeforeDate(myList, dateMatch).size(), 1);
@@ -123,8 +128,15 @@ public class FilterTaskTest {
 	@Test
 	public void testSearchOverdue() {
 		
-		Duration tempDeadLine = new Duration("300920", "2000");
-		tempTask4 = new DeadlineTask("This doesn't fail until 2020", tempDeadLine);
+		Calendar cal = Calendar.getInstance();
+		DateFormat format = new SimpleDateFormat("ddMMyy", Locale.ENGLISH);	
+		
+		cal.set(Calendar.DATE, 1);
+		Date tomorrow = cal.getTime();
+		String nextDay = format.format(tomorrow);
+		
+		Duration tempDeadLine = new Duration(nextDay, "2000");		
+		tempTask4 = new DeadlineTask("This doesn't fail until tomorrow", tempDeadLine);
 		myList.add(tempTask4);		
 		
 		try {
@@ -133,13 +145,28 @@ public class FilterTaskTest {
 			e.printStackTrace();
 		}
 		
+		cal.set(Calendar.DATE, -1);
+		Date yesterday = cal.getTime();
+		String previousDay = format.format(yesterday);
 		
-		tempDeadLine = new Duration("300912", "2000");
-		tempTask4 = new DeadlineTask("This has long overdue since 2012", tempDeadLine);
+		tempDeadLine = new Duration(previousDay, "2000");
+		tempTask4 = new DeadlineTask("This is overdue since yesterday", tempDeadLine);
 		myList.add(tempTask4);
 		
 		try {
 			assertEquals(myFilter.searchOverDue(myList).size(), 3);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testSearchBetweenDates() {
+		
+		try {
+			assertEquals(myFilter.searchBetweenDates(myList, "290915", "290915").size(), 1);
+			assertEquals(myFilter.searchBetweenDates(myList, "290915", "021115").size(), 2);
+			assertEquals(myFilter.searchBetweenDates(myList, "010101", "020202").size(), 0);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}

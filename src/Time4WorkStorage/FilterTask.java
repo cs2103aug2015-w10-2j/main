@@ -160,27 +160,21 @@ public class FilterTask {
 		
 		ArrayList<Tasks> resultList = new ArrayList<Tasks>();
 		
-		Date targetDate = null;
-		DateFormat format = new SimpleDateFormat("ddMMyy", Locale.ENGLISH);		
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(format.parse(date));
-		cal.add( Calendar.DATE, 1 );
-		
-		targetDate = cal.getTime();
-		
+		Date targetDate = stringToDate(date, 1);
+
 		for(int i=0; i<myList.size(); i++) {
 			
 			int taskType = myList.get(i).getType();
 			
 			if(taskType == DeadlineType) {
 				DeadlineTask tempTask = (DeadlineTask) myList.get(i);
-				Date myDate = format.parse(tempTask.getDate());
+				Date myDate = stringToDate(tempTask.getDate(),0);
 				if(myDate.before(targetDate)) {
 					resultList.add(myList.get(i));
 				}
 			} else if (taskType == DurationType) {
 				DurationTask tempTask = (DurationTask) myList.get(i);
-				Date myDate = format.parse(tempTask.getStartDate());
+				Date myDate = stringToDate(tempTask.getStartDate(),0);
 				if(myDate.before(targetDate)) {
 					resultList.add(myList.get(i));
 				}
@@ -194,26 +188,63 @@ public class FilterTask {
 		ArrayList<Tasks> resultList = new ArrayList<Tasks>();
 		
 		Calendar today = Calendar.getInstance();
-		today.set(Calendar.HOUR_OF_DAY, 0);
-		DateFormat format = new SimpleDateFormat("ddMMyy", Locale.ENGLISH);		
+		today.set(Calendar.DATE, 0);	
 		Date now = today.getTime();
 		
 		for(int i=0; i<myList.size(); i++) {			
 			int taskType = myList.get(i).getType();
 			if(taskType == DeadlineType) {
 				DeadlineTask tempTask = (DeadlineTask) myList.get(i);
-				Date myDate = format.parse(tempTask.getDate());
+				Date myDate = stringToDate(tempTask.getDate(),0);
 				if(myDate.before(now)) {
 					resultList.add(myList.get(i));
 				}
 			} else if (taskType == DurationType) {
 				DurationTask tempTask = (DurationTask) myList.get(i);
-				Date myDate = format.parse(tempTask.getStartDate());
+				Date myDate = stringToDate(tempTask.getStartDate(),0);
 				if(myDate.before(now)) {
 					resultList.add(myList.get(i));
 				}
 			} 		
 		}		
+		return resultList;
+	}
+	
+public ArrayList<Tasks> searchBetweenDates(ArrayList<Tasks> myList, String date1, String date2) throws ParseException {
+		
+		ArrayList<Tasks> resultList = new ArrayList<Tasks>();
+		ArrayList<Tasks> beforeDateB = new ArrayList<Tasks>();
+		ArrayList<Tasks> afterDateA = new ArrayList<Tasks>();
+		
+		Date dateA = stringToDate(date1, -1);
+		Date dateB = stringToDate(date2, 1);
+		
+		for(int i=0; i<myList.size(); i++) {
+			
+			int taskType = myList.get(i).getType();
+			
+			if(taskType == DeadlineType) {
+				DeadlineTask tempTask = (DeadlineTask) myList.get(i);
+				Date myDate = stringToDate(tempTask.getDate(),0);
+				if(myDate.before(dateB)) {
+					beforeDateB.add(myList.get(i));
+				}
+				if(myDate.after(dateA)) {
+					afterDateA.add(myList.get(i));
+				}
+			} else if (taskType == DurationType) {
+				DurationTask tempTask = (DurationTask) myList.get(i);
+				Date myDate = stringToDate(tempTask.getStartDate(),0);
+				if(myDate.before(dateB)) {
+					beforeDateB.add(myList.get(i));
+				}
+				if(myDate.after(dateA)) {
+					afterDateA.add(myList.get(i));
+				}
+			} 		
+		}
+		resultList = filterCommon(afterDateA, beforeDateB);
+		
 		return resultList;
 	}
 	
@@ -228,6 +259,23 @@ public class FilterTask {
 			}
 		}		
 		return resultList;
+	}
+	
+	private Date stringToDate(String date, int offset) throws ParseException {
+
+		DateFormat format = new SimpleDateFormat("ddMMyy", Locale.ENGLISH);		
+		Calendar cal = Calendar.getInstance();
+		
+		cal.setTime(format.parse(date));
+		cal.add( Calendar.DATE, offset );	
+		
+		Date returnDate = cal.getTime();
+		return returnDate;
+	}
+	
+	private ArrayList<Tasks> filterCommon(ArrayList<Tasks> listA, ArrayList<Tasks> listB) {
+		listA.retainAll(listB);
+		return listA;
 	}
 	
 }
