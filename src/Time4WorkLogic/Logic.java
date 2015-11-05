@@ -445,8 +445,10 @@ public class Logic {
             if (lastCommandType == "add") { //undo add operation
                 Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
                 int taskIDToBeDeleted = commandToUndo.getSelectedIndexNumber();
+                ArrayList<Integer> taskIDToBeDeletedList = new ArrayList<Integer>();
+                taskIDToBeDeletedList.add(taskIDToBeDeleted);
                 try {
-                    storage.deleteTask(taskIDToBeDeleted);
+                    storage.deleteTask(taskIDToBeDeletedList);
                 } catch (InterruptedException e) {
                     logger.log(Level.WARNING, "undo error");
                     e.printStackTrace();
@@ -466,8 +468,10 @@ public class Logic {
             } else if (lastCommandType == "update"){  // undo update operation
                 Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
                 int taskIDToBeDeleted = commandToUndo.getSelectedIndexNumber();
+                ArrayList<Integer> taskIDToBeDeletedList = new ArrayList<Integer>();
+                taskIDToBeDeletedList.add(taskIDToBeDeleted);
                 try {
-                    storage.deleteTask(taskIDToBeDeleted);
+                    storage.deleteTask(taskIDToBeDeletedList);
                 } catch (InterruptedException e) {
                     logger.log(Level.WARNING, "undo error");
                     e.printStackTrace();
@@ -498,7 +502,9 @@ public class Logic {
                     Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
                     Tasks task = commandToUndo.getTask();
                     int taskID = task.getTaskID();
-                    storage.SetIncompleted(taskID);
+                    ArrayList<Integer> taskIDList = new ArrayList<Integer>();
+                    taskIDList.add(taskID);
+                    storage.SetIncompleted(taskIDList);
                     incompleteList.add(task);
                     int taskIndexInCompleteList = getIndexFromTaskID(completeList, taskID);
                     completeList.remove(taskIndexInCompleteList);
