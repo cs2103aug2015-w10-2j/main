@@ -89,7 +89,7 @@ public class Storage {
 	}	
 	
 	//deletes the input taskID, returns the deleted task, returns null if no matching taskID
-	public Tasks deleteTask(int taskID) throws IOException, InterruptedException{		
+	public ArrayList<Tasks> deleteTask(ArrayList<Integer> taskID) throws IOException, InterruptedException{		
 		try {
 			return myLogic.delete(taskID);
 		} catch (IOException | InterruptedException e) {
@@ -100,21 +100,27 @@ public class Storage {
 	//replaces specified taskID with updated Tasks and returns "old" updated task
 	public Tasks UpdateTask(int taskID, Tasks updatedTask) throws Exception{
 		
-		Tasks oldTask = null;
+		ArrayList<Tasks> oldTask = null;
+		ArrayList<Integer> myID = new ArrayList<Integer>();
+		myID.add(taskID);
 		
 		try {
-			oldTask = myLogic.delete(taskID);
+			oldTask = myLogic.delete(myID);
 			myLogic.addNewTask(updatedTask);
 			
 		} catch (IOException | InterruptedException e) {
 			throw e;
 		}
 		
-		return oldTask;
+		if(oldTask.size() == 0) {
+			return null;
+		} else {				
+			return oldTask.get(0);
+		}
 	}
 	
-	//sets task as complete and returns the task
-	public Tasks SetCompleted(int taskID) throws Exception{		
+	//sets tasks as complete and returns the tasks
+	public ArrayList<Tasks> SetCompleted(ArrayList<Integer> taskID) throws Exception{		
 		try {
 			return myLogic.setCompleted(taskID, true);
 		} catch (IOException | InterruptedException e) {
@@ -122,8 +128,8 @@ public class Storage {
 		}		
 	}
 	
-	//sets task as incomplete and returns the task
-	public Tasks SetIncompleted(int taskID) throws Exception{		
+	//sets tasks as incomplete and returns the tasks
+	public ArrayList<Tasks> SetIncompleted(ArrayList<Integer> taskID) throws Exception{		
 		try {
 			return myLogic.setCompleted(taskID, false);
 		} catch (IOException | InterruptedException e) {

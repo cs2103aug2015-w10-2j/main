@@ -311,10 +311,10 @@ public class StorageLogic {
 			}
 	}
 
-	//searches and deletes the indicated taskID, if not found, returns null, if deleted returns deleted task 
-	public Tasks delete(int taskID) throws IOException, InterruptedException {
+	//searches and deletes the indicated taskIDs, if not found, returns null, if deleted returns deleted tasks 
+	public ArrayList<Tasks> delete(ArrayList<Integer> taskID) throws IOException, InterruptedException {
 		
-		Tasks deletedTask = null;
+		ArrayList<Tasks> deletedTask = new ArrayList<Tasks>();
 		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
 		
 		if(!myFile.exists()) {
@@ -335,11 +335,14 @@ public class StorageLogic {
 		boolean needDelete = false;
 
 		for(int i=0; i<myTaskList.size(); i++) {
-			if(myTaskList.get(i).getTaskID() == taskID) {
-				needDelete = true;
-				deletedTask = myTaskList.get(i);
-				myTaskList.remove(i);
-				break;
+			for(int j=0; j<taskID.size(); i++) {
+				if(myTaskList.get(i).getTaskID() == taskID.get(j)) {
+					needDelete = true;
+					deletedTask.add(myTaskList.get(i));
+					myTaskList.remove(i);
+					i--;
+					break;
+				}
 			}
 		}
 		
@@ -376,10 +379,10 @@ public class StorageLogic {
 		return deletedTask;		
 	}
 
-	//sets task as completed, returns the target task
-	public Tasks setCompleted(int taskID, boolean status) throws IOException, InterruptedException {
+	//sets tasks as completed, returns the target tasks
+	public ArrayList<Tasks> setCompleted(ArrayList<Integer> taskID, boolean status) throws IOException, InterruptedException {
 		
-		Tasks editedTask = null;
+		ArrayList<Tasks> editedTask = new ArrayList<Tasks>();
 		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
 		
 		if(!myFile.exists()) {
@@ -389,27 +392,24 @@ public class StorageLogic {
 				throw e;
 			}
 		}
-				
-		try {
-			openWriterReader();
-		} catch (IOException e) {
-			throw e;
-		}
 		
 		boolean needUpdate = false;
+		
 		try {
+			openWriterReader();
 			myTaskList = getAllTasks();
 		} catch (IOException e) {
 			throw e;
 		}
 		
 		for(int i=0; i<myTaskList.size(); i++) {
-			if(myTaskList.get(i).getTaskID() == taskID) {
-				needUpdate = true;
-				myTaskList.get(i).setCompleted(status);
-				editedTask = myTaskList.get(i);				
+			for(int j=0; j<taskID.size(); i++) {
+				if(myTaskList.get(i).getTaskID() == taskID.get(j)) {
+					needUpdate = true;
+					editedTask.add(myTaskList.get(i));	
+					myTaskList.get(i).setCompleted(status);								
+				}
 			}
-			
 		}
 		
 		//taskID to be deleted is found
