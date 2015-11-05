@@ -10,24 +10,30 @@ import Time4WorkLogic.FeedbackMessage;
 import Time4WorkLogic.Logic;
 import Time4WorkStorage.Tasks;
 import Time4WorkUI.DateDisplay;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
-
+import javafx.util.Callback;
 import Time4WorkUI.UserInput;
+import Time4WorkUI.FullValueCell;
 
-//@@author A0112077N
+//@@author: A0112077N
 public class TaskController {
 
 	private static Logic logic = new Logic();
 	private static UserInput userInput;
+
 	// -----------------------------------------
 	// FXML variables
 	// -----------------------------------------
@@ -101,6 +107,7 @@ public class TaskController {
 					output = getOutputFromLogic(userInput.getUserInput());
 					currentList = logic.getIncompleteTaskList();
 
+					//show the list of completed tasks for "display archive" cmd
 					if (userInput.isDisplayArchiveCommand()) {
 						currentList = output.getCompleteTaskList();
 					} else {
@@ -160,6 +167,21 @@ public class TaskController {
 		descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
 		fromCol.setCellValueFactory(new PropertyValueFactory<>("startDuration"));
 		toCol.setCellValueFactory(new PropertyValueFactory<>("endDuration"));
+
+		descriptionCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<TaskModel,String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(CellDataFeatures<TaskModel, String> param) {
+                return new ReadOnlyStringWrapper(param.getValue().getDescription());
+            }
+        });
+
+
+		 descriptionCol.setCellFactory(new Callback<TableColumn<TaskModel,String>, TableCell<TaskModel,String>>() {
+	            @Override
+	            public TableCell<TaskModel, String> call(TableColumn<TaskModel, String> param) {
+	                return new FullValueCell();
+	            }
+	        });
 	}
 
 	public void initTableView() {
