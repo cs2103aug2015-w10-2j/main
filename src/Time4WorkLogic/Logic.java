@@ -243,6 +243,7 @@ public class Logic {
         String indexDeletedFailed = "";
         
         ArrayList<Integer> arrangedIndexes = new ArrayList<Integer>();
+        ArrayList<Integer> validTaskID = new ArrayList<Integer>();
         
         userInputIndexes.sort(null);
         for (int i = numToBeDeleted - 1; i >= 0; i--) {
@@ -257,12 +258,7 @@ public class Logic {
                 int taskID = getTaskIDFromUserInput(userInputIndex);
                 Tasks deletedTask = getTaskFromTaskID(incompleteList, taskID); //store the task to be deleted
                 
-                try {
-                    storage.deleteTask(taskID);
-                } catch (InterruptedException e) {
-                    logger.log(Level.WARNING, "delete error");
-                    e.printStackTrace();
-                }
+                validTaskID.add(taskID);
                 incompleteList.remove(userInputIndex - 1);
                 
                 // Set up for undo operation
@@ -273,6 +269,13 @@ public class Logic {
                 indexDeletedSuccessfully = String.valueOf(userInputIndex + " ") + indexDeletedSuccessfully;
                 logger.log(Level.INFO, "end of processing delete command");
             }
+        }
+        
+        try {
+            storage.deleteTask(validTaskID);
+        } catch (InterruptedException e) {
+            logger.log(Level.WARNING, "delete error");
+            e.printStackTrace();
         }
         
         completeList = sortCompleteTask(completeList);
@@ -298,6 +301,7 @@ public class Logic {
         String indexMarkedFailed = "";
         
         ArrayList<Integer> arrangedIndexes = new ArrayList<Integer>();
+        ArrayList<Integer> validTaskID = new ArrayList<Integer>();
         
         userInputIndexes.sort(null);
         for (int i = numToBeMarked - 1; i >= 0; i--) {
@@ -312,15 +316,10 @@ public class Logic {
                 int taskID = getTaskIDFromUserInput(userInputIndex);
                 Tasks markedTask = getTaskFromTaskID(incompleteList, taskID); //store the task to be deleted
                 
-                try {
-                    storage.SetCompleted(taskID);
-                    incompleteList.remove(userInputIndex - 1);
-                    completeList.add(markedTask);
-                } catch (InterruptedException e) {
-                    logger.log(Level.WARNING, "mark error");
-                    e.printStackTrace();
-                }
+                validTaskID.add(taskID);
                 
+                incompleteList.remove(userInputIndex - 1);
+                completeList.add(markedTask);
                 // Set up for undo operation
                 Command reversedCommand = new Command("done", markedTask);
                 reversedCommandHistory.addReversedCommand(reversedCommand);
@@ -329,6 +328,13 @@ public class Logic {
                 indexMarkedSuccessfully = String.valueOf(userInputIndex + " ") + indexMarkedSuccessfully;
                 logger.log(Level.INFO, "end of processing mark command");
             }
+        }
+        
+        try {
+            storage.SetCompleted(validTaskID);
+        } catch (InterruptedException e) {
+            logger.log(Level.WARNING, "mark error");
+            e.printStackTrace();
         }
         
         completeList = sortCompleteTask(completeList);
