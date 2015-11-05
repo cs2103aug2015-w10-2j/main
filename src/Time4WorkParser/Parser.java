@@ -1,6 +1,5 @@
 package Time4WorkParser;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,6 +9,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.joestelmach.natty.*;
 
 import Time4WorkStorage.DeadlineTask;
 import Time4WorkStorage.Duration;
@@ -24,14 +24,12 @@ public class Parser {
   
   private ArrayList<String> VALID_DISPLAY_COMMANDS = new ArrayList<String>(Arrays.asList("archive", "floating", "deadline", "duration"));
   
-  private static final String KEYWORD_BY = "by";
-  private static final String KEYWORD_FROM = "from";
-  private static final String KEYWORD_TO = "to";
-  
   private static final String REGEX_WHITESPACES = "[\\s,]+";
   
   private static final Logger logger = Logger.getLogger(Parser.class.getName());
-    
+  
+  private static final com.joestelmach.natty.Parser dateParser = new com.joestelmach.natty.Parser();
+  
   public Parser() {
   }
   
@@ -169,7 +167,7 @@ public class Parser {
     ArrayList<String> resultArray = new ArrayList<String>();
     int lastWordIndex = findIndexOfLastWord(parameters);
     String description = createDescription(parameters, lastWordIndex);
-    if (!description.equals(null)){
+    if (!(description == null)){
       ArrayList<String> timeArray = getTimeArray(parameters, lastWordIndex);
       resultArray.add(description);
       resultArray.addAll(timeArray);
@@ -187,10 +185,15 @@ public class Parser {
     
     if (numberOfArguments == 0) {
       task = new FloatingTask(descriptionOfTask);
-    } else if (timeArray.contains(KEYWORD_BY) || timeArray.contains(KEYWORD_FROM) || timeArray.contains(KEYWORD_TO)){
-    	task = createKeywordTask(task, descriptionOfTask, timeArray);
     } else {
-      task = createNoKeywordTask(task, descriptionOfTask, timeArray, numberOfArguments);
+      try{
+        for (int i = 0; i < timeArray.size(); i++) {
+          Integer.parseInt(timeArray.get(i));
+        }
+        task = createNoKeywordTask(task, descriptionOfTask, timeArray, numberOfArguments);
+      } catch (NumberFormatException e) {
+        task = createKeywordTask(task, descriptionOfTask, timeArray);
+      }
     }
     return task;
   }
@@ -207,15 +210,37 @@ public class Parser {
   
   private Tasks createKeywordTask(Tasks task, String descriptionOfTask, ArrayList<String> timeArray) {
     timeArray.set(0, timeArray.get(0).toLowerCase());
-    if (timeArray.contains(KEYWORD_BY)) {
-      timeArray.remove(KEYWORD_BY);
-      task = createDeadlineTask(task, descriptionOfTask, timeArray);
-    } else if (timeArray.contains(KEYWORD_FROM) && timeArray.contains(KEYWORD_TO)) {
-      timeArray.remove(KEYWORD_FROM);
-      timeArray.remove(KEYWORD_TO);
-      task = createDurationTask(task, descriptionOfTask, timeArray);
+    ArrayList<String> formattedTimeArray = new ArrayList<String>();
+    createFormattedTimeArray(timeArray, formattedTimeArray);
+    if (formattedTimeArray.size() == 2) {
+      createFormattedTimeArray(timeArray, formattedTimeArray);
+      task = createDeadlineTask(task, descriptionOfTask, formattedTimeArray);
+    } else if (formattedTimeArray.size() == 4) {
+      createFormattedTimeArray(timeArray, formattedTimeArray);
+      task = createDurationTask(task, descriptionOfTask, formattedTimeArray);
     }
     return task;
+  }
+  
+  private void createFormattedTimeArray(ArrayList<String> timeArray, ArrayList<String> formattedTimeArray) {
+    String timeString = String.join(" ", timeArray);
+    List<DateGroup> dateGroups = dateParser.parse(timeString);
+    List<Date> dates = dateGroups.get(0).getDates();
+    int dateSize = dates.size();
+    for (int i = 0; i < dateSize; i++){
+      Date date = dates.get(i);
+      SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyy");
+      SimpleDateFormat timeFormat = new SimpleDateFormat("HHmm");
+      String formattedDate = dateFormat.format(date);
+      String formattedTime;
+      if (dateGroups.get(0).isTimeInferred()){
+        formattedTime = "2359";
+      } else {
+        formattedTime = timeFormat.format(date);
+      }
+      formattedTimeArray.add(formattedDate);
+      formattedTimeArray.add(formattedTime);
+    }
   }
   
   private Tasks createDurationTask(Tasks task, String descriptionOfTask, ArrayList<String> timeArray) {
@@ -359,9 +384,9 @@ public class Parser {
     
     ArrayList<String> combinedDescriptionList = createNewListWithCombinedDescription(arguments);
     
-    if (!combinedDescriptionList.equals(null)){
+    if (!(combinedDescriptionList == null)){
       task = createTaskListForAddingOrUpdating(combinedDescriptionList);
-      if(!task.equals(null)){
+      if(!(task == null)){
         command = new Command("add", task);
       } else {
         command = createInvalidCommand();
@@ -377,14 +402,17 @@ public class Parser {
     Command command;
     boolean containsDash;
     int argumentsLength = arguments.size();
+    ArrayList<Integer> arrayOfDeleteIndexes = new ArrayList<Integer>();
     
     containsDash = checkIfContainsDash(arguments, argumentsLength);
     
     if (argumentsLength == 1 && !containsDash){
       int indexToBeDeleted = Integer.parseInt(arguments.get(0));
-      command = new Command("delete", indexToBeDeleted);
+      arrayOfDeleteIndexes.add(indexToBeDeleted);
+      command = new Command("delete", arrayOfDeleteIndexes);
     } else {
-      command = new Command("delete", getArrayListForDoneOrDelete(arguments, containsDash, argumentsLength));
+      arrayOfDeleteIndexes = getArrayListForDoneOrDelete(arguments, containsDash, argumentsLength);
+      command = new Command("delete", arrayOfDeleteIndexes);
     }
     
     return command;
@@ -429,9 +457,9 @@ public class Parser {
     
     ArrayList<String> combinedDescriptionList = createNewListWithCombinedDescription(withoutTaskIDArguments);
     
-    if (!combinedDescriptionList.equals(null)){
+    if (!(combinedDescriptionList == null)){
       task = createTaskListForAddingOrUpdating(combinedDescriptionList);
-      if (!task.equals(null)){
+      if (!(task == null)){
         task.setTaskID(taskID);
         command = new Command("update", task);
       } else {
@@ -448,14 +476,8 @@ public class Parser {
     Command command;
     String keyword = String.join(" ", arguments);
     
-    try {
-      SimpleDateFormat date = new SimpleDateFormat("ddMMyy");
-      date.parse(keyword);
-      command = new Command("search", true, keyword);
-    } catch (ParseException e) {
-      command = new Command("search", false, keyword);
-    }
-        
+    command = new Command("search", keyword); 
+    
     return command;
   }
   
@@ -490,14 +512,17 @@ public class Parser {
     Command command;
     boolean containsDash;
     int argumentsLength = arguments.size();
+    ArrayList<Integer> arrayOfMarkDoneIndexes = new ArrayList<Integer>();
     
     containsDash = checkIfContainsDash(arguments, argumentsLength);
     
     if (argumentsLength == 1 && !containsDash){
       int indexToBeMarkedDone = Integer.parseInt(arguments.get(0));
-      command = new Command("done", indexToBeMarkedDone);
+      arrayOfMarkDoneIndexes.add(indexToBeMarkedDone);
+      command = new Command("done", arrayOfMarkDoneIndexes);
     } else {
-      command = new Command("done", getArrayListForDoneOrDelete(arguments, containsDash, argumentsLength));
+      arrayOfMarkDoneIndexes = getArrayListForDoneOrDelete(arguments, containsDash, argumentsLength);
+      command = new Command("done", arrayOfMarkDoneIndexes);
     }
     
     return command;
