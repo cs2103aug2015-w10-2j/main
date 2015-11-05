@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 
 import Time4WorkLogic.FeedbackMessage;
 import Time4WorkLogic.Logic;
-import Time4WorkStorage.Storage;
 import Time4WorkStorage.Tasks;
 import Time4WorkUI.DateDisplay;
 import javafx.beans.value.ChangeListener;
@@ -18,9 +17,6 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.SingleSelectionModel;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -92,11 +88,15 @@ public class TaskController {
 		fromCol.getStyleClass().add("align-center");
 		taskTitle.getStyleClass().add("taskTitle");
 
+		indexCol.prefWidthProperty().bind(taskTable.widthProperty().multiply(0.05));
+		descriptionCol.prefWidthProperty().bind(taskTable.widthProperty().multiply(0.55));
+		fromCol.prefWidthProperty().bind(taskTable.widthProperty().multiply(0.20));
+		toCol.prefWidthProperty().bind(taskTable.widthProperty().multiply(0.20));
+
 		indexCol.setCellValueFactory(new PropertyValueFactory<>("index"));
 		descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
 		fromCol.setCellValueFactory(new PropertyValueFactory<>("startDuration"));
 		toCol.setCellValueFactory(new PropertyValueFactory<>("endDuration"));
-		taskTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
 		initGUI();
 		handleUserInput();
@@ -112,6 +112,7 @@ public class TaskController {
 				String userInput = userCommand.getText();
 				upStack.push(userInput);
 				userCommand.setText(PROMPT_USERCOMMAND_CLEAR);
+
 				FeedbackMessage output;
 				try {
 					output = getOutputFromLogic(userInput);
@@ -125,8 +126,9 @@ public class TaskController {
 						taskTitle.setText(TITLE_TODO_TASK);
 					}
 
-					taskTable.setItems(getTaskList(currentList));
+					taskTable.setItems(getObservableTaskList(currentList));
 					feedback.setText(output.getFeedback());
+
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -141,11 +143,10 @@ public class TaskController {
 				userCommand.setText(currentCommand);
 				upStack.push(currentCommand);
 			}
-
 		});
 	}
 
-	public ObservableList<TaskModel> getTaskList(ArrayList<Tasks> currentList) {
+	public ObservableList<TaskModel> getObservableTaskList(ArrayList<Tasks> currentList) {
 		ObservableList<TaskModel> taskData = FXCollections.observableArrayList();
 		DateDisplay display = new DateDisplay();
 		for (int i = 0; i < currentList.size(); i++) {
@@ -159,7 +160,7 @@ public class TaskController {
 	public void initGUI() throws IOException {
 		taskTitle.setText(TITLE_TODO_TASK);
 		currentList = logic.getIncompleteTaskList();
-		taskTable.setItems(getTaskList(currentList));
+		taskTable.setItems(getObservableTaskList(currentList));
 	}
 
 	public FeedbackMessage getOutputFromLogic(String userCommand) throws Exception {
