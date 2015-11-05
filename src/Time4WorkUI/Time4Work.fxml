@@ -31,7 +31,7 @@
          <center>
             <GridPane prefHeight="450.0" prefWidth="600.0">
                <children>
-                  <Label id="taskTable" fx:id="taskTitle" textAlignment="CENTER">
+                  <Label id="taskTable" fx:id="taskTitle" text="TIME4WORK" textAlignment="CENTER">
                      <GridPane.margin>
                         <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
                      </GridPane.margin>
