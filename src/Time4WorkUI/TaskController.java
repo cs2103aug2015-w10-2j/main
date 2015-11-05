@@ -10,11 +10,8 @@ import Time4WorkLogic.FeedbackMessage;
 import Time4WorkLogic.Logic;
 import Time4WorkStorage.Tasks;
 import Time4WorkUI.DateDisplay;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -23,9 +20,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
+
+import Time4WorkUI.UserInput;
+
+//@@author A0112077N
 public class TaskController {
 
 	private static Logic logic = new Logic();
+	private static UserInput userInput;
 	// -----------------------------------------
 	// FXML variables
 	// -----------------------------------------
@@ -39,7 +41,6 @@ public class TaskController {
 	private Label feedback;
 	@FXML
 	private TableView<TaskModel> taskTable;
-
 	@FXML
 	private TableColumn<TaskModel, Integer> indexCol;
 	@FXML
@@ -48,7 +49,6 @@ public class TaskController {
 	private TableColumn<TaskModel, String> toCol;
 	@FXML
 	private TableColumn<TaskModel, String> fromCol;
-
 
 	// -----------------------------------------------------
 	// Class variables
@@ -68,40 +68,23 @@ public class TaskController {
 	// -------------------------------------------------------
 	private static final String PROMPT_USERCOMMAND_TEXT = "Enter command";
 	private static final String PROMPT_USERCOMMAND_CLEAR = "";
-	private static final String TITLE_TODO_TASK = "TODO TASKS";
-	private static final String TITLE_COMPLETED_TASK = "COMPLETED TASKS";
-
+	private static final String NO_CONTENT_TABLE_MESSAGE = "You have no tasks.";
 
 	/**
 	 * Initializes the controller class. This method is automatically called
 	 * after the fxml file has been loaded.
 	 *
-	 * Initializes the table columns and sets up sorting and filtering.
+	 * Initializes the table columns and sets up initial interface
 	 *
 	 * @throws Exception
 	 */
 	@FXML
 	private void initialize() throws Exception {
-		// Initialize the columns.
-		indexCol.getStyleClass().add("align-center");
-		toCol.getStyleClass().add("align-center");
-		fromCol.getStyleClass().add("align-center");
-		taskTitle.getStyleClass().add("taskTitle");
-
-		indexCol.prefWidthProperty().bind(taskTable.widthProperty().multiply(0.05));
-		descriptionCol.prefWidthProperty().bind(taskTable.widthProperty().multiply(0.55));
-		fromCol.prefWidthProperty().bind(taskTable.widthProperty().multiply(0.20));
-		toCol.prefWidthProperty().bind(taskTable.widthProperty().multiply(0.20));
-
-		indexCol.setCellValueFactory(new PropertyValueFactory<>("index"));
-		descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
-		fromCol.setCellValueFactory(new PropertyValueFactory<>("startDuration"));
-		toCol.setCellValueFactory(new PropertyValueFactory<>("endDuration"));
-
-		initGUI();
+		initColumn();
+		initTableView();
+		setUpUI();
 		handleUserInput();
 	}
-
 
 	public void handleUserInput() {
 		userCommand.setPromptText(PROMPT_USERCOMMAND_TEXT);
@@ -109,21 +92,19 @@ public class TaskController {
 
 		userCommand.setOnKeyPressed(e -> {
 			if (e.getCode().equals(KeyCode.ENTER)) {
-				String userInput = userCommand.getText();
-				upStack.push(userInput);
+				userInput = new UserInput(userCommand.getText());
+				upStack.push(userInput.getUserInput());
 				userCommand.setText(PROMPT_USERCOMMAND_CLEAR);
 
 				FeedbackMessage output;
 				try {
-					output = getOutputFromLogic(userInput);
+					output = getOutputFromLogic(userInput.getUserInput());
 					currentList = logic.getIncompleteTaskList();
 
-					if(userInput.toLowerCase().startsWith("display archive")){
+					if (userInput.isDisplayArchiveCommand()) {
 						currentList = output.getCompleteTaskList();
-						taskTitle.setText(TITLE_COMPLETED_TASK);
 					} else {
 						currentList = output.getIncompleteTaskList();
-						taskTitle.setText(TITLE_TODO_TASK);
 					}
 
 					taskTable.setItems(getObservableTaskList(currentList));
@@ -146,6 +127,12 @@ public class TaskController {
 		});
 	}
 
+
+	/**
+	 * Get the observableList to display in UI
+	 * @param currentList
+	 * @return taskData
+	 */
 	public ObservableList<TaskModel> getObservableTaskList(ArrayList<Tasks> currentList) {
 		ObservableList<TaskModel> taskData = FXCollections.observableArrayList();
 		DateDisplay display = new DateDisplay();
@@ -157,8 +144,30 @@ public class TaskController {
 		return taskData;
 	}
 
-	public void initGUI() throws IOException {
-		taskTitle.setText(TITLE_TODO_TASK);
+	public void initColumn() {
+		// Initialize the columns.
+		indexCol.getStyleClass().add("align-center");
+		toCol.getStyleClass().add("align-center");
+		fromCol.getStyleClass().add("align-center");
+		taskTitle.getStyleClass().add("taskTitle");
+
+		indexCol.prefWidthProperty().bind(taskTable.widthProperty().multiply(0.05));
+		descriptionCol.prefWidthProperty().bind(taskTable.widthProperty().multiply(0.55));
+		fromCol.prefWidthProperty().bind(taskTable.widthProperty().multiply(0.20));
+		toCol.prefWidthProperty().bind(taskTable.widthProperty().multiply(0.20));
+
+		indexCol.setCellValueFactory(new PropertyValueFactory<>("index"));
+		descriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
+		fromCol.setCellValueFactory(new PropertyValueFactory<>("startDuration"));
+		toCol.setCellValueFactory(new PropertyValueFactory<>("endDuration"));
+	}
+
+	public void initTableView() {
+		Label noContentLabel = new Label(NO_CONTENT_TABLE_MESSAGE);
+		taskTable.setPlaceholder(noContentLabel);
+	}
+
+	public void setUpUI() throws IOException {
 		currentList = logic.getIncompleteTaskList();
 		taskTable.setItems(getObservableTaskList(currentList));
 	}
@@ -170,5 +179,4 @@ public class TaskController {
 	public static ArrayList<Tasks> getDisplayedList() {
 		return currentList;
 	}
-
 }
