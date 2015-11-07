@@ -99,8 +99,7 @@ public class TaskController {
 
 		userCommand.setOnKeyPressed(e -> {
 			userInput = new UserInput(userCommand.getText());
-			autoCompleteUserCommand(userInput);
-
+			
 			if (e.getCode().equals(KeyCode.ENTER)) {
 				upStack.push(userInput.getUserInput());
 				userCommand.setText(PROMPT_USERCOMMAND_CLEAR);
@@ -230,11 +229,5 @@ public class TaskController {
 	 */
 	public static ArrayList<Tasks> getDisplayedList() {
 		return currentList;
-	}
-
-	public void autoCompleteUserCommand(UserInput input){
-		if (input.isAddCommand()){
-			userCommand.setText("add");
-		}
 	}
 }
