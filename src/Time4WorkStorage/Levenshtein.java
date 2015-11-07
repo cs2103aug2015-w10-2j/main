@@ -1,6 +1,6 @@
 package Time4WorkStorage;
 
-/* @@author A0125495Y */
+
 
 public class Levenshtein {
 	
@@ -24,7 +24,7 @@ public class Levenshtein {
                 costs[j] = cj;
             }
         }
-        
+        /* @@author A0125495Y */
         if(costs[search.length()] > limit) {
         	return -1;
         } else {

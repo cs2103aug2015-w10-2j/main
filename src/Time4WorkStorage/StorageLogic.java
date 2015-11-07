@@ -405,9 +405,11 @@ public class StorageLogic {
 		for(int i=0; i<myTaskList.size(); i++) {
 			for(int j=0; j<taskID.size(); j++) {
 				if(myTaskList.get(i).getTaskID() == taskID.get(j)) {
-					needUpdate = true;
-					editedTask.add(myTaskList.get(i));	
-					myTaskList.get(i).setCompleted(status);								
+					if(myTaskList.get(i).isCompleted() != status) {
+						needUpdate = true;
+						editedTask.add(myTaskList.get(i));	
+						myTaskList.get(i).setCompleted(status);	
+					}
 				}
 			}
 		}

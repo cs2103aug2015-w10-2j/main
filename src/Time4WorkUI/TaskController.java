@@ -1,6 +1,7 @@
 package Time4WorkUI;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Stack;
 import java.util.logging.Level;
@@ -190,7 +191,11 @@ public class TaskController {
 	}
 
 	public void setUpUI() throws IOException {
-		currentList = logic.getIncompleteTaskList();
+		try {
+			currentList = logic.getIncompleteTaskList();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 		taskTable.setItems(getObservableTaskList(currentList));
 	}
 

@@ -7,7 +7,8 @@ import java.util.ArrayList;
 
 public class Storage {
 	
-	private static Storage theStorage; 
+	//as constructor may try exception, create object when getInstance is called
+	private static Storage theStorage = null; 
 	private StorageLogic myLogic = new StorageLogic();
 	private CustomPathLogic myPath = new CustomPathLogic();
 	private static final String defFile = "myTasks.txt";
@@ -146,15 +147,15 @@ public class Storage {
 		}		
 	}
 	
-	
 	public static Storage getInstance() throws IOException {
 		
-		try {
-			theStorage = new Storage();
-		} catch (IOException e) {
-			throw e;
+		if(theStorage == null) {
+			try {
+				theStorage = new Storage();
+			} catch (IOException e) {
+				throw e;
+			}
 		}
-		
 		return theStorage;
 	}
 	

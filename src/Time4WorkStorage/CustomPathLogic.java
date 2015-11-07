@@ -13,11 +13,20 @@ import java.io.IOException;
 public class CustomPathLogic {
 	
 	private final String defPath = "pathcustom.txt";
-	private File pathFile =  new File(defPath);;
+	private File pathFile =  new File(defPath);
 	private FileWriter fw;
 	private FileReader fr; 
 	private BufferedWriter bw;
 	private BufferedReader br;
+	
+	private static final String MSG_WRITEROPEN_FAILED = "Unable to create writer for file";
+	private static final String MSG_READEROPEN_FAILED = "Unable to create reader for file";
+	private static final String MSG_WRITERCLOSE_FAILED = "Unable to close writer";
+	private static final String MSG_READERCLOSE_FAILED = "Unable to close reader";
+	private static final String MSG_FILEDELETION_FAILED = "Unable to delete file";
+	private static final String BACKSLASH = "\\";
+	
+
 	
 	//returns if custompath file exists
 	public boolean savedPathExists() {
@@ -27,7 +36,7 @@ public class CustomPathLogic {
 	//writes the new path into file
 	public void writeCustomPath(String customPath) throws IOException {
 		
-		customPath = customPath.replace("\\", "\\\\");
+		customPath = customPath.replace(BACKSLASH, BACKSLASH+BACKSLASH);
 		
 		try {
 			openWriter();
@@ -97,7 +106,7 @@ public class CustomPathLogic {
 		}
 		
 		if (!pathFile.delete()) {
-			throw new IOException("Could not delete file");
+			throw new IOException(MSG_FILEDELETION_FAILED);
 	    } 
 	}
 	
@@ -107,7 +116,7 @@ public class CustomPathLogic {
 			fw = new FileWriter(pathFile.getAbsoluteFile());
 			bw = new BufferedWriter(fw);
 		} catch (IOException e) {
-			throw new IOException("Unable to create writer for file");
+			throw new IOException(MSG_WRITEROPEN_FAILED);
 		}
 	}
 	
@@ -117,7 +126,7 @@ public class CustomPathLogic {
 			fr = new FileReader(pathFile.getAbsoluteFile());
 			br = new BufferedReader(fr);
 		} catch (FileNotFoundException e) {
-			throw new FileNotFoundException("Reader cannot be created. File may be is missing");
+			throw new FileNotFoundException(MSG_READEROPEN_FAILED);
 		}
 	}	
 
@@ -126,7 +135,7 @@ public class CustomPathLogic {
 			try {
 				bw.close();
 			} catch (IOException e) {
-				throw new IOException("Unable to close writer");
+				throw new IOException(MSG_WRITERCLOSE_FAILED);
 			}
 	}
 	
@@ -135,7 +144,7 @@ public class CustomPathLogic {
 		try {
 			br.close();
 		} catch (IOException e) {
-			throw new IOException("Unable to close reader");
+			throw new IOException(MSG_READERCLOSE_FAILED);
 		}
 	}
 

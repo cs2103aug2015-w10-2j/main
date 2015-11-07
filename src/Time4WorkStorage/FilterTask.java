@@ -28,6 +28,10 @@ public class FilterTask {
 		Levenshtein myLevenshtein = new Levenshtein();
 		ArrayList<Tasks> resultList = new ArrayList<Tasks>();
 		
+		if(searchString == null) {
+			return myList;
+		}
+		
 		String[] splitString = searchString.split(SPLITTER);
 		ArrayList<String> startWith = new ArrayList<String>();
 		ArrayList<String> words = new ArrayList<String>();
@@ -210,7 +214,7 @@ public class FilterTask {
 		return resultList;
 	}
 	
-public ArrayList<Tasks> searchBetweenDates(ArrayList<Tasks> myList, String date1, String date2) throws ParseException {
+	public ArrayList<Tasks> searchBetweenDates(ArrayList<Tasks> myList, String date1, String date2) throws ParseException {
 		
 		ArrayList<Tasks> resultList = new ArrayList<Tasks>();
 		ArrayList<Tasks> beforeDateB = new ArrayList<Tasks>();
