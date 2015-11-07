@@ -534,8 +534,8 @@ public class Logic {
             String lastCommandType = lastCommand.getCommand();
             if (lastCommandType == "add") { //undo add operation
                 Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
-                int taskIDToBeDeleted = commandToUndo.getSelectedIndexNumber();
-                ArrayList<Integer> taskIDToBeDeletedList = new ArrayList<Integer>();
+                ArrayList<Integer> taskIDToBeDeletedList = commandToUndo.getSelectedIndexNumbers();
+                int taskIDToBeDeleted = taskIDToBeDeletedList.get(0);
                 taskIDToBeDeletedList.add(taskIDToBeDeleted);
                 try {
                     storage.deleteTask(taskIDToBeDeletedList);
@@ -548,7 +548,7 @@ public class Logic {
                 incompleteList.remove(indexInPreviouslist);
                 undoSuccessfully = true;
             } else if (lastCommandType == "delete"){ //undo delete task
-                int undoDeleteNum = lastCommand.getSelectedIndexNumber();
+                int undoDeleteNum = lastCommand.getSelectedIndexNumbers().get(0);
                 for (int i = 0; i < undoDeleteNum; i++) {
                     Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
                     Tasks task = commandToUndo.getTask();
@@ -558,7 +558,7 @@ public class Logic {
                 undoSuccessfully = true;
             } else if (lastCommandType == "update"){  // undo update operation
                 Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
-                int taskIDToBeDeleted = commandToUndo.getSelectedIndexNumber();
+                int taskIDToBeDeleted = commandToUndo.getSelectedIndexNumbers().get(0);
                 ArrayList<Integer> taskIDToBeDeletedList = new ArrayList<Integer>();
                 taskIDToBeDeletedList.add(taskIDToBeDeleted);
                 try {
@@ -576,7 +576,7 @@ public class Logic {
                 incompleteList.add(commandToUndo.getTask());
                 undoSuccessfully = true;
             } else if (lastCommandType == "clear") {  // undo clear operation
-                int clearedTaskNum = lastCommand.getSelectedIndexNumber();
+                int clearedTaskNum = lastCommand.getSelectedIndexNumbers().get(0);
                 for (int i = 0; i < clearedTaskNum; i++) {
                     Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
                     Tasks task = commandToUndo.getTask();
@@ -589,7 +589,7 @@ public class Logic {
                 }
                 undoSuccessfully = true;
             } else if (lastCommandType == "done") {  //undo done operation
-                int undoMarkedNum = lastCommand.getSelectedIndexNumber();
+                int undoMarkedNum = lastCommand.getSelectedIndexNumbers().get(0);
                 for (int i = 0; i < undoMarkedNum; i++) {
                     Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
                     Tasks task = commandToUndo.getTask();

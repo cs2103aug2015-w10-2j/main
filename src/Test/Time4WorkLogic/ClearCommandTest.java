@@ -18,7 +18,7 @@ public class ClearCommandTest {
 	
 	 /*This is the test for clear all the tasks*/
 	@Test
-	public void addTest() throws Exception{
+	public void clearTest() throws Exception{
 		Tasks task1 = new FloatingTask("reading1.");
 		logic.executeAdd(task1);
 		Tasks task2 = new FloatingTask("reading2.");
