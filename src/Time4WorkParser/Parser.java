@@ -406,7 +406,9 @@ public class Parser {
     
     containsDash = checkIfContainsDash(arguments, argumentsLength);
     
-    if (argumentsLength == 1 && !containsDash){
+    if(argumentsLength == 0){
+      command = createInvalidCommand();
+    } else if (argumentsLength == 1 && !containsDash){
       int indexToBeDeleted = Integer.parseInt(arguments.get(0));
       arrayOfDeleteIndexes.add(indexToBeDeleted);
       command = new Command("delete", arrayOfDeleteIndexes);
@@ -548,7 +550,9 @@ public class Parser {
     
     containsDash = checkIfContainsDash(arguments, argumentsLength);
     
-    if (argumentsLength == 1 && !containsDash){
+    if(argumentsLength == 0){
+    	command = createInvalidCommand();
+    } else if (argumentsLength == 1 && !containsDash){
       int indexToBeMarkedDone = Integer.parseInt(arguments.get(0));
       arrayOfMarkDoneIndexes.add(indexToBeMarkedDone);
       command = new Command("done", arrayOfMarkDoneIndexes);
@@ -582,4 +586,3 @@ public class Parser {
   }
   
 }
-
