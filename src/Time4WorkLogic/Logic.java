@@ -141,6 +141,8 @@ public class Logic {
                     String fromDate = displayTime.get(0);
                     String toDate = displayTime.get(1);
                     return executeDisplayFromToDates(fromDate, toDate);
+                } else if (parsedCommand.getStoreSearchAndDisplayStrings() == "overdue") {
+                    return executeDisplayOverdue()
                 } else { // display by task type instead of dates
                     String displayType;
                     if (parsedCommand.getStoreSearchAndDisplayStrings() != null) {
@@ -500,6 +502,26 @@ public class Logic {
         }
     }
     
+    public FeedbackMessage executeDisplayOverdue() throws IOException, ParseException {
+        logger.log(Level.INFO, "start processing display task overdue command");
+        ArrayList<Tasks> searchList = new ArrayList<Tasks>();
+        
+        incompleteList = getIncompleteTaskList();
+        searchList = myFilter.searchOverDue(incompleteList);
+        
+        if (searchList.size() != 0) {
+            incompleteList = searchList;
+            completeList = sortCompleteTask(completeList);
+            incompleteList = sortIncompleteTask(incompleteList);
+            logger.log(Level.INFO, "end of processing display task overdue command");
+            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_TASKDATE_SUCCESSFULLY, "overdued"),
+                                       completeList, incompleteList);
+        } else {
+            logger.log(Level.INFO, "end of processing display task overdue command");
+            return new FeedbackMessage(MESSAGE_DISPLAY_FAILED, completeList, incompleteList);
+        }
+    }
+    
     public FeedbackMessage executeUndo() throws Exception {
         logger.log(Level.INFO, "start processing undo command");
         boolean undoSuccessfully = false;
@@ -619,7 +641,6 @@ public class Logic {
             displayList = myFilter.searchDuration(fullIncompleteTask);
         } else if (displayType.equals("floating")) {
             displayList = myFilter.searchFloating(fullIncompleteTask);
-            
         }
         
         
