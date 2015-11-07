@@ -494,17 +494,49 @@ public class Parser {
   }
   
   private Command createDisplayCommand(ArrayList<String> arguments){
+    Command command = null;
     String typeToDisplay = null;
     
     if (arguments.isEmpty()){
-      ;
+      command = new Command("display", typeToDisplay);
     } else if (VALID_DISPLAY_COMMANDS.contains(arguments.get(0))) {
       typeToDisplay = arguments.get(0);
+      command = new Command("display", typeToDisplay);
+    } else if (!dateParser.parse(String.join(" ", arguments)).isEmpty()){
+      String firstWord = arguments.get(0).toLowerCase();
+      ArrayList<String> timeArray = new ArrayList<String>();
+      List<DateGroup> dateGroups = dateParser.parse(String.join(" ", arguments));
+      List<Date> dates = dateGroups.get(0).getDates();
+      SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyy");
+      command = createDisplayTimeCommand(firstWord, timeArray, dates, dateFormat);
     } else {
-      ;
+      command = new Command("display", typeToDisplay);
     }
-    Command command = new Command("display", typeToDisplay);
-    
+    return command;
+  }
+  
+  private Command createDisplayTimeCommand(String firstWord, ArrayList<String> timeArray, List<Date> dates,
+                                           SimpleDateFormat dateFormat) {
+    Command command;
+    if (firstWord.equals("on")) {
+      Date date = dates.get(0);
+      String formattedDate = dateFormat.format(date);
+      timeArray.add(formattedDate);
+      command = new Command("display", 1, timeArray);
+    } else if (firstWord.equals("by")) {
+      Date date = dates.get(0);
+      String formattedDate = dateFormat.format(date);
+      timeArray.add(formattedDate);
+      command = new Command("display", 2, timeArray);
+    } else {
+      Date fromDate = dates.get(0);
+      Date toDate = dates.get(1);
+      String formattedStartDate = dateFormat.format(fromDate);
+      String formattedToDate = dateFormat.format(toDate);
+      timeArray.add(formattedStartDate);      
+      timeArray.add(formattedToDate);
+      command = new Command("display", 3, timeArray);
+    }
     return command;
   }
   
@@ -550,3 +582,4 @@ public class Parser {
   }
   
 }
+
