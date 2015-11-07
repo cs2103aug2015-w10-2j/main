@@ -142,7 +142,7 @@ public class Logic {
                     String toDate = displayTime.get(1);
                     return executeDisplayFromToDates(fromDate, toDate);
                 } else if (parsedCommand.getStoreSearchAndDisplayStrings() == "overdue") {
-                    return executeDisplayOverdue()
+                    return executeDisplayOverdue();
                 } else { // display by task type instead of dates
                     String displayType;
                     if (parsedCommand.getStoreSearchAndDisplayStrings() != null) {
