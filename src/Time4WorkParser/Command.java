@@ -7,11 +7,13 @@ public class Command {
   
   private Tasks task;
   private String command;
-  private String displayOrStoragePath;
+  private String storeSearchAndDisplayStrings;
   private int selectedIndexNumber;
   private ArrayList<Integer> selectedIndexNumbers = new ArrayList<Integer>();
   private boolean isDateSearch;
   private String searchKeyword;
+  private int displayType;
+  private ArrayList<String> timeArray;
   
   //for adding and updating
   public Command(String command, Tasks task) {
@@ -19,61 +21,65 @@ public class Command {
     this.task = task;
   }
   
-  //for storing and alternate display functions
-  public Command(String command, String displayOrStoragePath){
-   this.command = command;
-   this.displayOrStoragePath = displayOrStoragePath;
+  //for storing, searching and non-time display functions
+  public Command(String command, String storeSearchAndDisplayStrings){
+    this.command = command;
+    this.storeSearchAndDisplayStrings = storeSearchAndDisplayStrings;
   }
   
-  //search command
-  public Command(String command, boolean isDateSearch, String searchKeyword){
-	this.command = command;
-	this.isDateSearch = isDateSearch;
-	this.searchKeyword = searchKeyword;
-  }
-  
-  //for deleting 1 task or marking 1 task as done
-  public Command(String command, int selectedIndexNumber){
-   this.command = command;
-   this.selectedIndexNumber = selectedIndexNumber;
-  }
-  
-  //for deleting multiple tasks or marking multiple tasks as done
+  //for deleting tasks or marking tasks as done
   public Command(String command, ArrayList<Integer> selectedIndexNumbers){
-   this.command = command;
-   this.selectedIndexNumbers = selectedIndexNumbers;
+    this.command = command;
+    this.selectedIndexNumbers = selectedIndexNumbers;
   }
   
   //for exit and invalid commands
   public Command(String command){
-   this.command = command;
+    this.command = command;
+  }
+  
+  //for time display functions
+  public Command(String command, int displayType, ArrayList<String> timeArray) {
+    this.command = command;
+    this.displayType = displayType;
+    this.timeArray = timeArray;
   }
   
   public Tasks getTask(){
-   return task;
+    return task;
   }
   
   public String getCommand(){
-   return command;
+    return command;
   }
   
-  public String getDisplayTypeOrStoragePath() {
-   return displayOrStoragePath;
+  public String getStoreSearchAndDisplayStrings() {
+    return storeSearchAndDisplayStrings;
   }
-
+  
   public boolean getIsDateSearch() {
-	  return isDateSearch;
+    return isDateSearch;
   }
   
   public String getSearchKeyword() {
-	  return searchKeyword;
+    return searchKeyword;
   }
   
   public int getSelectedIndexNumber() {
-   return selectedIndexNumber;
+    return selectedIndexNumber;
   }
   
+  
   public ArrayList<Integer> getSelectedIndexNumbers(){
-   return selectedIndexNumbers;
-   }
+    return selectedIndexNumbers;
+  }
+  
+  public int getDisplayType() {
+    return displayType;
+  }
+  
+  public ArrayList<String> getTimeArray() {
+    return timeArray;
+  }
+  
 }
