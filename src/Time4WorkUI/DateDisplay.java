@@ -10,6 +10,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+//@@author A0112077N
 public class DateDisplay {
 
 	public DateDisplay(){
@@ -78,16 +79,5 @@ public class DateDisplay {
 			e.printStackTrace();
 		}
 		return dateFormatted + " " + timeFormatted;
-	}
-
-	public Date dateDurationFormatter(String dateDurationInString){
-		Date dateFormatted = null;
-		SimpleDateFormat prevformatter = new SimpleDateFormat("dd MMM yy, HH:mm");
-		try{
-			dateFormatted = prevformatter.parse(dateDurationInString);
-		} catch(ParseException e){
-			e.printStackTrace();
-		}
-		return dateFormatted;
 	}
 }
