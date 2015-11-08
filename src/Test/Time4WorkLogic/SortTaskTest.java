@@ -7,6 +7,7 @@ import org.junit.Test;
 import Time4WorkLogic.Logic;
 import Time4WorkStorage.DeadlineTask;
 import Time4WorkStorage.Duration;
+import Time4WorkStorage.DurationTask;
 import Time4WorkStorage.FloatingTask;
 import Time4WorkStorage.Tasks;
 
@@ -31,7 +32,7 @@ public class SortTaskTest {
 		logic.executeAdd(lateDeadlineTask);
 		
 		Duration duration = new Duration("101115", "1000", "101115", "1111");
-		Tasks durationTask = new DeadlineTask("duration task", duration);
+		Tasks durationTask = new DurationTask("duration task", duration);
 		logic.executeAdd(durationTask);
 		
 
