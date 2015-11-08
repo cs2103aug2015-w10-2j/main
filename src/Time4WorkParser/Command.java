@@ -10,7 +10,6 @@ public class Command {
   private Tasks task;
   private String command;
   private String storeSearchAndDisplayStrings;
-  private int selectedIndexNumber;
   private ArrayList<Integer> selectedIndexNumbers = new ArrayList<Integer>();
   private boolean isDateSearch;
   private int displayType;
@@ -61,11 +60,6 @@ public class Command {
   public boolean getIsDateSearch() {
     return isDateSearch;
   }
-  
-  public int getSelectedIndexNumber() {
-    return selectedIndexNumber;
-  }
-  
   
   public ArrayList<Integer> getSelectedIndexNumbers(){
     return selectedIndexNumbers;
