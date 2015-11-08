@@ -10,19 +10,21 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+//@@author: A0112077N
 public class PopUpMenu {
 	private Stage newStage = new Stage();
 	private VBox layout = new VBox();
 	private ImageView imageView = new ImageView();
 	private Scene scene;
 	private String LOCATION_HELP_SHEET = "img/reference.png";
-
+	private String HELP_SHEET_TITLE = "TIME4WORK HELP SHEET";
 	public ImageView getImageView() {
 		imageView.setImage(new Image(PopUpMenu.class.getResource(LOCATION_HELP_SHEET).toExternalForm()));
 		return imageView;
 	}
 
 	public void showMenu() {
+		newStage.setTitle(HELP_SHEET_TITLE);
 		// show the scene.
 		layout.getChildren().addAll(createPopup());
 		if (layout.getScene() == null) {
