@@ -417,9 +417,9 @@ public class Parser {
     } else {
       arrayOfDeleteIndexes = getArrayListForDoneOrDelete(arguments, containsDash, argumentsLength);
       if (arrayOfDeleteIndexes.isEmpty()){
-    	  command = createInvalidCommand();
+        command = createInvalidCommand();
       } else {
-          command = new Command("delete", arrayOfDeleteIndexes);
+        command = new Command("delete", arrayOfDeleteIndexes);
       }
     }
     
@@ -429,12 +429,12 @@ public class Parser {
   private boolean checkIfContainsDash(ArrayList<String> arguments) {
     int argumentsLength = arguments.size();
     boolean haveDash = false;
-	  for (int i = 0; i < argumentsLength; i++){
-    	if (arguments.get(i).contains("-")) {
-    		haveDash = true; 
-    	} 
+    for (int i = 0; i < argumentsLength; i++){
+      if (arguments.get(i).contains("-")) {
+        haveDash = true; 
+      } 
     }
-	  return haveDash;
+    return haveDash;
   }
   
   private ArrayList<Integer> getArrayListForDoneOrDelete(ArrayList<String> arguments, boolean containsDash, int argumentsLength) {
@@ -457,7 +457,7 @@ public class Parser {
         indexOfItems.add(i);
       }
     } else {
-    	;
+      ;
     }
     return indexOfItems;
   }
@@ -522,34 +522,62 @@ public class Parser {
       List<DateGroup> dateGroups = dateParser.parse(String.join(" ", arguments));
       List<Date> dates = dateGroups.get(0).getDates();
       SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyy");
-      command = createDisplayTimeCommand(firstWord, timeArray, dates, dateFormat);
+      command = createDisplayTimeCommand(arguments, firstWord, timeArray, dates, dateFormat);
     } else {
       command = new Command("display", typeToDisplay);
     }
     return command;
   }
   
-  private Command createDisplayTimeCommand(String firstWord, ArrayList<String> timeArray, List<Date> dates,
-                                           SimpleDateFormat dateFormat) {
+  private Command createDisplayTimeCommand(ArrayList<String> arguments, String firstWord, ArrayList<String> timeArray,
+                                           List<Date> dates, SimpleDateFormat dateFormat) {
     Command command;
     if (firstWord.equals("on")) {
-      Date date = dates.get(0);
-      String formattedDate = dateFormat.format(date);
-      timeArray.add(formattedDate);
-      command = new Command("display", 1, timeArray);
+      try{
+        arguments.remove("on");
+        for (int i = 0; i < arguments.size(); i++){
+          Integer.parseInt(arguments.get(i));
+        }
+        timeArray.add(arguments.get(0));
+        command = new Command("display", 1, timeArray);
+      } catch (NumberFormatException e) {
+        Date date = dates.get(0);
+        String formattedDate = dateFormat.format(date);
+        timeArray.add(formattedDate);
+        command = new Command("display", 1, timeArray);
+      }
     } else if (firstWord.equals("by")) {
-      Date date = dates.get(0);
-      String formattedDate = dateFormat.format(date);
-      timeArray.add(formattedDate);
-      command = new Command("display", 2, timeArray);
+      try{
+        arguments.remove("by");
+        for (int i = 0; i < arguments.size(); i++){
+          Integer.parseInt(arguments.get(i));
+        }
+        timeArray.add(arguments.get(0));
+        command = new Command("display", 2, timeArray);
+      } catch (NumberFormatException e) {
+        Date date = dates.get(0);
+        String formattedDate = dateFormat.format(date);
+        timeArray.add(formattedDate);
+        command = new Command("display", 2, timeArray);
+      }
     } else {
-      Date fromDate = dates.get(0);
-      Date toDate = dates.get(1);
-      String formattedStartDate = dateFormat.format(fromDate);
-      String formattedToDate = dateFormat.format(toDate);
-      timeArray.add(formattedStartDate);      
-      timeArray.add(formattedToDate);
-      command = new Command("display", 3, timeArray);
+      try{
+        arguments.remove("from");
+        arguments.remove("to");
+        for (int i = 0; i < arguments.size(); i++){
+          Integer.parseInt(arguments.get(i));
+        }
+        timeArray.addAll(arguments);
+        command = new Command("display", 3, timeArray);
+      } catch (NumberFormatException e) {
+        Date fromDate = dates.get(0);
+        Date toDate = dates.get(1);
+        String formattedStartDate = dateFormat.format(fromDate);
+        String formattedToDate = dateFormat.format(toDate);
+        timeArray.add(formattedStartDate);      
+        timeArray.add(formattedToDate);
+        command = new Command("display", 3, timeArray);
+      }
     }
     return command;
   }
@@ -563,7 +591,7 @@ public class Parser {
     containsDash = checkIfContainsDash(arguments);
     
     if(argumentsLength == 0){
-    	command = createInvalidCommand();
+      command = createInvalidCommand();
     } else if (argumentsLength == 1 && !containsDash){
       int indexToBeMarkedDone = Integer.parseInt(arguments.get(0));
       arrayOfMarkDoneIndexes.add(indexToBeMarkedDone);
