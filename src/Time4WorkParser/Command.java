@@ -11,9 +11,8 @@ public class Command {
   private int selectedIndexNumber;
   private ArrayList<Integer> selectedIndexNumbers = new ArrayList<Integer>();
   private boolean isDateSearch;
-  private String searchKeyword;
   private int displayType;
-  private ArrayList<String> timeArray;
+  private ArrayList<String> timeArray = new ArrayList<String>();
   
   //for adding and updating
   public Command(String command, Tasks task) {
@@ -59,10 +58,6 @@ public class Command {
   
   public boolean getIsDateSearch() {
     return isDateSearch;
-  }
-  
-  public String getSearchKeyword() {
-    return searchKeyword;
   }
   
   public int getSelectedIndexNumber() {
