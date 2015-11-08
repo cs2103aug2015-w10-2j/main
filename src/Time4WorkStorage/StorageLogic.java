@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 import Time4WorkStorage.Tasks.TaskType;
@@ -32,6 +33,7 @@ public class StorageLogic {
 	
 	private static final String defPath = "myTasks.txt";
 	private static final String TYPE_SPLITTER = "\"type\":";
+	private static final String REG_REPLACE_SPACES_OUTSIDE_QUOTES = "\\s+(?=((\\\\[\\\\\"]|[^\\\\\"])*\"(\\\\[\\\\\"]|[^\\\\\"])*\")*(\\\\[\\\\\"]|[^\\\\\"])*$)";
 	
 	private File myFile;
 	private FileWriter fw;
@@ -40,7 +42,7 @@ public class StorageLogic {
 	private BufferedReader br;
 	
 	private String currentPath = "";	
-	Gson gson = new Gson(); 
+	Gson gson = new GsonBuilder().setPrettyPrinting().create();
 	
 	//creates file at default directory, <local directory>/myTasks.txt
 	public void createDefaultFile() throws IOException {
@@ -148,26 +150,32 @@ public class StorageLogic {
 		}
 				
 		ArrayList<Tasks> myTaskList = new ArrayList<Tasks>();
-		String tempLine = "";
+		String tempLine = "", fullLine = "";
 		Tasks tempTask;
 		
 		//read contents of file		
 		try {
 			while ((tempLine = br.readLine()) != null) {
-				int type = getTypeFromGsonString(tempLine);
+				fullLine += tempLine.replaceAll(REG_REPLACE_SPACES_OUTSIDE_QUOTES, "");
 				
-				if (type == DeadlineType) {
-					tempTask = gson.fromJson(tempLine, DeadlineTask.class);
-				} else if (type == DurationType) {
-					tempTask = gson.fromJson(tempLine, DurationTask.class);
-				} else if (type == FloatingType) {
-					tempTask = gson.fromJson(tempLine, FloatingTask.class);
-				} else {
-					tempTask = null;
-				}
-				
-				if(tempTask != null ) {
-					myTaskList.add(tempTask);
+				if(tempLine.trim().equals("}")) {					
+					fullLine = fullLine.replaceAll(REG_REPLACE_SPACES_OUTSIDE_QUOTES, "");
+					int type = getTypeFromGsonString(fullLine);
+					
+					if (type == DeadlineType) {
+						tempTask = gson.fromJson(fullLine, DeadlineTask.class);
+					} else if (type == DurationType) {
+						tempTask = gson.fromJson(fullLine, DurationTask.class);
+					} else if (type == FloatingType) {
+						tempTask = gson.fromJson(fullLine, FloatingTask.class);
+					} else {
+						tempTask = null;
+					}
+					
+					if(tempTask != null ) {
+						myTaskList.add(tempTask);
+					}
+					fullLine = "";
 				}
 			}
 		} catch (JsonSyntaxException e) {
