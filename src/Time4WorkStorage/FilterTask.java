@@ -192,7 +192,6 @@ public class FilterTask {
 		ArrayList<Tasks> resultList = new ArrayList<Tasks>();
 		
 		Calendar today = Calendar.getInstance();
-		today.set(Calendar.DATE, 0);	
 		Date now = today.getTime();
 		
 		for(int i=0; i<myList.size(); i++) {			
