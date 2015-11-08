@@ -1,21 +1,6 @@
+/*@@author A0112077N */
 .background {
     -fx-background-color: #FCFCFC;
-}
-
-/*
- * ================================================================
- * TitleBar Styling
- * ================================================================
- */
-
-.titleBar {
-    -fx-spacing: 10;
-    -fx-background-color: white;
-    -fx-font-size: 16px ;
-}
-
-.titleBar #close {
-    -fx-label-padding: 0 0 0 0;
 }
 
 /*
@@ -24,14 +9,8 @@
  * ================================================================
  */
 
-
-
 .align-center {
   -fx-alignment: CENTER;
-}
-
-.align-right {
-  -fx-alignment: CENTER-RIGHT;
 }
 
 .label {
@@ -41,13 +20,11 @@
 }
 
 .table-view {
-    -fx-table-cell-border-color: #F9F9FA;
     -fx-padding: 5;
 }
 
 .table-cell {
     -fx-font-size: 13px;
-
 }
 
 .table-row-cell {
@@ -79,7 +56,7 @@
 }
 
 .table-view:focused .table-row-cell:filled:focused:selected {
-    -fx-background-color: -fx-focus-color;
+  	-fx-background-color: -fx-focus-color;
 }
 
 .text-field {
