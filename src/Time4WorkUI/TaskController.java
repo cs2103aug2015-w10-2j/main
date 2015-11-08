@@ -94,7 +94,6 @@ public class TaskController {
 
 		userCommand.setOnKeyPressed(e -> {
 			userInput = new UserInput(userCommand.getText());
-
 			if (e.getCode().equals(KeyCode.ENTER)) {
 				upStack.push(userInput.getUserInput());
 				userCommand.setText(PROMPT_USERCOMMAND_CLEAR);
@@ -102,9 +101,7 @@ public class TaskController {
 				FeedbackMessage output;
 				try {
 					output = getOutputFromLogic(userInput.getUserInput());
-					currentList = logic.getIncompleteTaskList();
 
-					// show the list of completed tasks for "display archive" command
 					if (userInput.isDisplayArchiveCommand()) {
 						currentList = output.getCompleteTaskList();
 					} else if (userInput.isDisplayInCompleteCommand()){
@@ -169,7 +166,7 @@ public class TaskController {
 		indexCol.getStyleClass().add("align-center");
 		toCol.getStyleClass().add("align-center");
 		fromCol.getStyleClass().add("align-center");
-	
+
 		indexCol.prefWidthProperty().bind(taskTable.widthProperty().multiply(0.05));
 		descriptionCol.prefWidthProperty().bind(taskTable.widthProperty().multiply(0.55));
 		fromCol.prefWidthProperty().bind(taskTable.widthProperty().multiply(0.20));
