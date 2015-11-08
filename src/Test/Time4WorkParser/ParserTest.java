@@ -1,18 +1,21 @@
 package Test.Time4WorkParser;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 
 import org.junit.Test;
 
+import com.joestelmach.natty.CalendarSource;
+
 import Time4WorkParser.Command;
 import Time4WorkParser.Parser;
-import Time4WorkStorage.Duration;
 import Time4WorkStorage.DeadlineTask;
+import Time4WorkStorage.Duration;
 import Time4WorkStorage.DurationTask;
-import Time4WorkStorage.FloatingTask;
 import Time4WorkStorage.Tasks;
-
-import java.util.ArrayList;
 
 public class ParserTest {
 
@@ -180,7 +183,14 @@ public class ParserTest {
 		//test deleting of one item
 		Command result = tester.parse("delete 1");
 		assertEquals("delete", result.getCommand());
-		assertEquals(Integer.parseInt("1"), result.getSelectedIndexNumber());
+		ArrayList<Integer> inputDeleteIndexes = result.getSelectedIndexNumbers();
+		ArrayList<Integer> items = new ArrayList<Integer>();
+		items.add(1);
+		
+		for(int i = 0; i < items.size(); i++){
+			assertEquals(items.get(i), inputDeleteIndexes.get(i));
+		}
+
 	}
 	
 	@Test
@@ -239,7 +249,14 @@ public class ParserTest {
 		//test marking of one item as done
 		Command result = tester.parse("done 1");
 		assertEquals("done", result.getCommand());
-		assertEquals(Integer.parseInt("1"), result.getSelectedIndexNumber());
+		ArrayList<Integer> inputDoneIndexes = result.getSelectedIndexNumbers();
+		
+		ArrayList<Integer> items = new ArrayList<Integer>();
+		items.add(1);
+		
+		for(int i = 0; i < items.size(); i++){
+			assertEquals(items.get(i), inputDoneIndexes.get(i));
+		};
 	}
 	
 	@Test
@@ -299,7 +316,7 @@ public class ParserTest {
 		Command result = tester.parse("search homework");
 		assertEquals("search", result.getCommand());
 		assertEquals(false, result.getIsDateSearch());
-		assertEquals("homework", result.getSearchKeyword());
+		assertEquals("homework", result.getStoreSearchAndDisplayStrings());
 	}
 	
 	@Test
@@ -307,7 +324,7 @@ public class ParserTest {
 		//test search for a string
 		Command result = tester.parse("search homework for CS2103");
 		assertEquals("search", result.getCommand());
-		assertEquals("homework for CS2103", result.getSearchKeyword());
+		assertEquals("homework for CS2103", result.getStoreSearchAndDisplayStrings());
 	}
 	
 	@Test
@@ -316,7 +333,7 @@ public class ParserTest {
 		Command result = tester.parse("store C:\\Users\\XXXX\\Desktop\\myfile.txt");
 		assertEquals("store", result.getCommand());
 		//final string of directory has added backslashes to account for escaping
-		assertEquals("C:\\\\Users\\\\XXXX\\\\Desktop\\\\myfile.txt", result.getDisplayTypeOrStoragePath());
+		assertEquals("C:\\\\Users\\\\XXXX\\\\Desktop\\\\myfile.txt", result.getStoreSearchAndDisplayStrings());
 	}
 	
 	@Test
@@ -352,6 +369,189 @@ public class ParserTest {
 	@Test
 	public void testStoreForwardSlash(){
 		Command result = tester.parse("store C:/Users/alan/Downloads");
-		assertEquals("C:/Users/alan/Downloads", result.getDisplayTypeOrStoragePath());
+		assertEquals("C:/Users/alan/Downloads", result.getStoreSearchAndDisplayStrings());
+	}
+	
+	@Test
+	public void testNullDescription() {
+		Command result = tester.parse("add home.work");
+		assertEquals("invalid", result.getCommand());
+	}
+	
+	@Test
+	public void testEmptyDelete(){
+		Command result = tester.parse("delete");
+		assertEquals("invalid", result.getCommand());
+	}
+	
+	@Test
+	public void testEmptyDone(){
+		Command result = tester.parse("done");
+		assertEquals("invalid", result.getCommand());
+	}
+	
+	@Test
+	public void testMultipleDelete(){
+		Command result = tester.parse("delete 5-8 10");
+		assertEquals("invalid", result.getCommand());
+	}
+	
+	@Test
+	public void testNaturalLanguageInputForDeadlineTask() throws Exception{
+		Date reference = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).parse("11/4/2015 12:00 am");
+		CalendarSource.setBaseDate(reference);
+		Command result = tester.parse("add finish homework. by thurs");
+		assertEquals("add", result.getCommand());
+		Tasks task = result.getTask();
+		assertEquals("finish homework", task.getDescription());
+		Duration timeDetails = ((DeadlineTask)task).getDurationDetails();
+		assertEquals("051115", timeDetails.getEndDate());
+		assertEquals("2359", timeDetails.getEndTime());
+	}
+	
+	@Test
+	public void testNaturalLanguageInputForDurationTask() throws Exception{
+		Date reference = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).parse("11/4/2015 12:00 am");
+		CalendarSource.setBaseDate(reference);
+		Command result = tester.parse("add super long seminar. friday 2pm - 4pm");
+		assertEquals("add", result.getCommand());
+		Tasks task = result.getTask();
+		assertEquals("super long seminar", task.getDescription());
+		Duration timeDetails = ((DurationTask)task).getDurationDetails();
+		assertEquals("061115", timeDetails.getStartDate());
+		assertEquals("1400", timeDetails.getStartTime());
+		assertEquals("061115", timeDetails.getEndDate());
+		assertEquals("1600", timeDetails.getEndTime());
+	}
+	
+	@Test
+	public void testFlippedDurationInput() {
+		Command result = tester.parse("add super long seminar. 111115 1800 101115 1200");
+		assertEquals("add", result.getCommand());
+		Tasks task = result.getTask();
+		Duration timeDetails = ((DurationTask)task).getDurationDetails();
+		assertEquals("super long seminar", task.getDescription());
+		assertEquals("101115", timeDetails.getStartDate());
+		assertEquals("1200", timeDetails.getStartTime());
+		assertEquals("111115", timeDetails.getEndDate());
+		assertEquals("1800", timeDetails.getEndTime());
+	}
+	
+	@Test
+	public void testSameDayDurationFlippedInput() {
+		Command result = tester.parse("add super long seminar. 111115 1800 111115 1200");
+		assertEquals("add", result.getCommand());
+		Tasks task = result.getTask();
+		Duration timeDetails = ((DurationTask)task).getDurationDetails();
+		assertEquals("super long seminar", task.getDescription());
+		assertEquals("111115", timeDetails.getStartDate());
+		assertEquals("1200", timeDetails.getStartTime());
+		assertEquals("111115", timeDetails.getEndDate());
+		assertEquals("1800", timeDetails.getEndTime());
+	}
+	
+	@Test
+	public void testSameDaySameHourDurationFlippedInput() {
+		Command result = tester.parse("add super long seminar. 111115 1859 111115 1801");
+		assertEquals("add", result.getCommand());
+		Tasks task = result.getTask();
+		Duration timeDetails = ((DurationTask)task).getDurationDetails();
+		assertEquals("super long seminar", task.getDescription());
+		assertEquals("111115", timeDetails.getStartDate());
+		assertEquals("1801", timeDetails.getStartTime());
+		assertEquals("111115", timeDetails.getEndDate());
+		assertEquals("1859", timeDetails.getEndTime());
+	}
+	
+	@Test
+	public void testSameDaySameHourDurationInput() {
+		Command result = tester.parse("add super long seminar. 111115 1801 111115 1859");
+		assertEquals("add", result.getCommand());
+		Tasks task = result.getTask();
+		Duration timeDetails = ((DurationTask)task).getDurationDetails();
+		assertEquals("super long seminar", task.getDescription());
+		assertEquals("111115", timeDetails.getStartDate());
+		assertEquals("1801", timeDetails.getStartTime());
+		assertEquals("111115", timeDetails.getEndDate());
+		assertEquals("1859", timeDetails.getEndTime());
+	}
+	
+	@Test
+	public void testInvalidTime() {
+		Command result = tester.parse("add super long seminar. 111115 2410 111115 2411");
+		assertEquals("invalid", result.getCommand());
+	}
+	
+	@Test
+	public void testUpdateNullDescription() {
+		Command result = tester.parse("update 4 home.work");
+		assertEquals("invalid", result.getCommand());
+	}
+	
+	@Test
+	public void testUpdateNullTime() {
+		Command result = tester.parse("update 4 homework. 181515 1400");
+		assertEquals("invalid", result.getCommand());
+	}
+	
+	@Test
+	public void testNormalDisplay() {
+		Command result = tester.parse("display");
+		assertEquals("display", result.getCommand());
+		assertEquals(null, result.getStoreSearchAndDisplayStrings());
+	}
+	
+	@Test
+	public void testInvalidSecondTermDisplay() {
+		Command result = tester.parse("display hahaha");
+		assertEquals("display", result.getCommand());
+		assertEquals(null, result.getStoreSearchAndDisplayStrings());
+	}
+	
+	@Test
+	public void testKeywordDisplay() {
+		Command result = tester.parse("display archive");
+		assertEquals("display", result.getCommand());
+		assertEquals("archive", result.getStoreSearchAndDisplayStrings());
+		Command result2 = tester.parse("display floating");
+		assertEquals("display", result2.getCommand());
+		assertEquals("floating", result2.getStoreSearchAndDisplayStrings());
+		Command result3 = tester.parse("display deadline");
+		assertEquals("display", result3.getCommand());
+		assertEquals("deadline", result3.getStoreSearchAndDisplayStrings());
+		Command result4 = tester.parse("display duration");
+		assertEquals("display", result4.getCommand());
+		assertEquals("duration", result4.getStoreSearchAndDisplayStrings());
+	}
+	
+	@Test
+	public void testDisplayOnDate() throws Exception {
+		Date reference = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).parse("11/4/2015 12:00 am");
+		CalendarSource.setBaseDate(reference);
+		Command result = tester.parse("display on monday");
+		assertEquals("display", result.getCommand());
+		assertEquals(1, result.getDisplayType());
+		assertEquals("091115", result.getTimeArray().get(0));
+	}
+	
+	@Test
+	public void testDisplayByDate() throws Exception {
+		Date reference = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).parse("11/4/2015 12:00 am");
+		CalendarSource.setBaseDate(reference);
+		Command result = tester.parse("display by monday");
+		assertEquals("display", result.getCommand());
+		assertEquals(2, result.getDisplayType());
+		assertEquals("091115", result.getTimeArray().get(0));
+	}
+	
+	@Test
+	public void testDisplayDateRange() throws Exception {
+		Date reference = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).parse("11/4/2015 12:00 am");
+		CalendarSource.setBaseDate(reference);
+		Command result = tester.parse("display from monday to wednesday");
+		assertEquals("display", result.getCommand());
+		assertEquals(3, result.getDisplayType());
+		assertEquals("091115", result.getTimeArray().get(0));
+		assertEquals("111115", result.getTimeArray().get(1));
 	}
 }
