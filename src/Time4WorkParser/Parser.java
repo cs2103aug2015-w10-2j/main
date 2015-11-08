@@ -404,7 +404,7 @@ public class Parser {
     int argumentsLength = arguments.size();
     ArrayList<Integer> arrayOfDeleteIndexes = new ArrayList<Integer>();
     
-    containsDash = checkIfContainsDash(arguments, argumentsLength);
+    containsDash = checkIfContainsDash(arguments);
     
     if(argumentsLength == 0){
       command = createInvalidCommand();
@@ -414,17 +414,25 @@ public class Parser {
       command = new Command("delete", arrayOfDeleteIndexes);
     } else {
       arrayOfDeleteIndexes = getArrayListForDoneOrDelete(arguments, containsDash, argumentsLength);
-      command = new Command("delete", arrayOfDeleteIndexes);
+      if (arrayOfDeleteIndexes.isEmpty()){
+    	  command = createInvalidCommand();
+      } else {
+          command = new Command("delete", arrayOfDeleteIndexes);
+      }
     }
     
     return command;
   }
   
-  private boolean checkIfContainsDash(ArrayList<String> arguments, int argumentsLength) {
-    if (argumentsLength == 1 && arguments.get(0).contains("-")) {
-      return true; 
+  private boolean checkIfContainsDash(ArrayList<String> arguments) {
+    int argumentsLength = arguments.size();
+    boolean haveDash = false;
+	  for (int i = 0; i < argumentsLength; i++){
+    	if (arguments.get(i).contains("-")) {
+    		haveDash = true; 
+    	} 
     }
-    return false;
+	  return haveDash;
   }
   
   private ArrayList<Integer> getArrayListForDoneOrDelete(ArrayList<String> arguments, boolean containsDash, int argumentsLength) {
@@ -434,7 +442,7 @@ public class Parser {
       for (int i = 0; i < argumentsLength; i++){
         indexOfItems.add(Integer.parseInt(arguments.get(i)));
       }
-    } else {
+    } else if (argumentsLength == 1 && containsDash){
       String[] strArray = arguments.get(0).trim().split("-");
       int startPoint = Integer.parseInt(strArray[0]);
       int endPoint = Integer.parseInt(strArray[1]);
@@ -446,6 +454,8 @@ public class Parser {
       for (int i = startPoint; i <= endPoint; i++){
         indexOfItems.add(i);
       }
+    } else {
+    	;
     }
     return indexOfItems;
   }
@@ -548,7 +558,7 @@ public class Parser {
     int argumentsLength = arguments.size();
     ArrayList<Integer> arrayOfMarkDoneIndexes = new ArrayList<Integer>();
     
-    containsDash = checkIfContainsDash(arguments, argumentsLength);
+    containsDash = checkIfContainsDash(arguments);
     
     if(argumentsLength == 0){
     	command = createInvalidCommand();
