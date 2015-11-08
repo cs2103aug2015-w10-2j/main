@@ -10,6 +10,7 @@ import Time4WorkStorage.Tasks;
 
 import static org.junit.Assert.*;
 
+//@@author A0133894W
 public class ClearCommandTest {
 	private static final String MESSAGE_CLEAR = "All task cleared successfully!";
 	private static final String MESSAGE_UNDO_ = "Undo %1$s!";
