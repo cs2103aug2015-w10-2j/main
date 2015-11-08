@@ -171,14 +171,12 @@ public class FilterTask {
 			int taskType = myList.get(i).getType();
 			
 			if(taskType == DeadlineType) {
-				DeadlineTask tempTask = (DeadlineTask) myList.get(i);
-				Date myDate = stringToDate(tempTask.getDate(),0);
+				Date myDate = stringToDate(((DeadlineTask) myList.get(i)).getDate(),0);
 				if(myDate.before(targetDate)) {
 					resultList.add(myList.get(i));
 				}
 			} else if (taskType == DurationType) {
-				DurationTask tempTask = (DurationTask) myList.get(i);
-				Date myDate = stringToDate(tempTask.getStartDate(),0);
+				Date myDate = stringToDate(((DurationTask) myList.get(i)).getStartDate(),0);
 				if(myDate.before(targetDate)) {
 					resultList.add(myList.get(i));
 				}
@@ -197,14 +195,12 @@ public class FilterTask {
 		for(int i=0; i<myList.size(); i++) {			
 			int taskType = myList.get(i).getType();
 			if(taskType == DeadlineType) {
-				DeadlineTask tempTask = (DeadlineTask) myList.get(i);
-				Date myDate = stringToDate(tempTask.getDate(),0);
+				Date myDate = stringToDate(((DeadlineTask) myList.get(i)).getDate(),0);
 				if(myDate.before(now)) {
 					resultList.add(myList.get(i));
 				}
 			} else if (taskType == DurationType) {
-				DurationTask tempTask = (DurationTask) myList.get(i);
-				Date myDate = stringToDate(tempTask.getStartDate(),0);
+				Date myDate = stringToDate(((DurationTask) myList.get(i)).getStartDate(),0);
 				if(myDate.before(now)) {
 					resultList.add(myList.get(i));
 				}
@@ -227,8 +223,7 @@ public class FilterTask {
 			int taskType = myList.get(i).getType();
 			
 			if(taskType == DeadlineType) {
-				DeadlineTask tempTask = (DeadlineTask) myList.get(i);
-				Date myDate = stringToDate(tempTask.getDate(),0);
+				Date myDate = stringToDate(((DeadlineTask) myList.get(i)).getDate(),0);
 				if(myDate.before(dateB)) {
 					beforeDateB.add(myList.get(i));
 				}
@@ -236,8 +231,7 @@ public class FilterTask {
 					afterDateA.add(myList.get(i));
 				}
 			} else if (taskType == DurationType) {
-				DurationTask tempTask = (DurationTask) myList.get(i);
-				Date myDate = stringToDate(tempTask.getStartDate(),0);
+				Date myDate = stringToDate(((DurationTask) myList.get(i)).getStartDate(),0);
 				if(myDate.before(dateB)) {
 					beforeDateB.add(myList.get(i));
 				}
