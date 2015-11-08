@@ -109,10 +109,6 @@ public class Logic {
             case ADD :
                 return executeAdd(task);
             case DELETE :
-                if (userInputIndexes.isEmpty()) {
-                    int userInputIndex = parsedCommand.getSelectedIndexNumber();
-                    userInputIndexes.add(userInputIndex);
-                }
                 return executeDelete(userInputIndexes);
             case UPDATE :
                 return executeUpdate(task);
