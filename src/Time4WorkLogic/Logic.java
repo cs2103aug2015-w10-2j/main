@@ -22,14 +22,15 @@ public class Logic {
     private static final String MESSAGE_INVALID_FORMAT = "invalid command: %1$s";
     private static final String MESSAGE_EMPTY_COMMAND = "Command is empty!";
     private static final String MESSAGE_ADDED_ = "Task added %1$s !";
-    private static final String MESSAGE_UPDATED_ = "Task updated %1$s !";
     private static final String MESSAGE_DELETED_ = "Task %1$s deleted %2$s !";
+    private static final String MESSAGE_UPDATED_ = "Task updated %1$s !";
     private static final String MESSAGE_DISPLAY_TASKTYPE_SUCCESSFULLY = "Here are all %1$s tasks";
     private static final String MESSAGE_DISPLAY_TASKDATE_SUCCESSFULLY = "Here are all tasks %1$s";
-    private static final String MESSAGE_DISPLAY_FAILED = "No such task!";
+    private static final String MESSAGE_DISPLAY_FAILED_ = "Display failed: %1$s";
     private static final String MESSAGE_SEARCH_ = "Task searched %1$s";
+    private static final String MESSAGE_SORT_FAILED = "Sort task failed: display without sorting";
     private static final String MESSAGE_DONE_ = "Mark task %1$s as done %2$s";
-    private static final String MESSAGE_CLEAR = "All task cleared successfully!";
+    private static final String MESSAGE_CLEAR_ = "All task cleared %1$s!";
     private static final String MESSAGE_UNDO_ = "Undo %1$s!";
     private static final String MESSAGE_CREATE_PATH_ = "Personalize storage path %1$s !";
     
@@ -56,14 +57,12 @@ public class Logic {
     
     // Constructor
     public Logic() {
+        logger.log(Level.INFO, LOGIC_INIT);
         try {
             storage = Storage.getInstance();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
-        logger.log(Level.INFO, LOGIC_INIT);
     }
     
     // =========================================================================
@@ -110,22 +109,16 @@ public class Logic {
         switch (commandType) {
             case ADD :
                 return executeAdd(task);
-            case UPDATE :
-                return executeUpdate(task);
             case DELETE :
                 if (userInputIndexes.isEmpty()) {
                     int userInputIndex = parsedCommand.getSelectedIndexNumber();
                     userInputIndexes.add(userInputIndex);
                 }
                 return executeDelete(userInputIndexes);
+            case UPDATE :
+                return executeUpdate(task);
             case UNDO :
                 return executeUndo();
-            case CLEAR :
-                return executeClear();
-            case SEARCH :
-                String searchKeyword = parsedCommand.getStoreSearchAndDisplayStrings();
-                return executeSearchDescription(searchKeyword);
-                
             case DISPLAY:
                 int displayDateType = parsedCommand.getDisplayType();
                 if (displayDateType == 1) { //display tasks on the specific one date
@@ -152,19 +145,23 @@ public class Logic {
                     }
                     return executeDisplay(displayType);
                 }
-                
+            case SEARCH :
+                String searchKeyword = parsedCommand.getStoreSearchAndDisplayStrings();
+                return executeSearchDescription(searchKeyword);
+            case STORE:
+                String storagePath = parsedCommand.getStoreSearchAndDisplayStrings();
+                return executeCreatePath(storagePath);
             case DONE:
                 if (userInputIndexes.isEmpty()) {
                     int userInputIndex = parsedCommand.getSelectedIndexNumber();
                     userInputIndexes.add(userInputIndex);
                 }
                 return executeMarkTaskAsDone(userInputIndexes);
-            case STORE:
-                String storagePath = parsedCommand.getStoreSearchAndDisplayStrings();
-                return executeCreatePath(storagePath);
             case INVALID :
                 return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "command is invalid"),
                                            completeList, incompleteList);
+            case CLEAR :
+                return executeClear();
             case EXIT :
                 logger.log(Level.INFO, "exit");
                 System.exit(0);
@@ -207,24 +204,34 @@ public class Logic {
     // Useful method for UI to get task list
     // =========================================================================
     
-    public ArrayList<Tasks> getCompleteTaskList() throws IOException, ParseException {
+    public ArrayList<Tasks> getCompleteTaskList() {
         fullTaskList = getFullTaskList();
         completeList = myFilter.searchCompleted(fullTaskList);
-        completeList = sortCompleteTask(completeList);
+        try {
+            completeList = sortCompleteTask(completeList);
+        } catch (IOException | ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         return completeList;
     }
     
-    public ArrayList<Tasks> getIncompleteTaskList() throws IOException, ParseException {
+    public ArrayList<Tasks> getIncompleteTaskList() {
         fullTaskList = getFullTaskList();
         incompleteList = myFilter.searchNotCompleted(fullTaskList);
-        incompleteList = sortIncompleteTask(incompleteList);
+        try {
+            incompleteList = sortIncompleteTask(incompleteList);
+        } catch (IOException | ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         return incompleteList;
     }
     
     // =========================================================================
     // Execute Command
     // =========================================================================
-    public FeedbackMessage executeAdd(Tasks newTask) throws IOException, ParseException {
+    public FeedbackMessage executeAdd(Tasks newTask) {
         try{
             logger.log(Level.INFO, "start processing add command");
             storage.appendTask(newTask);
@@ -244,14 +251,21 @@ public class Logic {
         reversedCommandHistory.addReversedCommand(reversedCommand);
         commandHistory.addCommand(new Command("add", newTask));
         
-        completeList = sortCompleteTask(completeList);
-        incompleteList = sortIncompleteTask(incompleteList);
+        try {
+            completeList = sortCompleteTask(completeList);
+            incompleteList = sortIncompleteTask(incompleteList);
+        } catch (IOException | ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
+        }
+        
         logger.log(Level.INFO, "end of processing add command");
         return new FeedbackMessage(String.format(MESSAGE_ADDED_, "successfully"),
                                    completeList, incompleteList);
     }
     
-    public FeedbackMessage executeDelete(ArrayList<Integer> userInputIndexes) throws IOException, ParseException {
+    public FeedbackMessage executeDelete(ArrayList<Integer> userInputIndexes) {
         logger.log(Level.INFO, "start processing delete command");
         
         int taskListSize = incompleteList.size();
@@ -293,14 +307,21 @@ public class Logic {
         
         try {
             storage.deleteTask(validTaskID);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | IOException e) {
             logger.log(Level.WARNING, "delete error");
             return new FeedbackMessage(String.format(MESSAGE_DELETED_, indexDeletedFailed, "failed: index out of range"),
                                        completeList, incompleteList);
         }
         
-        completeList = sortCompleteTask(completeList);
-        incompleteList = sortIncompleteTask(incompleteList);
+        try {
+            completeList = sortCompleteTask(completeList);
+            incompleteList = sortIncompleteTask(incompleteList);
+        } catch (IOException | ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
+        }
+        
         if (indexDeletedSuccessfully.isEmpty()) {
             return new FeedbackMessage(String.format(MESSAGE_DELETED_, indexDeletedFailed, "failed: index out of range"),
                                        completeList, incompleteList);
@@ -313,7 +334,419 @@ public class Logic {
         }
         
     }
-    public FeedbackMessage executeMarkTaskAsDone(ArrayList<Integer> userInputIndexes) throws Exception {
+    
+    public FeedbackMessage executeUpdate(Tasks task) {
+        logger.log(Level.INFO, "start processing update command");
+        int taskListSize = incompleteList.size();
+        int indexToBeDeleted = task.getTaskID();   // get index to be deleted by retrieving taskID
+        
+        if (taskListSize < indexToBeDeleted || indexToBeDeleted < 1) {
+            return new FeedbackMessage(String.format(MESSAGE_UPDATED_, "failed: no such task number"),
+                                       completeList, incompleteList);
+        } else {
+            int taskIDToBeDeleted = getTaskIDFromUserInput(indexToBeDeleted);
+            task.setTaskID(taskIDToBeDeleted);
+            
+            Tasks taskBeforeUpdated = null;
+            try {
+                taskBeforeUpdated = storage.UpdateTask(taskIDToBeDeleted, task);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "update error");
+                return new FeedbackMessage(String.format(MESSAGE_UPDATED_, "failed"),
+                                           completeList, incompleteList);
+            }
+            incompleteList.remove(indexToBeDeleted - 1);
+            incompleteList.add(task);
+            
+            // Set up for undo operation
+            Command reversedCommand = new Command("add", taskBeforeUpdated); // add the original one back
+            reversedCommandHistory.addReversedCommand(reversedCommand);
+            
+            ArrayList<Integer> taskIDToBeDeletedList = new ArrayList<Integer>();
+            taskIDToBeDeletedList.add(taskIDToBeDeleted);
+            reversedCommand = new Command("delete", taskIDToBeDeletedList); // delete the updated one
+            reversedCommandHistory.addReversedCommand(reversedCommand);
+            commandHistory.addCommand(new Command("update", task));
+            
+            try {
+                completeList = sortCompleteTask(completeList);
+                incompleteList = sortIncompleteTask(incompleteList);
+            } catch (IOException | ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
+            }
+            
+            logger.log(Level.INFO, "end of processing update command");
+            return new FeedbackMessage(String.format(MESSAGE_UPDATED_, "successfully"),
+                                       completeList, incompleteList);
+        }
+        
+    }
+    
+    public FeedbackMessage executeUndo() {
+        logger.log(Level.INFO, "start processing undo command");
+        boolean undoSuccessfully = false;
+        if (commandHistory.isEmpty()) {
+            logger.log(Level.INFO, "end of processing undo command");
+            return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed: no more command for undo"),
+                                       completeList, incompleteList);
+        } else {
+            Command lastCommand = commandHistory.getLastCommand();
+            String lastCommandType = lastCommand.getCommand();
+            if (lastCommandType == "add") { //undo add operation
+                Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
+                ArrayList<Integer> taskIDToBeDeletedList = commandToUndo.getSelectedIndexNumbers();
+                int taskIDToBeDeleted = taskIDToBeDeletedList.get(0);
+                taskIDToBeDeletedList.add(taskIDToBeDeleted);
+                try {
+                    storage.deleteTask(taskIDToBeDeletedList);
+                } catch (Exception e) {
+                    logger.log(Level.WARNING, "undo error");
+                    return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed"),
+                                               completeList, incompleteList);
+                }
+                int indexInPreviouslist = getIndexFromTaskID(incompleteList, taskIDToBeDeleted);
+                incompleteList.remove(indexInPreviouslist);
+                undoSuccessfully = true;
+            } else if (lastCommandType == "delete"){ //undo delete task
+                int undoDeleteNum = lastCommand.getSelectedIndexNumbers().get(0);
+                for (int i = 0; i < undoDeleteNum; i++) {
+                    Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
+                    Tasks task = commandToUndo.getTask();
+                    try {
+                        storage.appendTask(task);
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                        return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed"),
+                                                   completeList, incompleteList);
+                    }
+                    incompleteList.add(task);
+                }
+                undoSuccessfully = true;
+            } else if (lastCommandType == "update"){  // undo update operation
+                Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
+                int taskIDToBeDeleted = commandToUndo.getSelectedIndexNumbers().get(0);
+                ArrayList<Integer> taskIDToBeDeletedList = new ArrayList<Integer>();
+                taskIDToBeDeletedList.add(taskIDToBeDeleted);
+                try {
+                    storage.deleteTask(taskIDToBeDeletedList);
+                } catch (Exception e) {
+                    logger.log(Level.WARNING, "undo error");
+                    return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed"),
+                                               completeList, incompleteList);
+                }
+                int indexInPreviousList = getIndexFromTaskID(incompleteList, taskIDToBeDeleted);
+                incompleteList.remove(indexInPreviousList);
+                
+                commandToUndo = reversedCommandHistory.getLastReversedCommand();
+                try {
+                    storage.appendTask(commandToUndo.getTask());
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed"),
+                                               completeList, incompleteList);
+                }
+                incompleteList.add(commandToUndo.getTask());
+                undoSuccessfully = true;
+            } else if (lastCommandType == "clear") {  // undo clear operation
+                int clearedTaskNum = lastCommand.getSelectedIndexNumbers().get(0);
+                for (int i = 0; i < clearedTaskNum; i++) {
+                    Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
+                    Tasks task = commandToUndo.getTask();
+                    try {
+                        storage.appendTask(task);
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                        return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed"),
+                                                   completeList, incompleteList);
+                    }
+                    if (task.isCompleted()) {
+                        completeList.add(task);
+                    } else {
+                        incompleteList.add(task);
+                    }
+                }
+                undoSuccessfully = true;
+            } else if (lastCommandType == "done") {  //undo done operation
+                int undoMarkedNum = lastCommand.getSelectedIndexNumbers().get(0);
+                for (int i = 0; i < undoMarkedNum; i++) {
+                    Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
+                    Tasks task = commandToUndo.getTask();
+                    int taskID = task.getTaskID();
+                    ArrayList<Integer> taskIDList = new ArrayList<Integer>();
+                    taskIDList.add(taskID);
+                    try {
+                        storage.SetIncompleted(taskIDList);
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                        return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed"),
+                                                   completeList, incompleteList);
+                    }
+                    incompleteList.add(task);
+                    int taskIndexInCompleteList = getIndexFromTaskID(completeList, taskID);
+                    completeList.remove(taskIndexInCompleteList);
+                }
+                undoSuccessfully = true;
+            }
+            
+        }
+        
+        try {
+            completeList = sortCompleteTask(completeList);
+            incompleteList = sortIncompleteTask(incompleteList);
+        } catch (IOException | ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
+        }
+        
+        if (undoSuccessfully) {
+            logger.log(Level.INFO, "end of processing undo command");
+            return new FeedbackMessage(String.format(MESSAGE_UNDO_, "successfully!"),
+                                       completeList, incompleteList);
+        } else {
+            logger.log(Level.WARNING, "end of processing undo command: previous command cannot undo");
+            return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed!"),
+                                       completeList, incompleteList);
+        }
+        
+    }
+    
+    public FeedbackMessage executeDisplayOnDate(String keyDate) {
+        logger.log(Level.INFO, "start processing display task on one day command");
+        ArrayList<Tasks> searchList = new ArrayList<Tasks>();
+        
+        incompleteList = getIncompleteTaskList();
+        searchList = myFilter.searchDate(incompleteList, keyDate);
+        
+        if (searchList.size() != 0) {
+            incompleteList = searchList;
+            try {
+                completeList = sortCompleteTask(completeList);
+                incompleteList = sortIncompleteTask(incompleteList);
+            } catch (IOException | ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
+            }
+            
+            logger.log(Level.INFO, "end of processing display task on one day command");
+            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_TASKDATE_SUCCESSFULLY, ("on " + keyDate)),
+                                       completeList, incompleteList);
+        } else {
+            logger.log(Level.INFO, "end of processing display task on one day command");
+            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_, "No such task!"), completeList, incompleteList);
+        }
+    }
+    
+    public FeedbackMessage executeDisplayFromToDates(String fromDate, String toDate) {
+        logger.log(Level.INFO, "start processing display task between two dates command");
+        ArrayList<Tasks> searchList = new ArrayList<Tasks>();
+        
+        incompleteList = getIncompleteTaskList();
+        try {
+            searchList = myFilter.searchBetweenDates(incompleteList, fromDate, toDate);
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_, "cannot search display type"), completeList, incompleteList);
+        }
+        
+        if (searchList.size() != 0) {
+            incompleteList = searchList;
+            try {
+                completeList = sortCompleteTask(completeList);
+                incompleteList = sortIncompleteTask(incompleteList);
+            } catch (IOException | ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
+            }
+            
+            logger.log(Level.INFO, "end of processing display task between two dates command");
+            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_TASKDATE_SUCCESSFULLY,
+                                                     ("from " + fromDate + "to " + toDate)),
+                                       completeList, incompleteList);
+        } else {
+            logger.log(Level.INFO, "end of processing display task between two dates command");
+            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_, "No such task!"), completeList, incompleteList);
+        }
+    }
+    
+    public FeedbackMessage executeDisplayBeforeDate(String beforeDate) {
+        logger.log(Level.INFO, "start processing display task before one day command");
+        ArrayList<Tasks> searchList = new ArrayList<Tasks>();
+        
+        incompleteList = getIncompleteTaskList();
+        try {
+            searchList = myFilter.searchBeforeDate(incompleteList, beforeDate);
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_, "cannot search display type"), completeList, incompleteList);
+        }
+        
+        if (searchList.size() != 0) {
+            incompleteList = searchList;
+            try {
+                completeList = sortCompleteTask(completeList);
+                incompleteList = sortIncompleteTask(incompleteList);
+            } catch (IOException | ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
+            }
+            
+            logger.log(Level.INFO, "end of processing display task before one day command");
+            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_TASKDATE_SUCCESSFULLY, ("before" + beforeDate)),
+                                       completeList, incompleteList);
+        } else {
+            logger.log(Level.INFO, "end of processing display task before one day command");
+            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_, "No such task!"), completeList, incompleteList);
+        }
+    }
+    
+    public FeedbackMessage executeDisplayOverdue() {
+        logger.log(Level.INFO, "start processing display task overdue command");
+        ArrayList<Tasks> searchList = new ArrayList<Tasks>();
+        
+        incompleteList = getIncompleteTaskList();
+        try {
+            searchList = myFilter.searchOverDue(incompleteList);
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_, "cannot search display type"), completeList, incompleteList);
+        }
+        if (searchList.size() != 0) {
+            incompleteList = searchList;
+            try {
+                completeList = sortCompleteTask(completeList);
+                incompleteList = sortIncompleteTask(incompleteList);
+            } catch (IOException | ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
+            }
+            
+            logger.log(Level.INFO, "end of processing display task overdue command");
+            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_TASKDATE_SUCCESSFULLY, "overdued"),
+                                       completeList, incompleteList);
+        } else {
+            logger.log(Level.INFO, "end of processing display task overdue command");
+            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_, "No such task!"), completeList, incompleteList);
+        }
+    }
+    
+    
+    public FeedbackMessage executeDisplay(String displayType) {
+        logger.log(Level.INFO, "start processing display command");
+        
+        ArrayList<Tasks> displayList = new ArrayList<Tasks>();
+        fullTaskList = getFullTaskList();
+        
+        ArrayList<Tasks> fullIncompleteTask = new ArrayList<Tasks>();
+        fullIncompleteTask = getIncompleteTaskList();
+        
+        
+        if (displayType.equals("archive")) {
+            completeList = getCompleteTaskList();
+            displayList = myFilter.searchCompleted(fullTaskList);
+        } else if (displayType.equals("incomplete")) {
+            displayList = myFilter.searchNotCompleted(fullIncompleteTask);
+        } else if (displayType.equals("deadline")) {
+            displayList = myFilter.searchDeadline(fullIncompleteTask);
+        } else if (displayType.equals("duration")) {
+            displayList = myFilter.searchDuration(fullIncompleteTask);
+        } else if (displayType.equals("floating")) {
+            displayList = myFilter.searchFloating(fullIncompleteTask);
+        }
+        
+        
+        if (displayList.size() != 0) {
+            incompleteList = displayList;
+            try {
+                completeList = sortCompleteTask(completeList);
+                incompleteList = sortIncompleteTask(incompleteList);
+            } catch (IOException | ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
+            }
+            
+            logger.log(Level.INFO, "end of processing search command");
+            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_TASKTYPE_SUCCESSFULLY, displayType),
+                                       completeList, incompleteList);
+        } else {
+            logger.log(Level.INFO, "end of processing search command");
+            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_, "No such task!"), completeList, incompleteList);
+        }
+    }
+    
+    public FeedbackMessage executeSearchDescription(String keyword) {
+        logger.log(Level.INFO, "start processing search command");
+        ArrayList<Tasks> searchList = new ArrayList<Tasks>();
+        incompleteList = getIncompleteTaskList();
+        
+        searchList = myFilter.searchDescription(incompleteList, keyword);
+        
+        
+        if (searchList.size() != 0) {
+            incompleteList = searchList;
+            try {
+                completeList = sortCompleteTask(completeList);
+                incompleteList = sortIncompleteTask(incompleteList);
+            } catch (IOException | ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
+            }
+            
+            logger.log(Level.INFO, "end of processing search command");
+            return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "successfully"),
+                                       completeList, incompleteList);
+        } else {
+            logger.log(Level.INFO, "end of processing search command");
+            return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "failed: no such task"),
+                                       completeList, incompleteList);
+        }
+    }
+    
+    public FeedbackMessage executeCreatePath(String storagePath) {
+        try {
+            storage.setCustomPath(storagePath);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return new FeedbackMessage(String.format(MESSAGE_CREATE_PATH_, "failed"),
+                                       completeList, incompleteList);
+        }
+        isFirstCommand = true;
+        fullTaskList = getFullTaskList();
+        
+        completeList = getCompleteTaskList();
+        incompleteList = getIncompleteTaskList();
+        
+        try {
+            completeList = sortCompleteTask(completeList);
+            incompleteList = sortIncompleteTask(incompleteList);
+        } catch (IOException | ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
+        }
+        
+        return new FeedbackMessage(String.format(MESSAGE_CREATE_PATH_, "successfully"),
+                                   completeList, incompleteList);
+        
+    }
+    
+    public FeedbackMessage executeMarkTaskAsDone(ArrayList<Integer> userInputIndexes) {
         logger.log(Level.INFO, "start processing mark command");
         
         int taskListSize = incompleteList.size();
@@ -355,14 +788,21 @@ public class Logic {
         
         try {
             storage.SetCompleted(validTaskID);
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             logger.log(Level.WARNING, "mark error");
             return new FeedbackMessage(String.format(MESSAGE_DONE_, indexMarkedFailed, "failed !"),
                                        completeList, incompleteList);
         }
         
-        completeList = sortCompleteTask(completeList);
-        incompleteList = sortIncompleteTask(incompleteList);
+        try {
+            completeList = sortCompleteTask(completeList);
+            incompleteList = sortIncompleteTask(incompleteList);
+        } catch (IOException | ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
+        }
+        
         if (indexMarkedSuccessfully.isEmpty()) {
             return new FeedbackMessage(String.format(MESSAGE_DONE_, indexMarkedFailed, "failed !"),
                                        completeList, incompleteList);
@@ -376,291 +816,16 @@ public class Logic {
         
     }
     
-    public FeedbackMessage executeUpdate(Tasks task) throws IOException, ParseException {
-        logger.log(Level.INFO, "start processing update command");
-        int taskListSize = incompleteList.size();
-        int indexToBeDeleted = task.getTaskID();   // get index to be deleted by retrieving taskID
-        
-        if (taskListSize < indexToBeDeleted || indexToBeDeleted < 1) {
-            return new FeedbackMessage(String.format(MESSAGE_UPDATED_, "failed: no such task number"),
-                                       completeList, incompleteList);
-        } else {
-            int taskIDToBeDeleted = getTaskIDFromUserInput(indexToBeDeleted);
-            task.setTaskID(taskIDToBeDeleted);
-            
-            Tasks taskBeforeUpdated = null;
-            try {
-                taskBeforeUpdated = storage.UpdateTask(taskIDToBeDeleted, task);
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "update error");
-                return new FeedbackMessage(String.format(MESSAGE_UPDATED_, "failed"),
-                                           completeList, incompleteList);
-            }
-            incompleteList.remove(indexToBeDeleted - 1);
-            incompleteList.add(task);
-            
-            // Set up for undo operation
-            Command reversedCommand = new Command("add", taskBeforeUpdated); // add the original one back
-            reversedCommandHistory.addReversedCommand(reversedCommand);
-            
-            ArrayList<Integer> taskIDToBeDeletedList = new ArrayList<Integer>();
-            taskIDToBeDeletedList.add(taskIDToBeDeleted);
-            reversedCommand = new Command("delete", taskIDToBeDeletedList); // delete the updated one
-            reversedCommandHistory.addReversedCommand(reversedCommand);
-            commandHistory.addCommand(new Command("update", task));
-            
-            completeList = sortCompleteTask(completeList);
-            incompleteList = sortIncompleteTask(incompleteList);
-            logger.log(Level.INFO, "end of processing update command");
-            return new FeedbackMessage(String.format(MESSAGE_UPDATED_, "successfully"),
-                                       completeList, incompleteList);
-        }
-        
-    }
-    
-    
-    public FeedbackMessage executeSearchDescription(String keyword) throws IOException, ParseException {
-        logger.log(Level.INFO, "start processing search command");
-        ArrayList<Tasks> searchList = new ArrayList<Tasks>();
-        incompleteList = getIncompleteTaskList();
-        
-        searchList = myFilter.searchDescription(incompleteList, keyword);
-        
-        
-        if (searchList.size() != 0) {
-            incompleteList = searchList;
-            completeList = sortCompleteTask(completeList);
-            incompleteList = sortIncompleteTask(incompleteList);
-            logger.log(Level.INFO, "end of processing search command");
-            return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "successfully"),
-                                       completeList, incompleteList);
-        } else {
-            logger.log(Level.INFO, "end of processing search command");
-            return new FeedbackMessage(String.format(MESSAGE_SEARCH_, "failed: no such task"),
-                                       completeList, incompleteList);
-        }
-    }
-    
-    public FeedbackMessage executeDisplayOnDate(String keyDate) throws IOException, ParseException {
-        logger.log(Level.INFO, "start processing display task on one day command");
-        ArrayList<Tasks> searchList = new ArrayList<Tasks>();
-        
-        incompleteList = getIncompleteTaskList();
-        searchList = myFilter.searchDate(incompleteList, keyDate);
-        
-        if (searchList.size() != 0) {
-            incompleteList = searchList;
-            completeList = sortCompleteTask(completeList);
-            incompleteList = sortIncompleteTask(incompleteList);
-            logger.log(Level.INFO, "end of processing display task on one day command");
-            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_TASKDATE_SUCCESSFULLY, ("on " + keyDate)),
-                                       completeList, incompleteList);
-        } else {
-            logger.log(Level.INFO, "end of processing display task on one day command");
-            return new FeedbackMessage(MESSAGE_DISPLAY_FAILED, completeList, incompleteList);
-        }
-    }
-    
-    public FeedbackMessage executeDisplayFromToDates(String fromDate, String toDate) throws ParseException, IOException {
-        logger.log(Level.INFO, "start processing display task between two dates command");
-        ArrayList<Tasks> searchList = new ArrayList<Tasks>();
-        
-        incompleteList = getIncompleteTaskList();
-        searchList = myFilter.searchBetweenDates(incompleteList, fromDate, toDate);
-        
-        if (searchList.size() != 0) {
-            incompleteList = searchList;
-            completeList = sortCompleteTask(completeList);
-            incompleteList = sortIncompleteTask(incompleteList);
-            logger.log(Level.INFO, "end of processing display task between two dates command");
-            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_TASKDATE_SUCCESSFULLY,
-                                                     ("from " + fromDate + "to " + toDate)),
-                                       completeList, incompleteList);
-        } else {
-            logger.log(Level.INFO, "end of processing display task between two dates command");
-            return new FeedbackMessage(MESSAGE_DISPLAY_FAILED, completeList, incompleteList);
-        }
-    }
-    
-    public FeedbackMessage executeDisplayBeforeDate(String beforeDate) throws ParseException, IOException {
-        logger.log(Level.INFO, "start processing display task before one day command");
-        ArrayList<Tasks> searchList = new ArrayList<Tasks>();
-        
-        incompleteList = getIncompleteTaskList();
-        searchList = myFilter.searchBeforeDate(incompleteList, beforeDate);
-        
-        if (searchList.size() != 0) {
-            incompleteList = searchList;
-            completeList = sortCompleteTask(completeList);
-            incompleteList = sortIncompleteTask(incompleteList);
-            logger.log(Level.INFO, "end of processing display task before one day command");
-            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_TASKDATE_SUCCESSFULLY, ("before" + beforeDate)),
-                                       completeList, incompleteList);
-        } else {
-            logger.log(Level.INFO, "end of processing display task before one day command");
-            return new FeedbackMessage(MESSAGE_DISPLAY_FAILED, completeList, incompleteList);
-        }
-    }
-    
-    public FeedbackMessage executeDisplayOverdue() throws IOException, ParseException {
-        logger.log(Level.INFO, "start processing display task overdue command");
-        ArrayList<Tasks> searchList = new ArrayList<Tasks>();
-        
-        incompleteList = getIncompleteTaskList();
-        searchList = myFilter.searchOverDue(incompleteList);
-        
-        if (searchList.size() != 0) {
-            incompleteList = searchList;
-            completeList = sortCompleteTask(completeList);
-            incompleteList = sortIncompleteTask(incompleteList);
-            logger.log(Level.INFO, "end of processing display task overdue command");
-            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_TASKDATE_SUCCESSFULLY, "overdued"),
-                                       completeList, incompleteList);
-        } else {
-            logger.log(Level.INFO, "end of processing display task overdue command");
-            return new FeedbackMessage(MESSAGE_DISPLAY_FAILED, completeList, incompleteList);
-        }
-    }
-    
-    public FeedbackMessage executeUndo() throws Exception {
-        logger.log(Level.INFO, "start processing undo command");
-        boolean undoSuccessfully = false;
-        if (commandHistory.isEmpty()) {
-            logger.log(Level.INFO, "end of processing undo command");
-            return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed: no more command for undo"),
-                                       completeList, incompleteList);
-        } else {
-            Command lastCommand = commandHistory.getLastCommand();
-            String lastCommandType = lastCommand.getCommand();
-            if (lastCommandType == "add") { //undo add operation
-                Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
-                ArrayList<Integer> taskIDToBeDeletedList = commandToUndo.getSelectedIndexNumbers();
-                int taskIDToBeDeleted = taskIDToBeDeletedList.get(0);
-                taskIDToBeDeletedList.add(taskIDToBeDeleted);
-                try {
-                    storage.deleteTask(taskIDToBeDeletedList);
-                } catch (InterruptedException e) {
-                    logger.log(Level.WARNING, "undo error");
-                    return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed"),
-                                               completeList, incompleteList);
-                }
-                int indexInPreviouslist = getIndexFromTaskID(incompleteList, taskIDToBeDeleted);
-                incompleteList.remove(indexInPreviouslist);
-                undoSuccessfully = true;
-            } else if (lastCommandType == "delete"){ //undo delete task
-                int undoDeleteNum = lastCommand.getSelectedIndexNumbers().get(0);
-                for (int i = 0; i < undoDeleteNum; i++) {
-                    Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
-                    Tasks task = commandToUndo.getTask();
-                    storage.appendTask(task);
-                    incompleteList.add(task);
-                }
-                undoSuccessfully = true;
-            } else if (lastCommandType == "update"){  // undo update operation
-                Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
-                int taskIDToBeDeleted = commandToUndo.getSelectedIndexNumbers().get(0);
-                ArrayList<Integer> taskIDToBeDeletedList = new ArrayList<Integer>();
-                taskIDToBeDeletedList.add(taskIDToBeDeleted);
-                try {
-                    storage.deleteTask(taskIDToBeDeletedList);
-                } catch (InterruptedException e) {
-                    logger.log(Level.WARNING, "undo error");
-                    return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed"),
-                                               completeList, incompleteList);
-                }
-                int indexInPreviousList = getIndexFromTaskID(incompleteList, taskIDToBeDeleted);
-                incompleteList.remove(indexInPreviousList);
-                
-                commandToUndo = reversedCommandHistory.getLastReversedCommand();
-                storage.appendTask(commandToUndo.getTask());
-                incompleteList.add(commandToUndo.getTask());
-                undoSuccessfully = true;
-            } else if (lastCommandType == "clear") {  // undo clear operation
-                int clearedTaskNum = lastCommand.getSelectedIndexNumbers().get(0);
-                for (int i = 0; i < clearedTaskNum; i++) {
-                    Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
-                    Tasks task = commandToUndo.getTask();
-                    storage.appendTask(task);
-                    if (task.isCompleted()) {
-                        completeList.add(task);
-                    } else {
-                        incompleteList.add(task);
-                    }
-                }
-                undoSuccessfully = true;
-            } else if (lastCommandType == "done") {  //undo done operation
-                int undoMarkedNum = lastCommand.getSelectedIndexNumbers().get(0);
-                for (int i = 0; i < undoMarkedNum; i++) {
-                    Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
-                    Tasks task = commandToUndo.getTask();
-                    int taskID = task.getTaskID();
-                    ArrayList<Integer> taskIDList = new ArrayList<Integer>();
-                    taskIDList.add(taskID);
-                    storage.SetIncompleted(taskIDList);
-                    incompleteList.add(task);
-                    int taskIndexInCompleteList = getIndexFromTaskID(completeList, taskID);
-                    completeList.remove(taskIndexInCompleteList);
-                }
-                undoSuccessfully = true;
-            }
-            
-        }
-        
-        completeList = sortCompleteTask(completeList);
-        incompleteList = sortIncompleteTask(incompleteList);
-        if (undoSuccessfully) {
-            logger.log(Level.INFO, "end of processing undo command");
-            return new FeedbackMessage(String.format(MESSAGE_UNDO_, "successfully!"),
-                                       completeList, incompleteList);
-        } else {
-            logger.log(Level.WARNING, "end of processing undo command: previous command cannot undo");
-            return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed!"),
-                                       completeList, incompleteList);
-        }
-        
-    }
-    
-    public FeedbackMessage executeDisplay(String displayType) throws Exception {
-        logger.log(Level.INFO, "start processing display command");
-        
-        ArrayList<Tasks> displayList = new ArrayList<Tasks>();
-        fullTaskList = getFullTaskList();
-        
-        ArrayList<Tasks> fullIncompleteTask = new ArrayList<Tasks>();
-        fullIncompleteTask = getIncompleteTaskList();
-        
-        
-        if (displayType.equals("archive")) {
-            completeList = getCompleteTaskList();
-            displayList = myFilter.searchCompleted(fullTaskList);
-        } else if (displayType.equals("incomplete")) {
-            displayList = myFilter.searchNotCompleted(fullIncompleteTask);
-        } else if (displayType.equals("deadline")) {
-            displayList = myFilter.searchDeadline(fullIncompleteTask);
-        } else if (displayType.equals("duration")) {
-            displayList = myFilter.searchDuration(fullIncompleteTask);
-        } else if (displayType.equals("floating")) {
-            displayList = myFilter.searchFloating(fullIncompleteTask);
-        }
-        
-        
-        if (displayList.size() != 0) {
-            incompleteList = displayList;
-            completeList = sortCompleteTask(completeList);
-            incompleteList = sortIncompleteTask(incompleteList);
-            logger.log(Level.INFO, "end of processing search command");
-            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_TASKTYPE_SUCCESSFULLY, displayType),
-                                       completeList, incompleteList);
-        } else {
-            logger.log(Level.INFO, "end of processing search command");
-            return new FeedbackMessage(MESSAGE_DISPLAY_FAILED, completeList, incompleteList);
-        }
-    }
-    
-    
-    public FeedbackMessage executeClear() throws Exception {
+    public FeedbackMessage executeClear() {
         logger.log(Level.INFO, "start processing clear command");
-        ArrayList<Tasks> previousTaskList = storage.ClearAll();
+        ArrayList<Tasks> previousTaskList = null;
+        try {
+            previousTaskList = storage.ClearAll();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return new FeedbackMessage(String.format(MESSAGE_CLEAR_, "failed"), completeList, incompleteList);
+        }
         int previousTaskListSize = previousTaskList.size();
         
         ArrayList<Integer> sizeInArrayForm = new ArrayList<Integer>();
@@ -677,23 +842,7 @@ public class Logic {
         completeList.clear();
         incompleteList.clear();
         logger.log(Level.INFO, "end of processing clear command");
-        return new FeedbackMessage(MESSAGE_CLEAR, completeList, incompleteList);
-    }
-    
-    public FeedbackMessage executeCreatePath(String storagePath) throws IOException, ParseException {
-        storage.setCustomPath(storagePath);
-        isFirstCommand = true;
-        fullTaskList = getFullTaskList();
-        
-        completeList = getCompleteTaskList();
-        incompleteList = getIncompleteTaskList();
-        
-        completeList = sortCompleteTask(completeList);
-        incompleteList = sortIncompleteTask(incompleteList);
-        
-        return new FeedbackMessage(String.format(MESSAGE_CREATE_PATH_, "successfully"),
-                                   completeList, incompleteList);
-        
+        return new FeedbackMessage(String.format(MESSAGE_CLEAR_, "successfully"), completeList, incompleteList);
     }
     
     // =========================================================================
@@ -762,6 +911,5 @@ public class Logic {
         logger.log(Level.INFO, "end of processing complete sort");
         return taskList;
     }
-    
     
 }
