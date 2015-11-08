@@ -22,7 +22,7 @@ public class Parser {
   private static final int POSITION_PARAM_COMMAND = 0;
   private static final int POSITION_FIRST_PARAM_ARGUMENT = 1;
   
-  private ArrayList<String> VALID_DISPLAY_COMMANDS = new ArrayList<String>(Arrays.asList("archive", "floating", "deadline", "duration"));
+  private ArrayList<String> VALID_DISPLAY_COMMANDS = new ArrayList<String>(Arrays.asList("archive", "floating", "deadline", "duration", "overdue"));
   
   private static final String REGEX_WHITESPACES = "[\\s,]+";
   
