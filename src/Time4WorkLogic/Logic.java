@@ -131,13 +131,18 @@ public class Logic {
                     return executeDisplayBeforeDate(beforeDate);
                 } else if (displayDateType == 3) { // display tasks from one date to another date
                     ArrayList<String> displayTime = parsedCommand.getTimeArray();
-                    String fromDate = displayTime.get(0);
-                    String toDate = displayTime.get(1);
-                    return executeDisplayFromToDates(fromDate, toDate);
+                    if (displayTime.size() != 2) {
+                        return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_,
+                                                                 "only one argument for duration task"),
+                                                   completeList, incompleteList);
+                    } else {
+                        String fromDate = displayTime.get(0);
+                        String toDate = displayTime.get(1);
+                        return executeDisplayFromToDates(fromDate, toDate);
+                    }
                 } else if ((parsedCommand.getStoreSearchAndDisplayStrings() == null)) {
-                	String displayType = "incomplete";
-                	return executeDisplay(displayType);
-                	
+                    String displayType = "incomplete";
+                    return executeDisplay(displayType);
                 } else if (parsedCommand.getStoreSearchAndDisplayStrings().equals("overdue")) {
                     return executeDisplayOverdue();
                 } else { // display by task type instead of dates
