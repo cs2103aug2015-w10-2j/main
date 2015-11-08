@@ -5,12 +5,14 @@ import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 //@@author: A0112077N
 public class UserInterface extends Application {
-	private static final String MAIN_WINDOW_LAYOUT = "view/Time4Work.fxml";
+	private static final String LOCATION_MAIN_WINDOW_LAYOUT = "view/Time4Work.fxml";
+	private static final String LOCATION_ICON ="img/icon.png";
 	private static final String WINDOW_TITLE = "Time4Work";
 	private Stage primaryStage;
 	private Scene scene;
@@ -25,7 +27,8 @@ public class UserInterface extends Application {
 	public void showWindow() {
 		try {
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(UserInterface.class.getResource(MAIN_WINDOW_LAYOUT));
+			loader.setLocation(UserInterface.class.getResource(LOCATION_MAIN_WINDOW_LAYOUT));
+			primaryStage.getIcons().add(new Image(getClass().getResourceAsStream(LOCATION_ICON)));
 			AnchorPane page = (AnchorPane) loader.load();
 			scene = new Scene(page);
 			primaryStage.setScene(scene);
