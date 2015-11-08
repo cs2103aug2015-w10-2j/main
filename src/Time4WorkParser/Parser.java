@@ -532,52 +532,112 @@ public class Parser {
   private Command createDisplayTimeCommand(ArrayList<String> arguments, String firstWord, ArrayList<String> timeArray,
                                            List<Date> dates, SimpleDateFormat dateFormat) {
     Command command;
+    String nullString = null;
     if (firstWord.equals("on")) {
-      try{
-        arguments.remove("on");
-        for (int i = 0; i < arguments.size(); i++){
-          Integer.parseInt(arguments.get(i));
-        }
-        timeArray.add(arguments.get(0));
-        command = new Command("display", 1, timeArray);
-      } catch (NumberFormatException e) {
-        Date date = dates.get(0);
-        String formattedDate = dateFormat.format(date);
-        timeArray.add(formattedDate);
-        command = new Command("display", 1, timeArray);
-      }
+      command = createDisplayOnTime(arguments, timeArray, dates, dateFormat, nullString);
     } else if (firstWord.equals("by")) {
-      try{
-        arguments.remove("by");
-        for (int i = 0; i < arguments.size(); i++){
-          Integer.parseInt(arguments.get(i));
-        }
-        timeArray.add(arguments.get(0));
-        command = new Command("display", 2, timeArray);
-      } catch (NumberFormatException e) {
-        Date date = dates.get(0);
-        String formattedDate = dateFormat.format(date);
-        timeArray.add(formattedDate);
-        command = new Command("display", 2, timeArray);
-      }
+      command = createDisplayByTime(arguments, timeArray, dates, dateFormat, nullString);
     } else {
       try{
         arguments.remove("from");
         arguments.remove("to");
-        for (int i = 0; i < arguments.size(); i++){
-          Integer.parseInt(arguments.get(i));
+        if (arguments.size() == 1){
+          command = createDisplayOnTimeWithoutKeywordOn(arguments, timeArray, nullString);
+        } else if (arguments.size() == 2){
+          command = createDisplayDateRangeNoNaturalLanguage(arguments, timeArray, nullString);
+        } else {
+          command = new Command("display", nullString);
         }
-        timeArray.addAll(arguments);
-        command = new Command("display", 3, timeArray);
       } catch (NumberFormatException e) {
-        Date fromDate = dates.get(0);
-        Date toDate = dates.get(1);
-        String formattedStartDate = dateFormat.format(fromDate);
-        String formattedToDate = dateFormat.format(toDate);
-        timeArray.add(formattedStartDate);      
-        timeArray.add(formattedToDate);
+        command = createDisplayDateRangeNaturalLanguage(timeArray, dates, dateFormat);
+      }
+    }
+    return command;
+  }
+  
+  private Command createDisplayDateRangeNaturalLanguage(ArrayList<String> timeArray, List<Date> dates,
+                                                        SimpleDateFormat dateFormat) {
+    Command command;
+    Date fromDate = dates.get(0);
+    Date toDate = dates.get(1);
+    String formattedStartDate = dateFormat.format(fromDate);
+    String formattedToDate = dateFormat.format(toDate);
+    timeArray.add(formattedStartDate);      
+    timeArray.add(formattedToDate);
+    command = new Command("display", 3, timeArray);
+    return command;
+  }
+  
+  private Command createDisplayDateRangeNoNaturalLanguage(ArrayList<String> arguments, ArrayList<String> timeArray,
+                                                          String nullString) {
+    Command command;
+    String fromDate = arguments.get(0);
+    String toDate = arguments.get(1);
+    Integer.parseInt(fromDate);
+    Integer.parseInt(toDate);
+    if (checkValidDate(fromDate) && checkValidDate(toDate)){
+      if (checkStartDateBeforeEndDate(fromDate, toDate)){
+        timeArray.add(fromDate);
+        timeArray.add(toDate);
+        command = new Command("display", 3, timeArray);
+      } else {
+        timeArray.add(toDate);
+        timeArray.add(fromDate);
         command = new Command("display", 3, timeArray);
       }
+    } else {
+      command = new Command("display", nullString);
+    }
+    return command;
+  }
+  
+  private Command createDisplayOnTimeWithoutKeywordOn(ArrayList<String> arguments, ArrayList<String> timeArray,
+                                                      String nullString) {
+    Command command;
+    String onDate = arguments.get(0);
+    Integer.parseInt(onDate);
+    if (checkValidDate(onDate)) {
+      timeArray.add(arguments.get(0));
+      command = new Command("display", 1, timeArray);
+    } else {
+      command = new Command("display", nullString);
+    }
+    return command;
+  }
+  
+  private Command createDisplayByTime(ArrayList<String> arguments, ArrayList<String> timeArray, List<Date> dates,
+                                      SimpleDateFormat dateFormat, String nullString) {
+    Command command;
+    try{
+      arguments.remove("by");
+      String byDate = arguments.get(0);
+      Integer.parseInt(byDate);
+      if (checkValidDate(byDate)) {
+        timeArray.add(arguments.get(0));
+        command = new Command("display", 2, timeArray);
+      } else {
+        command = new Command("display", nullString);
+      }
+    } catch (NumberFormatException e) {
+      Date date = dates.get(0);
+      String formattedDate = dateFormat.format(date);
+      timeArray.add(formattedDate);
+      command = new Command("display", 2, timeArray);
+    }
+    return command;
+  }
+  
+  private Command createDisplayOnTime(ArrayList<String> arguments, ArrayList<String> timeArray, List<Date> dates,
+                                      SimpleDateFormat dateFormat, String nullString) {
+    Command command;
+    try{
+      arguments.remove("on");
+      command = createDisplayOnTimeWithoutKeywordOn(arguments, timeArray, nullString);
+    } catch (NumberFormatException e) {
+      Date date = dates.get(0);
+      String formattedDate = dateFormat.format(date);
+      timeArray.add(formattedDate);
+      command = new Command("display", 1, timeArray);
     }
     return command;
   }
