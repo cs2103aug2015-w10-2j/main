@@ -8,10 +8,9 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
-
-
+//@@author: A0112077N
 public class UserInterface extends Application {
-	private static final String MAIN_WINDOW_LAYOUT = "Time4Work.fxml";
+	private static final String MAIN_WINDOW_LAYOUT = "view/Time4Work.fxml";
 	private static final String WINDOW_TITLE = "Time4Work";
 	private Stage primaryStage;
 	private Scene scene;
