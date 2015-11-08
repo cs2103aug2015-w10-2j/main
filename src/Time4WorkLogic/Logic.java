@@ -134,15 +134,14 @@ public class Logic {
                     String fromDate = displayTime.get(0);
                     String toDate = displayTime.get(1);
                     return executeDisplayFromToDates(fromDate, toDate);
+                } else if ((parsedCommand.getStoreSearchAndDisplayStrings() == null)) {
+                	String displayType = "incomplete";
+                	return executeDisplay(displayType);
+                	
                 } else if (parsedCommand.getStoreSearchAndDisplayStrings().equals("overdue")) {
                     return executeDisplayOverdue();
                 } else { // display by task type instead of dates
-                    String displayType;
-                    if (parsedCommand.getStoreSearchAndDisplayStrings() != null) {
-                        displayType = parsedCommand.getStoreSearchAndDisplayStrings();
-                    } else {
-                        displayType = "incomplete";
-                    }
+                    String displayType = parsedCommand.getStoreSearchAndDisplayStrings();
                     return executeDisplay(displayType);
                 }
             case SEARCH :
