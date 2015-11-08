@@ -524,7 +524,7 @@ public class Parser {
       SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyy");
       command = createDisplayTimeCommand(arguments, firstWord, timeArray, dates, dateFormat);
     } else {
-      command = new Command("display", typeToDisplay);
+      command = createInvalidCommand();
     }
     return command;
   }
@@ -546,7 +546,7 @@ public class Parser {
         } else if (arguments.size() == 2){
           command = createDisplayDateRangeNoNaturalLanguage(arguments, timeArray, nullString);
         } else {
-          command = new Command("display", nullString);
+          command = createInvalidCommand();
         }
       } catch (NumberFormatException e) {
         command = createDisplayDateRangeNaturalLanguage(timeArray, dates, dateFormat);
@@ -586,7 +586,7 @@ public class Parser {
         command = new Command("display", 3, timeArray);
       }
     } else {
-      command = new Command("display", nullString);
+      command = createInvalidCommand();
     }
     return command;
   }
@@ -600,7 +600,7 @@ public class Parser {
       timeArray.add(arguments.get(0));
       command = new Command("display", 1, timeArray);
     } else {
-      command = new Command("display", nullString);
+      command = createInvalidCommand();
     }
     return command;
   }
@@ -616,7 +616,7 @@ public class Parser {
         timeArray.add(arguments.get(0));
         command = new Command("display", 2, timeArray);
       } else {
-        command = new Command("display", nullString);
+        command = createInvalidCommand();
       }
     } catch (NumberFormatException e) {
       Date date = dates.get(0);
