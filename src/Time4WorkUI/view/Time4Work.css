@@ -5,6 +5,23 @@
 
 /*
  * ================================================================
+ * Font Declarations
+ * ================================================================
+ */
+@font-face {
+	font-family: Georgia;
+	font-style: normal;
+	src: url("/Time4Work/Time4WorkUI/fonts/Georgia.ttf");
+}
+
+@font-face {
+	font-family: tehuti;
+	font-style: normal;
+	src: url("/Time4Work/Time4WorkUI/fonts/tehuti-book.otf");
+}
+
+/*
+ * ================================================================
  * TableView Styling
  * ================================================================
  */
@@ -16,7 +33,7 @@
 .label {
     -fx-font-size: 11pt;
     -fx-text-fill: #2B236F;
-    -fx-font-family: "Verdana";
+    -fx-font-family: "tehuti";
 }
 
 .table-view {
@@ -24,11 +41,7 @@
 }
 
 .table-cell {
-    -fx-font-size: 13px;
-}
-
-.table-row-cell {
-    -fx-cell-size: 30px;
+    -fx-font-size: 13.5px;
 }
 
 .table-view .column-header-background {
@@ -37,7 +50,7 @@
 }
 
 .table-view .column-header, .table-view .filler {
-    -fx-size: 11;
+    -fx-size: 13;
     -fx-border-width: 0 0 1 0;
     -fx-background-color: transparent;
     -fx-border-color:
@@ -49,8 +62,8 @@
 }
 
 .table-view .column-header .label {
-    -fx-font-size: 11pt;
-    -fx-font-family: "Verdana";
+    -fx-font-size: 13pt;
+    -fx-font-family: "tehuti";
     -fx-alignment: center;
      -fx-text-fill: #1E184D;
 }
