@@ -506,8 +506,7 @@ public class ParserTest {
 	@Test
 	public void testInvalidSecondTermDisplay() {
 		Command result = tester.parse("display hahaha");
-		assertEquals("display", result.getCommand());
-		assertEquals(null, result.getStoreSearchAndDisplayStrings());
+		assertEquals("invalid", result.getCommand());
 	}
 	
 	@Test
@@ -555,5 +554,97 @@ public class ParserTest {
 		assertEquals(3, result.getDisplayType());
 		assertEquals("091115", result.getTimeArray().get(0));
 		assertEquals("111115", result.getTimeArray().get(1));
+	}
+	
+	@Test
+	public void testDisplayFlippedDateRangeNoNaturalLanguage() throws Exception {
+		Date reference = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).parse("11/4/2015 12:00 am");
+		CalendarSource.setBaseDate(reference);
+		Command result = tester.parse("display from 131115 to 111115");
+		assertEquals("display", result.getCommand());
+		assertEquals(3, result.getDisplayType());
+		assertEquals("111115", result.getTimeArray().get(0));
+		assertEquals("131115", result.getTimeArray().get(1));
+	}
+	
+	@Test
+	public void testDisplayDateRangeNoNaturalLanguage() throws Exception {
+		Date reference = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).parse("11/4/2015 12:00 am");
+		CalendarSource.setBaseDate(reference);
+		Command result = tester.parse("display from 111115 to 131115");
+		assertEquals("display", result.getCommand());
+		assertEquals(3, result.getDisplayType());
+		assertEquals("111115", result.getTimeArray().get(0));
+		assertEquals("131115", result.getTimeArray().get(1));
+	}
+	
+	@Test
+	public void testDisplayDateRangeInvalidStartDateNoNaturalLanguage() throws Exception {
+		Date reference = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).parse("11/4/2015 12:00 am");
+		CalendarSource.setBaseDate(reference);
+		Command result = tester.parse("display from 331115 to 131115");
+		assertEquals("invalid", result.getCommand());
+	}
+	
+	@Test
+	public void testDisplayDateRangeInvalidEndDateNoNaturalLanguage() throws Exception {
+		Date reference = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).parse("11/4/2015 12:00 am");
+		CalendarSource.setBaseDate(reference);
+		Command result = tester.parse("display from 111115 to 331115");
+		assertEquals("invalid", result.getCommand());
+	}
+	
+	@Test
+	public void testDisplayOnDateNoNaturalLanguage() throws Exception {
+		Date reference = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).parse("11/4/2015 12:00 am");
+		CalendarSource.setBaseDate(reference);
+		Command result = tester.parse("display 111115");
+		assertEquals("display", result.getCommand());
+		assertEquals(1, result.getDisplayType());
+		assertEquals("111115", result.getTimeArray().get(0));
+	}
+	
+	@Test
+	public void testDisplayByDateNoNaturalLanguage() throws Exception {
+		Date reference = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).parse("11/4/2015 12:00 am");
+		CalendarSource.setBaseDate(reference);
+		Command result = tester.parse("display by 111115");
+		assertEquals("display", result.getCommand());
+		assertEquals(2, result.getDisplayType());
+		assertEquals("111115", result.getTimeArray().get(0));
+	}
+	
+	@Test
+	public void testTooManyDatesDisplayByDateNoNaturalLanguage() throws Exception {
+		Date reference = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).parse("11/4/2015 12:00 am");
+		CalendarSource.setBaseDate(reference);
+		Command result = tester.parse("display 111115 141115 151115");
+		assertEquals("invalid", result.getCommand());
+	}
+	
+	@Test
+	public void testDisplayOnDateInvalidDateNoNaturalLanguage() throws Exception {
+		Date reference = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).parse("11/4/2015 12:00 am");
+		CalendarSource.setBaseDate(reference);
+		Command result = tester.parse("display 331115");
+		assertEquals("invalid", result.getCommand());
+	}
+	
+	@Test
+	public void testDisplayByDateInvalidDateNoNaturalLanguage() throws Exception {
+		Date reference = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).parse("11/4/2015 12:00 am");
+		CalendarSource.setBaseDate(reference);
+		Command result = tester.parse("display by 331115");
+		assertEquals("invalid", result.getCommand());
+	}
+	
+	@Test
+	public void testDisplayOnDateWithOnKeywordNoNaturalLanguage() throws Exception {
+		Date reference = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).parse("11/4/2015 12:00 am");
+		CalendarSource.setBaseDate(reference);
+		Command result = tester.parse("display on 131115");
+		assertEquals("display", result.getCommand());
+		assertEquals(1, result.getDisplayType());
+		assertEquals("131115", result.getTimeArray().get(0));
 	}
 }
