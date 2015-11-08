@@ -50,7 +50,6 @@ public class Logic {
     private CommandHistory commandHistory = new CommandHistory();
     private CommandHistory reversedCommandHistory = new CommandHistory();
     
-    
     enum COMMAND_TYPE {
         ADD, UPDATE, DELETE, SEARCH, DISPLAY, STORE, INVALID, UNDO, DONE, CLEAR, EXIT
     };
@@ -121,33 +120,12 @@ public class Logic {
                 return executeUndo();
             case DISPLAY:
                 int displayDateType = parsedCommand.getDisplayType();
-                if (displayDateType == 1) { //display tasks on the specific one date
-                    ArrayList<String> displayTime = parsedCommand.getTimeArray();
-                    String displayDate = displayTime.get(0);
-                    return executeDisplayOnDate(displayDate);
-                } else if (displayDateType == 2) { //display all tasks due by one date
-                    ArrayList<String> displayTime = parsedCommand.getTimeArray();
-                    String beforeDate = displayTime.get(0);
-                    return executeDisplayBeforeDate(beforeDate);
-                } else if (displayDateType == 3) { // display tasks from one date to another date
-                    ArrayList<String> displayTime = parsedCommand.getTimeArray();
-                    if (displayTime.size() != 2) {
-                        return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_,
-                                                                 "only one argument for duration task"),
-                                                   completeList, incompleteList);
-                    } else {
-                        String fromDate = displayTime.get(0);
-                        String toDate = displayTime.get(1);
-                        return executeDisplayFromToDates(fromDate, toDate);
-                    }
-                } else if ((parsedCommand.getStoreSearchAndDisplayStrings() == null)) {
-                    String displayType = "incomplete";
-                    return executeDisplay(displayType);
-                } else if (parsedCommand.getStoreSearchAndDisplayStrings().equals("overdue")) {
-                    return executeDisplayOverdue();
-                } else { // display by task type instead of dates
-                    String displayType = parsedCommand.getStoreSearchAndDisplayStrings();
-                    return executeDisplay(displayType);
+                if (checkDisplayDate(displayDateType)) {
+                	ArrayList<String> displayTime = parsedCommand.getTimeArray();
+                	return determineDisplayMethodForDate(displayDateType, displayTime);
+                } else {
+                	String displayType = parsedCommand.getStoreSearchAndDisplayStrings();
+                	return determineDisplayMethodNoneDate(displayType);
                 }
             case SEARCH :
                 String searchKeyword = parsedCommand.getStoreSearchAndDisplayStrings();
@@ -156,10 +134,6 @@ public class Logic {
                 String storagePath = parsedCommand.getStoreSearchAndDisplayStrings();
                 return executeCreatePath(storagePath);
             case DONE:
-                if (userInputIndexes.isEmpty()) {
-                    int userInputIndex = parsedCommand.getSelectedIndexNumber();
-                    userInputIndexes.add(userInputIndex);
-                }
                 return executeMarkTaskAsDone(userInputIndexes);
             case INVALID :
                 return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "command is invalid"),
@@ -200,7 +174,7 @@ public class Logic {
             return COMMAND_TYPE.INVALID;
         }
     }
-    private static boolean checkIfEmptyString(String userCommand) {
+    private static boolean checkIfEmptyString (String userCommand) {
         return userCommand.trim().equals("");
     }
     
@@ -214,7 +188,6 @@ public class Logic {
         try {
             completeList = sortCompleteTask(completeList);
         } catch (IOException | ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return completeList;
@@ -226,7 +199,6 @@ public class Logic {
         try {
             incompleteList = sortIncompleteTask(incompleteList);
         } catch (IOException | ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return incompleteList;
@@ -259,7 +231,6 @@ public class Logic {
             completeList = sortCompleteTask(completeList);
             incompleteList = sortIncompleteTask(incompleteList);
         } catch (IOException | ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
         }
@@ -321,7 +292,6 @@ public class Logic {
             completeList = sortCompleteTask(completeList);
             incompleteList = sortIncompleteTask(incompleteList);
         } catch (IOException | ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
         }
@@ -376,7 +346,6 @@ public class Logic {
                 completeList = sortCompleteTask(completeList);
                 incompleteList = sortIncompleteTask(incompleteList);
             } catch (IOException | ParseException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
             }
@@ -421,7 +390,6 @@ public class Logic {
                     try {
                         storage.appendTask(task);
                     } catch (IOException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                         return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed"),
                                                    completeList, incompleteList);
@@ -448,7 +416,6 @@ public class Logic {
                 try {
                     storage.appendTask(commandToUndo.getTask());
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                     return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed"),
                                                completeList, incompleteList);
@@ -463,7 +430,6 @@ public class Logic {
                     try {
                         storage.appendTask(task);
                     } catch (IOException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                         return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed"),
                                                    completeList, incompleteList);
@@ -486,7 +452,6 @@ public class Logic {
                     try {
                         storage.SetIncompleted(taskIDList);
                     } catch (Exception e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                         return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed"),
                                                    completeList, incompleteList);
@@ -504,7 +469,6 @@ public class Logic {
             completeList = sortCompleteTask(completeList);
             incompleteList = sortIncompleteTask(incompleteList);
         } catch (IOException | ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
         }
@@ -534,7 +498,6 @@ public class Logic {
                 completeList = sortCompleteTask(completeList);
                 incompleteList = sortIncompleteTask(incompleteList);
             } catch (IOException | ParseException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
             }
@@ -556,7 +519,6 @@ public class Logic {
         try {
             searchList = myFilter.searchBetweenDates(incompleteList, fromDate, toDate);
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_, "cannot search display type"), completeList, incompleteList);
         }
@@ -567,7 +529,6 @@ public class Logic {
                 completeList = sortCompleteTask(completeList);
                 incompleteList = sortIncompleteTask(incompleteList);
             } catch (IOException | ParseException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
             }
@@ -590,7 +551,6 @@ public class Logic {
         try {
             searchList = myFilter.searchBeforeDate(incompleteList, beforeDate);
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_, "cannot search display type"), completeList, incompleteList);
         }
@@ -601,7 +561,6 @@ public class Logic {
                 completeList = sortCompleteTask(completeList);
                 incompleteList = sortIncompleteTask(incompleteList);
             } catch (IOException | ParseException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
             }
@@ -623,7 +582,6 @@ public class Logic {
         try {
             searchList = myFilter.searchOverDue(incompleteList);
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_, "cannot search display type"), completeList, incompleteList);
         }
@@ -633,7 +591,6 @@ public class Logic {
                 completeList = sortCompleteTask(completeList);
                 incompleteList = sortIncompleteTask(incompleteList);
             } catch (IOException | ParseException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
             }
@@ -674,6 +631,9 @@ public class Logic {
         } else if (displayType.equals("floating")) {
             logger.log(Level.INFO, "start processing display floating tasks");
             displayList = myFilter.searchFloating(fullIncompleteTask);
+        } else {
+        	return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_, "No such task type!"), 
+        			                   completeList, incompleteList);
         }
         
         
@@ -683,7 +643,6 @@ public class Logic {
                 completeList = sortCompleteTask(completeList);
                 incompleteList = sortIncompleteTask(incompleteList);
             } catch (IOException | ParseException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
             }
@@ -711,7 +670,6 @@ public class Logic {
                 completeList = sortCompleteTask(completeList);
                 incompleteList = sortIncompleteTask(incompleteList);
             } catch (IOException | ParseException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
             }
@@ -731,7 +689,6 @@ public class Logic {
         try {
             storage.setCustomPath(storagePath);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return new FeedbackMessage(String.format(MESSAGE_CREATE_PATH_, "failed"),
                                        completeList, incompleteList);
@@ -746,7 +703,6 @@ public class Logic {
             completeList = sortCompleteTask(completeList);
             incompleteList = sortIncompleteTask(incompleteList);
         } catch (IOException | ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
         }
@@ -808,7 +764,6 @@ public class Logic {
             completeList = sortCompleteTask(completeList);
             incompleteList = sortIncompleteTask(incompleteList);
         } catch (IOException | ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
         }
@@ -832,7 +787,6 @@ public class Logic {
         try {
             previousTaskList = storage.ClearAll();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return new FeedbackMessage(String.format(MESSAGE_CLEAR_, "failed"), completeList, incompleteList);
         }
@@ -887,6 +841,62 @@ public class Logic {
             }
         }
         return index;
+    }
+    
+    // =========================================================================
+    // useful methods for logic
+    // =========================================================================
+    
+    private boolean checkDisplayDate (int displayDateType) {
+    	boolean isDisplayDate = false;
+    	if (displayDateType == 1 || displayDateType == 2 || displayDateType == 3) {
+    		isDisplayDate = true;
+    	}
+    	return isDisplayDate;
+    }
+    
+    private FeedbackMessage determineDisplayMethodForDate (int displayType, ArrayList<String> displayTime) {
+    	if (displayType == 1) {
+    		String displayDate = displayTime.get(0);
+    		return executeDisplayOnDate(displayDate);
+    	} else if (displayType == 2) {
+    		String displayDate = displayTime.get(0);
+    		return executeDisplayBeforeDate(displayDate);
+    	} else if (displayType == 3) {
+    		handleDisplayFromTo(displayTime);
+    	}
+		return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_, "not display date according to date"), 
+				                    completeList, incompleteList);
+    }
+    
+    private FeedbackMessage handleDisplayFromTo (ArrayList<String> displayTime) {
+    	if (checkIsTimeArrayValidForDisplayFromTo(displayTime)) {
+    		String fromDate = displayTime.get(0);
+            String toDate = displayTime.get(1);
+            return executeDisplayFromToDates(fromDate, toDate);
+    	} else {
+    		return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_,
+                                       "only one argument for duration task"),
+                                        completeList, incompleteList);
+    	}
+    }
+    private boolean checkIsTimeArrayValidForDisplayFromTo (ArrayList<String> displayTime) {
+    	boolean isTimeArrayValidForDisplayFromTo = false;
+    	if (displayTime.size() == 2) {
+    		isTimeArrayValidForDisplayFromTo = true;
+    	}
+    	return isTimeArrayValidForDisplayFromTo;
+    }
+    
+    private FeedbackMessage determineDisplayMethodNoneDate (String displayType) {
+    	if (displayType == null) {
+    		displayType = "incomplete";
+    		return executeDisplay(displayType);
+    	} else if (displayType.equals("overdue")) {
+    		return executeDisplayOverdue();
+    	} else {
+    		return executeDisplay(displayType);
+    	}
     }
     
     private boolean checkIsSameTaskID (Tasks task, int taskID) {
