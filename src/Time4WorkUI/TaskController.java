@@ -114,6 +114,8 @@ public class TaskController {
 						currentList = output.getIncompleteTaskList();
 					} else if(userInput.isHelpCommand()){
 						help.showMenu();
+					} else {
+						currentList = output.getIncompleteTaskList();
 					}
 
 					taskTable.setItems(getObservableTaskList(currentList));
