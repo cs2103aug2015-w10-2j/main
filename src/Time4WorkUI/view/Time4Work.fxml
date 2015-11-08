@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 
 <!-- @@author A0112077N -->
+
 <AnchorPane prefHeight="620.0" prefWidth="700.0" styleClass="background" stylesheets="@Time4Work.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Time4WorkUI.TaskController">
    <children>
       <BorderPane prefHeight="620.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -32,12 +33,7 @@
          <center>
             <GridPane prefHeight="450.0" prefWidth="600.0">
                <children>
-                  <Label id="taskTable" fx:id="taskTitle" stylesheets="@Title.css" text="TIME4WORK" textAlignment="CENTER">
-                     <GridPane.margin>
-                        <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
-                     </GridPane.margin>
-                  </Label>
-                  <TableView fx:id="taskTable" stylesheets="@Time4Work.css" GridPane.rowIndex="1">
+                  <TableView fx:id="taskTable" stylesheets="@Time4Work.css">
                      <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                      </columnResizePolicy>
@@ -60,10 +56,9 @@
                </columnConstraints>
                <rowConstraints>
                   <RowConstraints vgrow="SOMETIMES" />
-                  <RowConstraints vgrow="SOMETIMES" />
                </rowConstraints>
                <padding>
-                  <Insets left="13.0" right="13.0" />
+                  <Insets left="13.0" right="13.0" top="15.0" />
                </padding>
             </GridPane>
          </center></BorderPane>
