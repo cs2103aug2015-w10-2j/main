@@ -119,7 +119,6 @@ public class TaskController {
 						currentList = output.getIncompleteTaskList();
 					}
 
-					currentList = output.getIncompleteTaskList();
 					taskTable.setItems(getObservableTaskList(currentList));
 					feedback.setText(output.getFeedback());
 
