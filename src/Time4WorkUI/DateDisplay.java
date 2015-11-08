@@ -1,7 +1,5 @@
 package Time4WorkUI;
 
-import Time4WorkLogic.FeedbackMessage;
-import Time4WorkLogic.Logic;
 import Time4WorkStorage.DeadlineTask;
 import Time4WorkStorage.Duration;
 import Time4WorkStorage.DurationTask;
@@ -11,12 +9,8 @@ import Time4WorkStorage.Tasks;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class DateDisplay {
-	private static final Logic logic = new Logic();
-	private static final Logger logger = Logger.getLogger(Logic.class.getName());
 
 	public DateDisplay(){
 	}
