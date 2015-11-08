@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import Time4WorkLogic.FeedbackMessage;
 import Time4WorkLogic.Logic;
 import Time4WorkStorage.DeadlineTask;
 import Time4WorkStorage.Duration;

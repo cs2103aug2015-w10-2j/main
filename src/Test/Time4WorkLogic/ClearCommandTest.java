@@ -9,7 +9,6 @@ import Time4WorkStorage.FloatingTask;
 import Time4WorkStorage.Tasks;
 
 import static org.junit.Assert.*;
-import java.io.IOException;
 
 public class ClearCommandTest {
 	private static final String MESSAGE_CLEAR = "All task cleared successfully!";

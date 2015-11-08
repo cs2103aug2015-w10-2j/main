@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 
 import Time4WorkLogic.*;
 import Time4WorkStorage.Tasks;
-import Time4WorkUI.*;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
