@@ -8,11 +8,10 @@ import Time4WorkStorage.FloatingTask;
 import Time4WorkStorage.Tasks;
 
 import static org.junit.Assert.*;
-import java.io.IOException;
 import java.util.ArrayList;
 
+//@@author A0133894W
 public class DoneCommandTest {
-	private static final String MESSAGE_DONE_ = "x";
 	private static final String MESSAGE_UNDO_ = "Undo %1$s!";
 	Logic logic = new Logic();
 	

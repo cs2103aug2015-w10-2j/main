@@ -570,7 +570,7 @@ public class Logic {
             
             logger.log(Level.INFO, "end of processing display task between two dates command");
             return new FeedbackMessage(String.format(MESSAGE_DISPLAY_TASKDATE_SUCCESSFULLY,
-                                                     ("from " + fromDate + "to " + toDate)),
+                                                     ("from " + fromDate + " to " + toDate)),
                                        completeList, incompleteList);
         } else {
             logger.log(Level.INFO, "end of processing display task between two dates command");
@@ -603,7 +603,7 @@ public class Logic {
             }
             
             logger.log(Level.INFO, "end of processing display task before one day command");
-            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_TASKDATE_SUCCESSFULLY, ("before" + beforeDate)),
+            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_TASKDATE_SUCCESSFULLY, ("before " + beforeDate)),
                                        completeList, incompleteList);
         } else {
             logger.log(Level.INFO, "end of processing display task before one day command");
@@ -655,15 +655,20 @@ public class Logic {
         
         
         if (displayType.equals("archive")) {
+            logger.log(Level.INFO, "start processing display archive");
             completeList = getCompleteTaskList();
             displayList = myFilter.searchCompleted(fullTaskList);
         } else if (displayType.equals("incomplete")) {
+            logger.log(Level.INFO, "start processing display incomplete");
             displayList = myFilter.searchNotCompleted(fullIncompleteTask);
         } else if (displayType.equals("deadline")) {
+            logger.log(Level.INFO, "start processing display deadline tasks");
             displayList = myFilter.searchDeadline(fullIncompleteTask);
         } else if (displayType.equals("duration")) {
+            logger.log(Level.INFO, "start processing display duration tasks");
             displayList = myFilter.searchDuration(fullIncompleteTask);
         } else if (displayType.equals("floating")) {
+            logger.log(Level.INFO, "start processing display floating tasks");
             displayList = myFilter.searchFloating(fullIncompleteTask);
         }
         
@@ -679,11 +684,11 @@ public class Logic {
                 return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
             }
             
-            logger.log(Level.INFO, "end of processing search command");
+            logger.log(Level.INFO, "end of processing display command");
             return new FeedbackMessage(String.format(MESSAGE_DISPLAY_TASKTYPE_SUCCESSFULLY, displayType),
                                        completeList, incompleteList);
         } else {
-            logger.log(Level.INFO, "end of processing search command");
+            logger.log(Level.INFO, "end of processing display command");
             return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_, "No such task!"), completeList, incompleteList);
         }
     }
@@ -718,6 +723,7 @@ public class Logic {
     }
     
     public FeedbackMessage executeCreatePath(String storagePath) {
+        logger.log(Level.INFO, " start processing create path");
         try {
             storage.setCustomPath(storagePath);
         } catch (IOException e) {
@@ -740,7 +746,7 @@ public class Logic {
             e.printStackTrace();
             return new FeedbackMessage(MESSAGE_SORT_FAILED, completeList, incompleteList);
         }
-        
+        logger.log(Level.INFO, " end of processing create path");
         return new FeedbackMessage(String.format(MESSAGE_CREATE_PATH_, "successfully"),
                                    completeList, incompleteList);
         
