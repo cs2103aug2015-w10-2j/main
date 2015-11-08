@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+//@@author: A0112077N
 public class TaskModel {
 	private final IntegerProperty index;
 	private final StringProperty description;
