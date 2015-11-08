@@ -10,6 +10,7 @@ import Time4WorkStorage.DurationTask;
 import Time4WorkStorage.FloatingTask;
 import Time4WorkStorage.Tasks;
 
+//@@author A0133894W
 public class TaskSorter {
     private ArrayList<Tasks> taskList;
     int DeadlineType = 1;
@@ -22,7 +23,7 @@ public class TaskSorter {
     }
     
     
-    public ArrayList<Tasks> sortTask (boolean sortIncomplete) throws ParseException {
+    public ArrayList<Tasks> sortTask (boolean isIncomplete) throws ParseException {
         ArrayList<Tasks> floatingTaskList = new ArrayList<Tasks>();
         ArrayList<Tasks> tempTaskList = new ArrayList<Tasks>();
         int taskListSize = taskList.size();
@@ -43,7 +44,7 @@ public class TaskSorter {
             for (int j = 0; j < i; j++) {
                 ArrayList<Tasks> comparedTaskList = compareTask(taskList.get(j),
                                                                 taskList.get(j+1));
-                if (sortIncomplete == true) {
+                if (isIncomplete == true) {
                     if (comparedTaskList.get(0) == taskList.get(j+1)) {
                         Tasks temp = taskList.get(j);
                         taskList.set(j, taskList.get(j+1));
