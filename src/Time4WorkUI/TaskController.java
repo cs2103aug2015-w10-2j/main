@@ -1,14 +1,14 @@
 package Time4WorkUI;
 
 import java.io.IOException;
-
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import Time4WorkLogic.*;
+import Time4WorkLogic.FeedbackMessage;
+import Time4WorkLogic.Logic;
 import Time4WorkStorage.Tasks;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
@@ -18,14 +18,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
-
 
 //@@author: A0112077N
 public class TaskController {
@@ -98,7 +97,7 @@ public class TaskController {
 
 		userCommand.setOnKeyPressed(e -> {
 			userInput = new UserInput(userCommand.getText());
-			
+
 			if (e.getCode().equals(KeyCode.ENTER)) {
 				upStack.push(userInput.getUserInput());
 				userCommand.setText(PROMPT_USERCOMMAND_CLEAR);
@@ -115,8 +114,6 @@ public class TaskController {
 						currentList = output.getIncompleteTaskList();
 					} else if(userInput.isHelpCommand()){
 						help.showMenu();
-					} else {
-						currentList = output.getIncompleteTaskList();
 					}
 
 					taskTable.setItems(getObservableTaskList(currentList));
@@ -190,7 +187,7 @@ public class TaskController {
 
 	/**
 	 * Create tooltip to show the whole description of the task
-	 * This is useful when description content is too long
+	 * This is helpful when description content is too long
 	 */
 	public void createTooltipForDescriptionCol(){
 		descriptionCol.setCellValueFactory(
@@ -231,4 +228,5 @@ public class TaskController {
 	public static ArrayList<Tasks> getDisplayedList() {
 		return currentList;
 	}
+
 }
