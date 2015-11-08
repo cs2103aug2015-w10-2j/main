@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import Time4WorkStorage.DeadlineTask;
 import Time4WorkStorage.Duration;
@@ -26,7 +27,7 @@ import Time4WorkStorage.Tasks;
 public class StorageLogicTest {
 	
 	StorageLogic myLogic = new StorageLogic();
-	Gson gson = new Gson();
+	Gson gson = new GsonBuilder().setPrettyPrinting().create();
 	
 	final String testFile = "testFile.txt";
 	final Tasks tempTask1 = new FloatingTask(1, "I'm a floating task!");
@@ -41,14 +42,13 @@ public class StorageLogicTest {
 	File myFile;
 	FileReader fr; 
 	BufferedReader br;
+	ArrayList<Tasks> tempList = new ArrayList<Tasks>();
 	boolean fault;
 	
 	@Before
 	public void setUp() {
 		
 		myFile = null;
-		fr = null;
-		br = null;
 		fault = false;
 		
 		try {
@@ -68,120 +68,63 @@ public class StorageLogicTest {
 		}
 	}
 	
-	//retrieves the last line and compares
+	//adds a new task and compares size
 	@Test
 	public void testAddNewTask() {
-		if(!fault) {	
-			myFile = new File(testFile);
+
+		if(!fault) {
+			
 			try {
-				fr = new FileReader(myFile.getAbsoluteFile());
-				br = new BufferedReader(fr);
+				tempList = myLogic.getAllTasks();
 			} catch (IOException e) {
 				e.printStackTrace();
-				fault = true;
 			}
 			
-			if(!fault) {
-				String lastLine = "", tempLine = "";
-				try {
-					while ((tempLine = br.readLine()) != null) {
-						lastLine = tempLine;
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				//compares last string
-				assertEquals(lastLine,tempTask3String);
-			}			
+			Duration tempDeadLine = new Duration("051115", "2000");
+			Tasks tempTask4 = new DeadlineTask("New task", tempDeadLine);
+			
+			try {
+				myLogic.addNewTask(tempTask4);
+				tempList = myLogic.getAllTasks();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			assertEquals(tempList.size(),4);
 		}
 	}
 	
-	//deletes last line and compares
+	//deletes last item and compares size
 	@Test
 	public void testDeleteLast() {
 		
 		ArrayList<Integer> list3 = new ArrayList<Integer>();
-		list3.add(3);
-		
-		if(!fault) {	
-			myFile = new File(testFile);
-						
-			if(!fault) {
-				try {
-					myLogic.delete(list3);
-				} catch (IOException | InterruptedException e) {
-					e.printStackTrace();
-					fault = true;
-				}
-			}
-			if(!fault) {				
-				try {
-					fr = new FileReader(myFile.getAbsoluteFile());
-					br = new BufferedReader(fr);
-				} catch (IOException e) {
-					e.printStackTrace();
-					fault = true;
-				}
+		list3.add(3);		
+
+		if(!fault) {
 			
-				if(!fault) {
-					String lastLine = "", tempLine = "";
-					try {
-						while ((tempLine = br.readLine()) != null) {
-							lastLine = tempLine;
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					//compares last string
-					assertEquals(lastLine,tempTask2String);
-				}			
+			try {
+				tempList = myLogic.getAllTasks();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		}
-	}
-	
-	//deletes first line and compares last line
-	@Test
-	public void testDeleteFirst() {
-		
-		ArrayList<Integer> list1 = new ArrayList<Integer>();
-		list1.add(1);
-		
-		if(!fault) {	
-			myFile = new File(testFile);
-						
-			if(!fault) {
-				try {
-					myLogic.delete(list1);
-				} catch (IOException | InterruptedException e) {
-					e.printStackTrace();
-					fault = true;
-				}
-			}
-			if(!fault) {				
-				try {
-					fr = new FileReader(myFile.getAbsoluteFile());
-					br = new BufferedReader(fr);
-				} catch (IOException e) {
-					e.printStackTrace();
-					fault = true;
-				}
 			
-				if(!fault) {
-					String lastLine = "", tempLine = "";
-					try {
-						while ((tempLine = br.readLine()) != null) {
-							lastLine = tempLine;
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					//compares last string
-					assertEquals(lastLine,tempTask3String);
-				}			
+			assertEquals(tempList.size(),3);
+			
+			try {
+				myLogic.delete(list3);
+				tempList = myLogic.getAllTasks();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
+
+			assertEquals(tempList.size(),2);
+
 		}
+
 	}
-	
 	
 	//sets all 3 as completed
 	@Test
@@ -192,35 +135,27 @@ public class StorageLogicTest {
 		list.add(2);
 		list.add(3);
 		
-		ArrayList<Tasks> results = null;
-		
 		if(!fault) {	
-			myFile = new File(testFile);
-						
-			if(!fault) {
-				try {
-					myLogic.setCompleted(list, true);
-				} catch (IOException | InterruptedException e) {
-					e.printStackTrace();
-					fault = true;
-				}
+			try {
+				myLogic.setCompleted(list, true);
+			} catch (IOException | InterruptedException e) {
+				e.printStackTrace();
+				fault = true;
 			}
-			if(!fault) {				
-				try {
-					fr = new FileReader(myFile.getAbsoluteFile());
-					br = new BufferedReader(fr);		
-					results = myLogic.getAllTasks();
-				} catch (IOException e) {
-					e.printStackTrace();
-					fault = true;
-				}
+		}
+		
+		if(!fault) {				
+			try {
+				tempList = myLogic.getAllTasks();
+			} catch (IOException e) {
+				e.printStackTrace();
+				fault = true;
+			}
 			
-				if(!fault) {
-					for(int i=0; i<results.size(); i++) {
-						assertEquals(results.get(i).isCompleted(),true);
-					}
-				}			
-			}
+			for(int i=0; i<tempList.size(); i++) {
+				assertEquals(tempList.get(i).isCompleted(),true);
+			}			
+
 		}
 	}
 	
@@ -228,51 +163,25 @@ public class StorageLogicTest {
 	@Test
 	public void testClear() {
 		
-		ArrayList<Tasks> results = null;
-		
-		if(!fault) {	
-			myFile = new File(testFile);
-						
-			if(!fault) {				
-				try {
-					results = myLogic.getAllTasks();
-				} catch (IOException e) {
+		if(!fault) {
+			try {
+				tempList = myLogic.getAllTasks();
+			} catch (IOException e) {
 					e.printStackTrace();
 					fault = true;
-				}
 			}
 			
-			if(!fault) {				
-				assertTrue(results.size() != 0);
-				try {
-					myLogic.clear();
-				} catch (IOException | InterruptedException e) {
-					e.printStackTrace();
-					fault = true;
-				}
-			}
+			assertTrue(tempList.size() != 0);
 			
-			if(!fault) {				
-				try {
-					fr = new FileReader(myFile.getAbsoluteFile());
-					br = new BufferedReader(fr);
-				} catch (IOException e) {
-					e.printStackTrace();
-					fault = true;
-				}
-				
-				if(!fault) {
-					int itemCounter = 0;
-					try {
-						while ((br.readLine()) != null) {
-							itemCounter++;
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					assertEquals(itemCounter,0);
-				}
-			}
+			try {
+				myLogic.clear();
+				tempList = myLogic.getAllTasks();
+			} catch (IOException | InterruptedException e) {
+				e.printStackTrace();
+				fault = true;
+			}			
+	
+			assertEquals(tempList.size(),0);
 		}
 	}
 	
@@ -280,8 +189,6 @@ public class StorageLogicTest {
 	@After
 	public void cleanUp() throws InterruptedException {
 		try {
-			br.close();
-			fr.close();
 			myLogic.deleteDataFile();
 		} catch (IOException e) {
 			e.printStackTrace();
