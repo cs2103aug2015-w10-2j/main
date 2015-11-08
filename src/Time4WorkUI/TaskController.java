@@ -37,8 +37,6 @@ public class TaskController {
 	// FXML variables
 	// -----------------------------------------
 	@FXML
-	private Label taskTitle;
-	@FXML
 	private VBox inputBox;
 	@FXML
 	private TextField userCommand;
@@ -70,7 +68,7 @@ public class TaskController {
 	// -------------------------------------------------------
 	// Message String
 	// -------------------------------------------------------
-	private static final String PROMPT_USERCOMMAND_TEXT = "Enter command";
+	private static final String PROMPT_FEEDBACK_TEXT = "Ready!";
 	private static final String PROMPT_USERCOMMAND_CLEAR = "";
 	private static final String NO_CONTENT_TABLE_MESSAGE = "You have no tasks.";
 	private static final String INIT_UI = "init ui";
@@ -92,8 +90,7 @@ public class TaskController {
 	}
 
 	public void handleUserInput() {
-		userCommand.setPromptText(PROMPT_USERCOMMAND_TEXT);
-		feedback.setText("Commands: add, delete, update, display, search, undo, store");
+		feedback.setText(PROMPT_FEEDBACK_TEXT);
 
 		userCommand.setOnKeyPressed(e -> {
 			userInput = new UserInput(userCommand.getText());
@@ -172,8 +169,7 @@ public class TaskController {
 		indexCol.getStyleClass().add("align-center");
 		toCol.getStyleClass().add("align-center");
 		fromCol.getStyleClass().add("align-center");
-		taskTitle.getStyleClass().add("taskTitle");
-
+	
 		indexCol.prefWidthProperty().bind(taskTable.widthProperty().multiply(0.05));
 		descriptionCol.prefWidthProperty().bind(taskTable.widthProperty().multiply(0.55));
 		fromCol.prefWidthProperty().bind(taskTable.widthProperty().multiply(0.20));
