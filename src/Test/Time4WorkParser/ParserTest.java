@@ -195,6 +195,12 @@ public class ParserTest {
     assertEquals("invalid", result.getCommand());
   }
   
+  @Test
+  public void testAssertTooManyArguments() {
+    Command result = tester.parse("add super long seminar. from monday to tues or wed");
+    assertEquals("invalid", result.getCommand());
+  }
+  
   // ================================================================================
   // Test update methods
   // ================================================================================

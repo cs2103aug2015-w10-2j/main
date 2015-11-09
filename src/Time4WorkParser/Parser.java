@@ -371,6 +371,7 @@ public class Parser {
     timeArray.set(0, timeArray.get(0).toLowerCase());
     ArrayList<String> formattedTimeArray = new ArrayList<String>();
     createFormattedTimeArray(timeArray, formattedTimeArray);
+    assert(formattedTimeArray.size() < 5);
     if (formattedTimeArray.size() == 2) { //deadline task
       createFormattedTimeArray(timeArray, formattedTimeArray);
       task = createDeadlineTask(task, descriptionOfTask, formattedTimeArray);
