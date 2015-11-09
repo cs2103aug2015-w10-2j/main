@@ -21,7 +21,7 @@ public class Logic {
     // Feedback massage string
     // =========================================================================
     
-    private static final String MESSAGE_INVALID_FORMAT = "invalid command: %1$s";
+    private static final String MESSAGE_INVALID_FORMAT = "Invalid command: %1$s";
     private static final String MESSAGE_EMPTY_COMMAND = "Command is empty!";
     private static final String MESSAGE_ADDED_ = "Task added %1$s !";
     private static final String MESSAGE_DELETED_ = "Task %1$s deleted %2$s !";
@@ -134,7 +134,7 @@ public class Logic {
             case DONE:
                 return executeMarkTaskAsDone(userInputIndexes);
             case INVALID :
-                return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "command is invalid"),
+                return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "Command is invalid"),
                                            completeList, incompleteList);
             case CLEAR :
                 return executeClear();
@@ -142,7 +142,7 @@ public class Logic {
                 logger.log(Level.INFO, "exit");
                 System.exit(0);
             default :
-                return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "command does not exist"),
+                return new FeedbackMessage(String.format(MESSAGE_INVALID_FORMAT, "Command does not exist"),
                                            completeList, incompleteList);
         }
     }
@@ -812,8 +812,8 @@ public class Logic {
     // =========================================================================
     
     private int getTaskIDFromUserInput(int userInput) {
-        Tasks requriedTask = incompleteList.get(userInput - 1);
-        int taskID = requriedTask.getTaskID();
+        Tasks requiredTask = incompleteList.get(userInput - 1);
+        int taskID = requiredTask.getTaskID();
         return taskID;
     }
     
