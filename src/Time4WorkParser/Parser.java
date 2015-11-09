@@ -345,7 +345,7 @@ public class Parser {
     if (numberOfArguments == 0) {
       task = new FloatingTask(descriptionOfTask);
     } else {
-      try{
+      try {
         for (int i = 0; i < timeArray.size(); i++) {
           Integer.parseInt(timeArray.get(i));
         }

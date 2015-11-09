@@ -22,19 +22,19 @@ public class Command {
   }
   
   //for storing, searching and non-time display functions
-  public Command(String command, String storeSearchAndDisplayStrings){
+  public Command(String command, String storeSearchAndDisplayStrings) {
     this.command = command;
     this.storeSearchAndDisplayStrings = storeSearchAndDisplayStrings;
   }
   
   //for deleting tasks or marking tasks as done
-  public Command(String command, ArrayList<Integer> selectedIndexNumbers){
+  public Command(String command, ArrayList<Integer> selectedIndexNumbers) {
     this.command = command;
     this.selectedIndexNumbers = selectedIndexNumbers;
   }
   
-  //for exit and invalid commands
-  public Command(String command){
+  //for undo, clear, exit and invalid commands
+  public Command(String command) {
     this.command = command;
   }
   
@@ -45,11 +45,11 @@ public class Command {
     this.timeArray = timeArray;
   }
   
-  public Tasks getTask(){
+  public Tasks getTask() {
     return task;
   }
   
-  public String getCommand(){
+  public String getCommand() {
     return command;
   }
   
@@ -61,7 +61,7 @@ public class Command {
     return isDateSearch;
   }
   
-  public ArrayList<Integer> getSelectedIndexNumbers(){
+  public ArrayList<Integer> getSelectedIndexNumbers() {
     return selectedIndexNumbers;
   }
   
