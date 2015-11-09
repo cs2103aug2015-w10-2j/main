@@ -308,7 +308,7 @@ public class ParserTest {
     ArrayList<Integer> items = new ArrayList<Integer>();
     items.add(1);
     
-    for(int i = 0; i < items.size(); i++) {
+    for (int i = 0; i < items.size(); i++) {
       assertEquals(items.get(i), inputDeleteIndexes.get(i));
     }
     
@@ -326,7 +326,7 @@ public class ParserTest {
     items.add(5);
     items.add(9);
     
-    for(int i = 0; i < items.size(); i++) {
+    for (int i = 0; i < items.size(); i++) {
       assertEquals(items.get(i), inputDeleteIndexes.get(i));
     }
   }
@@ -343,7 +343,7 @@ public class ParserTest {
     items.add(2);
     items.add(3);
     
-    for(int i = 0; i < items.size(); i++) {
+    for (int i = 0; i < items.size(); i++) {
       assertEquals(items.get(i), inputDeleteIndexes.get(i));
     }
   }
@@ -360,7 +360,7 @@ public class ParserTest {
     items.add(2);
     items.add(3);
     
-    for(int i = 0; i < items.size(); i++) {
+    for (int i = 0; i < items.size(); i++) {
       assertEquals(items.get(i), inputDeleteIndexes.get(i));
     }
   }
@@ -392,7 +392,7 @@ public class ParserTest {
     ArrayList<Integer> items = new ArrayList<Integer>();
     items.add(1);
     
-    for(int i = 0; i < items.size(); i++) {
+    for (int i = 0; i < items.size(); i++) {
       assertEquals(items.get(i), inputDoneIndexes.get(i));
     }
   }
@@ -409,7 +409,7 @@ public class ParserTest {
     items.add(6);
     items.add(8);
     
-    for(int i = 0; i < items.size(); i++) {
+    for (int i = 0; i < items.size(); i++) {
       assertEquals(items.get(i), inputDoneIndexes.get(i));
     }
   }
@@ -426,7 +426,7 @@ public class ParserTest {
     items.add(2);
     items.add(3);
     
-    for(int i = 0; i < items.size(); i++) {
+    for (int i = 0; i < items.size(); i++) {
       assertEquals(items.get(i), inputDoneIndexes.get(i));
     }
   }
@@ -443,7 +443,7 @@ public class ParserTest {
     items.add(2);
     items.add(3);
     
-    for(int i = 0; i < items.size(); i++) {
+    for (int i = 0; i < items.size(); i++) {
       assertEquals(items.get(i), inputDoneIndexes.get(i));
     }
   }

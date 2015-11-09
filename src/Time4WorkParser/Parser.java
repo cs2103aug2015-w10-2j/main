@@ -85,7 +85,7 @@ public class Parser {
     
     if (!(combinedDescriptionList == null)) {
       task = createTaskListForAddingOrUpdating(combinedDescriptionList);
-      if(!(task == null)){
+      if (!(task == null)) {
         command = new Command("add", task);
       } else {
         command = createInvalidCommand();
@@ -105,15 +105,15 @@ public class Parser {
     
     containsDash = checkIfContainsDash(arguments);
     
-    if(argumentsLength == 0) {
+    if (argumentsLength == 0) {
       command = createInvalidCommand();
-    } else if (argumentsLength == 1 && !containsDash){
+    } else if (argumentsLength == 1 && !containsDash) {
       int indexToBeDeleted = Integer.parseInt(arguments.get(0));
       arrayOfDeleteIndexes.add(indexToBeDeleted);
       command = new Command("delete", arrayOfDeleteIndexes);
     } else {
       arrayOfDeleteIndexes = getArrayListForDoneOrDelete(arguments, containsDash, argumentsLength);
-      if (arrayOfDeleteIndexes.isEmpty()){
+      if (arrayOfDeleteIndexes.isEmpty()) {
         command = createInvalidCommand();
       } else {
         command = new Command("delete", arrayOfDeleteIndexes);
@@ -134,7 +134,7 @@ public class Parser {
     
     if (!(combinedDescriptionList == null)) {
       task = createTaskListForAddingOrUpdating(combinedDescriptionList);
-      if (!(task == null)){
+      if (!(task == null)) {
         task.setTaskID(taskID);
         command = new Command("update", task);
       } else {
@@ -155,7 +155,7 @@ public class Parser {
     
     containsDash = checkIfContainsDash(arguments);
     
-    if(argumentsLength == 0) {
+    if (argumentsLength == 0) {
       command = createInvalidCommand();
     } else if (argumentsLength == 1 && !containsDash) {
       int indexToBeMarkedDone = Integer.parseInt(arguments.get(0));
@@ -196,7 +196,7 @@ public class Parser {
     } else if (VALID_DISPLAY_COMMANDS.contains(arguments.get(0))) {
       typeToDisplay = arguments.get(0);
       command = new Command("display", typeToDisplay);
-    } else if (!dateParser.parse(String.join(" ", arguments)).isEmpty()){
+    } else if (!dateParser.parse(String.join(" ", arguments)).isEmpty()) {
       String firstWord = arguments.get(0).toLowerCase();
       ArrayList<String> timeArray = new ArrayList<String>();
       List<DateGroup> dateGroups = dateParser.parse(String.join(" ", arguments));
@@ -303,7 +303,7 @@ public class Parser {
     ArrayList<String> description = getDescriptionArray(parameters, end);
     String descriptionString;
     String lastWord = description.get(end);
-    if(lastWord.endsWith(".")) {
+    if (lastWord.endsWith(".")) {
       description.set(end, lastWord.replaceAll(".$", ""));
       descriptionString = String.join(" ", description);
     } else {
@@ -437,7 +437,7 @@ public class Parser {
   private Tasks createDurationTaskForFullInputCommand(Tasks task, String descriptionOfTask, String startDate,
                                                       String startTime, String endDate, String endTime) {
     if (checkValidDate(startDate) && checkValidDate(endDate) && checkValidTime(startTime) && checkValidTime(endTime)) {
-      if(startDate.equals(endDate)){ //creates a Duration object using createDurationTaskForSameDayEvent
+      if (startDate.equals(endDate)) { //creates a Duration object using createDurationTaskForSameDayEvent
         task = createDurationTaskForSameDayEvent(task, descriptionOfTask, startDate, startTime, endTime);
       } else if (checkStartDateBeforeEndDate(startDate, endDate)) { //creates a Duration object for (start,start,end,end) if checkStartDateBeforeEndDate true
         Duration durationPeriod = new Duration(startDate, startTime, endDate, endTime);
@@ -454,7 +454,7 @@ public class Parser {
   //flips the time if it is not
   private Tasks createDurationTaskForSameDayEvent(Tasks task, String descriptionOfTask, String date, String startTime, String endTime) {
     if (checkValidDate(date) && checkValidTime(startTime) && checkValidTime(endTime)) {
-      if (checkStartTimeBeforeEndTime(startTime, endTime)){
+      if (checkStartTimeBeforeEndTime(startTime, endTime)) {
         Duration durationPeriod = new Duration(date, startTime, date, endTime);
         task = new DurationTask(descriptionOfTask, durationPeriod);
       } else {
@@ -567,7 +567,7 @@ public class Parser {
     } else if (firstWord.equals("by")) {
       command = createDisplayByTime(arguments, timeArray, dates, dateFormat, nullString);
     } else {
-      try{
+      try {
         arguments.remove("from");
         arguments.remove("to");
         if (arguments.size() == 1) {
@@ -697,7 +697,7 @@ public class Parser {
     ArrayList<Integer> indexOfItems = new ArrayList<Integer>();
     
     if (argumentsLength > 1 && !containsDash) {
-      for (int i = 0; i < argumentsLength; i++){
+      for (int i = 0; i < argumentsLength; i++) {
         indexOfItems.add(Integer.parseInt(arguments.get(i)));
       }
     } else if (argumentsLength == 1 && containsDash) {
