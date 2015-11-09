@@ -14,14 +14,14 @@ public class DateDisplayTest {
 
 	private String FLOATING_TASK = "I am a floating task.";
 
-	private String DEADLINE_TASK1 = "I am a deadline task. by 121215 1200";
-	private String DEADLINE_TASK2 = "I am a deadline task. by 121215";
+	private String DEADLINE_TASK1 = "I am a deadline task. by 12 dec noon";
+	private String DEADLINE_TASK2 = "I am a deadline task. by 12 dec";
 	private String DEADLINE_TASK3 = "I am a deadline task. 121215";
 	private String DEADLINE_TASK4 = "I am a deadline task. 121215 1200";
 
-	private String DURATION_TASK1 = "I am a duration task. from 101015 1200 to 111015 1400";
+	private String DURATION_TASK1 = "I am a duration task. from 10 oct noon to 11 oct 2pm";
 	private String DURATION_TASK2 = "I am a duration task. 101015 1200 111015 1400";
-	private String DURATION_TASK3 = "I am a duration task. from 101015 1200 to 1400";
+	private String DURATION_TASK3 = "I am a duration task. 10 oct noon to 2pm";
 	private String DURATION_TASK4 = "I am a duration task. 101015 1200 1400";
 
 	@Test
