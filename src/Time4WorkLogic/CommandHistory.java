@@ -1,7 +1,7 @@
 package Time4WorkLogic;
 import java.util.Stack;
 
-import Time4WorkParser.Command;
+import Time4WorkData.Command;
 
 //@@author A0133894W
 public class CommandHistory {

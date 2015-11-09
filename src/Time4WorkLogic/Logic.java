@@ -6,11 +6,13 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import Time4WorkParser.Command;
+import Time4WorkData.Command;
+import Time4WorkData.FeedbackMessage;
 import Time4WorkParser.Parser;
-import Time4WorkStorage.FilterTask;
+import Time4WorkUtility.FilterTask;
+import Time4WorkUtility.TaskSorter;
 import Time4WorkStorage.Storage;
-import Time4WorkStorage.Tasks;
+import Time4WorkData.Tasks;
 
 //@@author A0133894W
 public class Logic {

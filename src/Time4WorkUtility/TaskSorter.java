@@ -1,14 +1,11 @@
-package Time4WorkLogic;
+package Time4WorkUtility;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import Time4WorkStorage.DeadlineTask;
-import Time4WorkStorage.DurationTask;
-import Time4WorkStorage.FloatingTask;
-import Time4WorkStorage.Tasks;
+import Time4WorkData.*;
 
 //@@author A0133894W
 public class TaskSorter {

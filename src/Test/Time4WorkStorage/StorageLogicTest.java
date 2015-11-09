@@ -15,12 +15,9 @@ import org.junit.Test;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import Time4WorkStorage.DeadlineTask;
-import Time4WorkStorage.Duration;
-import Time4WorkStorage.DurationTask;
-import Time4WorkStorage.FloatingTask;
+import Time4WorkData.*;
 import Time4WorkStorage.StorageLogic;
-import Time4WorkStorage.Tasks;
+
 
 /* @@author A0125495Y */
 

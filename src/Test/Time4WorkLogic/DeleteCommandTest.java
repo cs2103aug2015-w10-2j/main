@@ -2,10 +2,10 @@ package Test.Time4WorkLogic;
 
 import org.junit.Test;
 
-import Time4WorkLogic.FeedbackMessage;
+import Time4WorkData.FeedbackMessage;
 import Time4WorkLogic.Logic;
-import Time4WorkStorage.FloatingTask;
-import Time4WorkStorage.Tasks;
+import Time4WorkData.FloatingTask;
+import Time4WorkData.Tasks;
 
 import static org.junit.Assert.*;
 import java.util.ArrayList;

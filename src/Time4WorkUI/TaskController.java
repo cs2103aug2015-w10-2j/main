@@ -7,9 +7,9 @@ import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import Time4WorkLogic.FeedbackMessage;
+import Time4WorkData.FeedbackMessage;
 import Time4WorkLogic.Logic;
-import Time4WorkStorage.Tasks;
+import Time4WorkData.Tasks;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;

@@ -2,13 +2,9 @@ package Test.Time4WorkLogic;
 
 import org.junit.Test;
 
-import Time4WorkLogic.FeedbackMessage;
+import Time4WorkData.FeedbackMessage;
 import Time4WorkLogic.Logic;
-import Time4WorkStorage.DeadlineTask;
-import Time4WorkStorage.Duration;
-import Time4WorkStorage.DurationTask;
-import Time4WorkStorage.FloatingTask;
-import Time4WorkStorage.Tasks;
+import Time4WorkData.*;
 
 import static org.junit.Assert.*;
 

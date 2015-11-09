@@ -1,4 +1,4 @@
-package Time4WorkStorage;
+package Time4WorkUtility;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -7,10 +7,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import Time4WorkData.Tasks.TaskType;
+import Time4WorkData.*;
 
 /* @@author A0125495Y */
 
-import Time4WorkStorage.Tasks.TaskType;
+
 
 public class FilterTask {
 	

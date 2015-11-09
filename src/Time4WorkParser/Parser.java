@@ -13,11 +13,7 @@ import java.util.logging.Logger;
 
 import com.joestelmach.natty.*;
 
-import Time4WorkStorage.DeadlineTask;
-import Time4WorkStorage.Duration;
-import Time4WorkStorage.DurationTask;
-import Time4WorkStorage.FloatingTask;
-import Time4WorkStorage.Tasks;
+import Time4WorkData.*;
 
 public class Parser {
   

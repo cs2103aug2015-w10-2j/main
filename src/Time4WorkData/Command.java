@@ -1,7 +1,7 @@
 //@@author A0110920Y
 
-package Time4WorkParser;
-import Time4WorkStorage.Tasks;
+package Time4WorkData;
+import Time4WorkData.Tasks;
 
 import java.util.*;
 

@@ -12,12 +12,8 @@ import org.junit.Test;
 
 import com.joestelmach.natty.CalendarSource;
 
-import Time4WorkParser.Command;
+import Time4WorkData.*;
 import Time4WorkParser.Parser;
-import Time4WorkStorage.DeadlineTask;
-import Time4WorkStorage.Duration;
-import Time4WorkStorage.DurationTask;
-import Time4WorkStorage.Tasks;
 
 public class ParserTest {
   

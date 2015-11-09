@@ -13,12 +13,8 @@ import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 
-import Time4WorkStorage.DeadlineTask;
-import Time4WorkStorage.Duration;
-import Time4WorkStorage.DurationTask;
-import Time4WorkStorage.FilterTask;
-import Time4WorkStorage.FloatingTask;
-import Time4WorkStorage.Tasks;
+import Time4WorkData.*;
+import Time4WorkUtility.FilterTask;
 
 /* @@author A0125495Y */
 

@@ -3,6 +3,8 @@ package Time4WorkStorage;
 import java.io.*;
 import java.util.ArrayList;
 
+import Time4WorkData.Tasks;
+
 /* @@author A0125495Y */
 
 public class Storage {

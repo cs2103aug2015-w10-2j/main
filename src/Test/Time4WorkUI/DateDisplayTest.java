@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import Time4WorkLogic.Logic;
-import Time4WorkStorage.Tasks;
+import Time4WorkData.Tasks;
 import Time4WorkUI.DateDisplay;
 
 public class DateDisplayTest {

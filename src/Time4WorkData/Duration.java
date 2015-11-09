@@ -1,6 +1,6 @@
-package Time4WorkStorage;
+package Time4WorkData;
 
-import Time4WorkStorage.Tasks.TaskType;
+import Time4WorkData.Tasks.TaskType;
 
 /* @@author A0125495Y */
 

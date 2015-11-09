@@ -1,11 +1,6 @@
 package Time4WorkUI;
 
-import Time4WorkStorage.DeadlineTask;
-import Time4WorkStorage.Duration;
-import Time4WorkStorage.DurationTask;
-import Time4WorkStorage.FloatingTask;
-import Time4WorkStorage.Tasks;
-
+import Time4WorkData.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
