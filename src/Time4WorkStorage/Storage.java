@@ -2,6 +2,8 @@ package Time4WorkStorage;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import Time4WorkData.Tasks;
 
@@ -17,23 +19,27 @@ public class Storage {
 	
 	private static final String BACKSLASH = "\\";
 	private static final String FORWARDSLASH = "/";
+	
+	private static final Logger logger = Logger.getLogger(Storage.class.getName());
 
 	//use storage default path, <local directory>/myTasks.txt unless there's a previous saved path
 	private Storage() throws IOException {
-		
+		logger.log(Level.INFO, "Storage initialized");
 		String customPath = "";
 		if(myPath.savedPathExists()) {
 			customPath = myPath.readCustomPath();
 			myLogic.createCustomFile(customPath, false);
+			logger.log(Level.INFO, "Custom path found during init");
 		} else {
 			myLogic.createDefaultFile();
+			logger.log(Level.INFO, "No custom path found during init");
 		}
 	}
 	
 	//custom path, path has to have escape characters
 	//eg. C:\\user\\Desktop\\myTasks.txt
 	public void setCustomPath(String path) throws IOException {
-		
+		logger.log(Level.INFO, "Setting custom path");
 		String customPath = "";
 		if(myPath.savedPathExists()) {
 			customPath = myPath.readCustomPath();
@@ -74,7 +80,8 @@ public class Storage {
 	}
 	
 	//read from file, deserialize and returns all tasks
-	public ArrayList<Tasks> readFile() throws IOException {		
+	public ArrayList<Tasks> readFile() throws IOException {
+		logger.log(Level.INFO, "Storage reading data");
 		try {
 			return myLogic.getAllTasks();
 		} catch (IOException e) {
@@ -83,7 +90,8 @@ public class Storage {
 	}
 
 	//adds new task at the end of the list, returns back the new task if successful
-	public Tasks appendTask(Tasks newTask) throws IOException {		
+	public Tasks appendTask(Tasks newTask) throws IOException {
+		logger.log(Level.INFO, "Storage adding task");
 		try {
 			return myLogic.addNewTask(newTask);
 		} catch (IOException e) {
@@ -92,7 +100,8 @@ public class Storage {
 	}	
 	
 	//deletes the input taskID, returns the deleted task, returns null if no matching taskID
-	public ArrayList<Tasks> deleteTask(ArrayList<Integer> taskID) throws IOException, InterruptedException{		
+	public ArrayList<Tasks> deleteTask(ArrayList<Integer> taskID) throws IOException, InterruptedException{
+		logger.log(Level.INFO, "Storage deleting tasks");
 		try {
 			return myLogic.delete(taskID);
 		} catch (IOException | InterruptedException e) {
@@ -102,7 +111,7 @@ public class Storage {
 	
 	//replaces specified taskID with updated Tasks and returns "old" updated task
 	public Tasks UpdateTask(int taskID, Tasks updatedTask) throws Exception{
-		
+		logger.log(Level.INFO, "Storage updating task");
 		ArrayList<Tasks> oldTask = null;
 		ArrayList<Integer> myID = new ArrayList<Integer>();
 		myID.add(taskID);
@@ -123,7 +132,8 @@ public class Storage {
 	}
 	
 	//sets tasks as complete and returns the tasks
-	public ArrayList<Tasks> SetCompleted(ArrayList<Integer> taskID) throws Exception{		
+	public ArrayList<Tasks> SetCompleted(ArrayList<Integer> taskID) throws Exception{
+		logger.log(Level.INFO, "Storage setting tasks as complete");
 		try {
 			return myLogic.setCompleted(taskID, true);
 		} catch (IOException | InterruptedException e) {
@@ -132,7 +142,8 @@ public class Storage {
 	}
 	
 	//sets tasks as incomplete and returns the tasks
-	public ArrayList<Tasks> SetIncompleted(ArrayList<Integer> taskID) throws Exception{		
+	public ArrayList<Tasks> SetIncompleted(ArrayList<Integer> taskID) throws Exception{
+		logger.log(Level.INFO, "Storage setting tasks as incomplete");
 		try {
 			return myLogic.setCompleted(taskID, false);
 		} catch (IOException | InterruptedException e) {
@@ -141,7 +152,8 @@ public class Storage {
 	}
 	
 	//clear the file of contents, does not delete file
-	public ArrayList<Tasks> ClearAll() throws Exception{		
+	public ArrayList<Tasks> ClearAll() throws Exception{
+		logger.log(Level.INFO, "Storage recreating");
 		try {
 			return myLogic.clear();
 		} catch (IOException | InterruptedException e) {
@@ -162,6 +174,7 @@ public class Storage {
 	}
 	
 	public void deleteCustomPathFile() throws IOException {
+		logger.log(Level.INFO, "Storage deleting custom path file");
 		try {
 			myPath.deleteCustomPathFile();
 		} catch (IOException e) {
@@ -170,6 +183,7 @@ public class Storage {
 	}
 	
 	public void deleteDataFile() throws IOException {
+		logger.log(Level.INFO, "Storage deleting data file");
 		try {
 			theStorage.deleteDataFile();
 		} catch (IOException e) {

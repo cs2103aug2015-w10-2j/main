@@ -33,6 +33,7 @@ public class FilterTask {
 		if(searchString == null) {
 			return myList;
 		}
+		assert(searchString != null);
 		
 		String[] splitString = searchString.split(SPLITTER);
 		ArrayList<String> startWith = new ArrayList<String>();
@@ -103,7 +104,8 @@ public class FilterTask {
 			if(added) {
 				resultList.add(myList.get(i));
 			}			
-		}		
+		}
+		assert(resultList.size() <= myList.size());
 		return resultList;
 	}
 	
@@ -116,7 +118,8 @@ public class FilterTask {
 			if(myList.get(i).isCompleted() == completed) {
 				resultList.add(myList.get(i));
 			}
-		}		
+		}
+		assert(resultList.size() <= myList.size());
 		return resultList;
 	}
 	
@@ -158,7 +161,8 @@ public class FilterTask {
 					resultList.add(myList.get(i));
 				}
 			} 		
-		}		
+		}
+		assert(resultList.size() <= myList.size());
 		return resultList;
 	}
 	
@@ -183,7 +187,8 @@ public class FilterTask {
 					resultList.add(myList.get(i));
 				}
 			} 		
-		}		
+		}
+		assert(resultList.size() <= myList.size());
 		return resultList;
 	}
 	
@@ -207,7 +212,8 @@ public class FilterTask {
 					resultList.add(myList.get(i));
 				}
 			} 		
-		}		
+		}
+		assert(resultList.size() <= myList.size());
 		return resultList;
 	}
 	
@@ -243,7 +249,7 @@ public class FilterTask {
 			} 		
 		}
 		resultList = filterCommon(afterDateA, beforeDateB);
-		
+		assert(resultList.size() <= myList.size());
 		return resultList;
 	}
 	
@@ -256,7 +262,8 @@ public class FilterTask {
 			if(myList.get(i).getType() == searchType) {
 				resultList.add(myList.get(i));
 			}
-		}		
+		}
+		assert(resultList.size() <= myList.size());
 		return resultList;
 	}
 	
