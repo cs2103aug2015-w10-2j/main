@@ -19,6 +19,8 @@ public class ClearCommandTest {
 	 /*This is the test for clear all the tasks*/
 	@Test
 	public void clearTest() throws Exception{
+		logic.executeClear();
+		
 		Tasks task1 = new FloatingTask("reading1.");
 		logic.executeAdd(task1);
 		Tasks task2 = new FloatingTask("reading2.");
@@ -36,6 +38,8 @@ public class ClearCommandTest {
 		feedbackMessage = logic.executeUndo();
 		assertEquals(String.format(MESSAGE_UNDO_, "successfully!"), feedbackMessage.getFeedback());
 		assertEquals(3, feedbackMessage.getIncompleteTaskList().size());
+		
+		logic.executeClear();
 	}
 	
 }
