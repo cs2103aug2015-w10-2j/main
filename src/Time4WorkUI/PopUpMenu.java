@@ -17,6 +17,7 @@ public class PopUpMenu {
 	private ImageView imageView = new ImageView();
 	private Scene scene;
 	private String LOCATION_HELP_SHEET = "img/reference.png";
+	private String LOCATION_ICON ="img/icon.png";
 	private String HELP_SHEET_TITLE = "TIME4WORK HELP SHEET";
 	public ImageView getImageView() {
 		imageView.setImage(new Image(PopUpMenu.class.getResource(LOCATION_HELP_SHEET).toExternalForm()));
@@ -25,6 +26,7 @@ public class PopUpMenu {
 
 	public void showMenu() {
 		newStage.setTitle(HELP_SHEET_TITLE);
+		newStage.getIcons().add(new Image(getClass().getResourceAsStream(LOCATION_ICON)));
 		// show the scene.
 		layout.getChildren().addAll(createPopup());
 		if (layout.getScene() == null) {
