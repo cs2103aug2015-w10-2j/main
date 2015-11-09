@@ -11,7 +11,6 @@ public class Command {
   private String command;
   private String storeSearchAndDisplayStrings;
   private ArrayList<Integer> selectedIndexNumbers = new ArrayList<Integer>();
-  private boolean isDateSearch;
   private int displayType;
   private ArrayList<String> timeArray = new ArrayList<String>();
   
@@ -55,10 +54,6 @@ public class Command {
   
   public String getStoreSearchAndDisplayStrings() {
     return storeSearchAndDisplayStrings;
-  }
-  
-  public boolean getIsDateSearch() {
-    return isDateSearch;
   }
   
   public ArrayList<Integer> getSelectedIndexNumbers() {

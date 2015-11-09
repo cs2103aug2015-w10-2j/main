@@ -468,7 +468,6 @@ public class ParserTest {
     //test search for a single keyword
     Command result = tester.parse("search homework");
     assertEquals("search", result.getCommand());
-    assertEquals(false, result.getIsDateSearch());
     assertEquals("homework", result.getStoreSearchAndDisplayStrings());
   }
   
