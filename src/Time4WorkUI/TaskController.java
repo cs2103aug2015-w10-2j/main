@@ -108,11 +108,13 @@ public class TaskController {
 						currentList = output.getIncompleteTaskList();
 					} else if(userInput.isHelpCommand()){
 						help.showMenu();
+						logger.log(Level.INFO, "UI: show help sheet");
 					} else {
 						currentList = output.getIncompleteTaskList();
 					}
 
 					taskTable.setItems(getObservableTaskList(currentList));
+					logger.log(Level.INFO, "UI: create table view");
 					feedback.setText(output.getFeedback());
 
 				} catch (Exception e1) {
@@ -134,6 +136,7 @@ public class TaskController {
 			// Shortcut to open help sheet
 			if (e.getCode().equals(KeyCode.F1)){
 				help.showMenu();
+				logger.log(Level.INFO, "UI: show help sheet");
 			}
 
 			//Shortcut to close the program
