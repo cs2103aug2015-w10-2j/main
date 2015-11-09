@@ -119,11 +119,11 @@ public class Logic {
             case DISPLAY:
                 int displayDateType = parsedCommand.getDisplayType();
                 if (checkDisplayDate(displayDateType)) {
-                	ArrayList<String> displayTime = parsedCommand.getTimeArray();
-                	return determineDisplayMethodForDate(displayDateType, displayTime);
+                    ArrayList<String> displayTime = parsedCommand.getTimeArray();
+                    return determineDisplayMethodForDate(displayDateType, displayTime);
                 } else {
-                	String displayType = parsedCommand.getStoreSearchAndDisplayStrings();
-                	return determineDisplayMethodNoneDate(displayType);
+                    String displayType = parsedCommand.getStoreSearchAndDisplayStrings();
+                    return determineDisplayMethodNoneDate(displayType);
                 }
             case SEARCH :
                 String searchKeyword = parsedCommand.getStoreSearchAndDisplayStrings();
@@ -389,24 +389,24 @@ public class Logic {
     }
     
     private boolean implementUndoByType (String undoType, Command lastCommand) {
-    	if (undoType.equals("add")) {
-    		return tryUndoForAdd();
-    	} else if (undoType.equals("delete")) {
-    		return tryUndoForDelete(lastCommand);
-    	} else if (undoType.equals("update")) {
-    		return tryUndoForUpdate();
-    	} else if (undoType.equals("clear")) {
-    		return tryUndoForClear(lastCommand);
-    	} else if (undoType.equals("done")) {
-    		return tryUndoForDone(lastCommand);
-    	} else {
-    		return false;
-    	}
-     }
+        if (undoType.equals("add")) {
+            return tryUndoForAdd();
+        } else if (undoType.equals("delete")) {
+            return tryUndoForDelete(lastCommand);
+        } else if (undoType.equals("update")) {
+            return tryUndoForUpdate();
+        } else if (undoType.equals("clear")) {
+            return tryUndoForClear(lastCommand);
+        } else if (undoType.equals("done")) {
+            return tryUndoForDone(lastCommand);
+        } else {
+            return false;
+        }
+    }
     
     private boolean tryUndoForAdd() {
-    	boolean isSuccess = true;
-    	Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
+        boolean isSuccess = true;
+        Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
         ArrayList<Integer> taskIDToBeDeletedList = commandToUndo.getSelectedIndexNumbers();
         int taskIDToBeDeleted = taskIDToBeDeletedList.get(0);
         taskIDToBeDeletedList.add(taskIDToBeDeleted);
@@ -423,8 +423,8 @@ public class Logic {
     }
     
     private boolean tryUndoForDelete(Command lastCommand) {
-    	boolean isSuccess = true;
-    	int undoDeleteNum = lastCommand.getSelectedIndexNumbers().get(0);
+        boolean isSuccess = true;
+        int undoDeleteNum = lastCommand.getSelectedIndexNumbers().get(0);
         for (int i = 0; i < undoDeleteNum; i++) {
             Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
             Tasks task = commandToUndo.getTask();
@@ -440,8 +440,8 @@ public class Logic {
     }
     
     private boolean tryUndoForUpdate() {
-    	boolean isSuccess = true;
-    	Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
+        boolean isSuccess = true;
+        Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
         int taskIDToBeDeleted = commandToUndo.getSelectedIndexNumbers().get(0);
         ArrayList<Integer> taskIDToBeDeletedList = new ArrayList<Integer>();
         taskIDToBeDeletedList.add(taskIDToBeDeleted);
@@ -466,8 +466,8 @@ public class Logic {
     }
     
     private boolean tryUndoForClear(Command lastCommand) {
-    	boolean isSuccess = true;
-    	int clearedTaskNum = lastCommand.getSelectedIndexNumbers().get(0);
+        boolean isSuccess = true;
+        int clearedTaskNum = lastCommand.getSelectedIndexNumbers().get(0);
         for (int i = 0; i < clearedTaskNum; i++) {
             Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
             Tasks task = commandToUndo.getTask();
@@ -488,8 +488,8 @@ public class Logic {
     }
     
     private boolean tryUndoForDone(Command lastCommand) {
-    	boolean isSuccess = true;
-    	int undoMarkedNum = lastCommand.getSelectedIndexNumbers().get(0);
+        boolean isSuccess = true;
+        int undoMarkedNum = lastCommand.getSelectedIndexNumbers().get(0);
         for (int i = 0; i < undoMarkedNum; i++) {
             Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
             Tasks task = commandToUndo.getTask();
@@ -657,8 +657,8 @@ public class Logic {
             logger.log(Level.INFO, "start processing display floating tasks");
             displayList = myFilter.searchFloating(fullIncompleteTask);
         } else {
-        	return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_, "No such task type!"), 
-        			                   completeList, incompleteList);
+            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_, "No such task type!"),
+                                       completeList, incompleteList);
         }
         
         
@@ -873,55 +873,55 @@ public class Logic {
     // =========================================================================
     
     private boolean checkDisplayDate (int displayDateType) {
-    	boolean isDisplayDate = false;
-    	if (displayDateType == 1 || displayDateType == 2 || displayDateType == 3) {
-    		isDisplayDate = true;
-    	}
-    	return isDisplayDate;
+        boolean isDisplayDate = false;
+        if (displayDateType == 1 || displayDateType == 2 || displayDateType == 3) {
+            isDisplayDate = true;
+        }
+        return isDisplayDate;
     }
     
     private FeedbackMessage determineDisplayMethodForDate (int displayType, ArrayList<String> displayTime) {
-    	if (displayType == 1) {
-    		String displayDate = displayTime.get(0);
-    		return executeDisplayOnDate(displayDate);
-    	} else if (displayType == 2) {
-    		String displayDate = displayTime.get(0);
-    		return executeDisplayBeforeDate(displayDate);
-    	} else if (displayType == 3) {
-    		handleDisplayFromTo(displayTime);
-    	}
-		return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_, "not display date according to date"), 
-				                    completeList, incompleteList);
+        if (displayType == 1) {
+            String displayDate = displayTime.get(0);
+            return executeDisplayOnDate(displayDate);
+        } else if (displayType == 2) {
+            String displayDate = displayTime.get(0);
+            return executeDisplayBeforeDate(displayDate);
+        } else if (displayType == 3) {
+            return handleDisplayFromTo(displayTime);
+        }
+        return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_, "not display date according to date"),
+                                   completeList, incompleteList);
     }
     
     private FeedbackMessage handleDisplayFromTo (ArrayList<String> displayTime) {
-    	if (checkIsTimeArrayValidForDisplayFromTo(displayTime)) {
-    		String fromDate = displayTime.get(0);
+        if (checkIsTimeArrayValidForDisplayFromTo(displayTime)) {
+            String fromDate = displayTime.get(0);
             String toDate = displayTime.get(1);
             return executeDisplayFromToDates(fromDate, toDate);
-    	} else {
-    		return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_,
-                                       "only one argument for duration task"),
-                                        completeList, incompleteList);
-    	}
+        } else {
+            return new FeedbackMessage(String.format(MESSAGE_DISPLAY_FAILED_,
+                                                     "only one argument for duration task"),
+                                       completeList, incompleteList);
+        }
     }
     private boolean checkIsTimeArrayValidForDisplayFromTo (ArrayList<String> displayTime) {
-    	boolean isTimeArrayValidForDisplayFromTo = false;
-    	if (displayTime.size() == 2) {
-    		isTimeArrayValidForDisplayFromTo = true;
-    	}
-    	return isTimeArrayValidForDisplayFromTo;
+        boolean isTimeArrayValidForDisplayFromTo = false;
+        if (displayTime.size() == 2) {
+            isTimeArrayValidForDisplayFromTo = true;
+        }
+        return isTimeArrayValidForDisplayFromTo;
     }
     
     private FeedbackMessage determineDisplayMethodNoneDate (String displayType) {
-    	if (displayType == null) {
-    		displayType = "incomplete";
-    		return executeDisplay(displayType);
-    	} else if (displayType.equals("overdue")) {
-    		return executeDisplayOverdue();
-    	} else {
-    		return executeDisplay(displayType);
-    	}
+        if (displayType == null) {
+            displayType = "incomplete";
+            return executeDisplay(displayType);
+        } else if (displayType.equals("overdue")) {
+            return executeDisplayOverdue();
+        } else {
+            return executeDisplay(displayType);
+        }
     }
     
     private boolean checkIsSameTaskID (Tasks task, int taskID) {
