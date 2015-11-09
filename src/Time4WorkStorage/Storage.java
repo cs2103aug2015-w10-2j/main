@@ -169,4 +169,12 @@ public class Storage {
 		}
 	}
 	
+	public void deleteDataFile() throws IOException {
+		try {
+			theStorage.deleteDataFile();
+		} catch (IOException e) {
+			throw e;
+		}
+	}
+	
 }

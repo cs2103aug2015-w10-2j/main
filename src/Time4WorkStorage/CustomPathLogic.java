@@ -94,7 +94,7 @@ public class CustomPathLogic {
 			fr.close();
 			br.close();
 		} catch (IOException e) {
-			throw e;
+			e.printStackTrace();
 		}
 		
 		System.gc();
