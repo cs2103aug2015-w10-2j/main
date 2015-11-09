@@ -17,7 +17,7 @@ public class UpdateCommandTest {
     
     /*This is the test for update task*/
     @Test
-    public void updateOneTest() throws Exception{
+    public void updateOneTest() throws Exception {
         
         logic.executeClear();
         Tasks task = new FloatingTask("reading");

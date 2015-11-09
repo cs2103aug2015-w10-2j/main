@@ -365,102 +365,7 @@ public class Logic {
         } else {
             Command lastCommand = commandHistory.getLastCommand();
             String lastCommandType = lastCommand.getCommand();
-            if (lastCommandType == "add") { //undo add operation
-                Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
-                ArrayList<Integer> taskIDToBeDeletedList = commandToUndo.getSelectedIndexNumbers();
-                int taskIDToBeDeleted = taskIDToBeDeletedList.get(0);
-                taskIDToBeDeletedList.add(taskIDToBeDeleted);
-                try {
-                    storage.deleteTask(taskIDToBeDeletedList);
-                } catch (Exception e) {
-                    logger.log(Level.WARNING, "undo error");
-                    return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed"),
-                                               completeList, incompleteList);
-                }
-                int indexInPreviouslist = getIndexFromTaskID(incompleteList, taskIDToBeDeleted);
-                incompleteList.remove(indexInPreviouslist);
-                undoSuccessfully = true;
-            } else if (lastCommandType == "delete"){ //undo delete task
-                int undoDeleteNum = lastCommand.getSelectedIndexNumbers().get(0);
-                for (int i = 0; i < undoDeleteNum; i++) {
-                    Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
-                    Tasks task = commandToUndo.getTask();
-                    try {
-                        storage.appendTask(task);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed"),
-                                                   completeList, incompleteList);
-                    }
-                    incompleteList.add(task);
-                }
-                undoSuccessfully = true;
-            } else if (lastCommandType == "update"){  // undo update operation
-                Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
-                int taskIDToBeDeleted = commandToUndo.getSelectedIndexNumbers().get(0);
-                ArrayList<Integer> taskIDToBeDeletedList = new ArrayList<Integer>();
-                taskIDToBeDeletedList.add(taskIDToBeDeleted);
-                try {
-                    storage.deleteTask(taskIDToBeDeletedList);
-                } catch (Exception e) {
-                    logger.log(Level.WARNING, "undo error");
-                    return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed"),
-                                               completeList, incompleteList);
-                }
-                int indexInPreviousList = getIndexFromTaskID(incompleteList, taskIDToBeDeleted);
-                incompleteList.remove(indexInPreviousList);
-                
-                commandToUndo = reversedCommandHistory.getLastReversedCommand();
-                try {
-                    storage.appendTask(commandToUndo.getTask());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed"),
-                                               completeList, incompleteList);
-                }
-                incompleteList.add(commandToUndo.getTask());
-                undoSuccessfully = true;
-            } else if (lastCommandType == "clear") {  // undo clear operation
-                int clearedTaskNum = lastCommand.getSelectedIndexNumbers().get(0);
-                for (int i = 0; i < clearedTaskNum; i++) {
-                    Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
-                    Tasks task = commandToUndo.getTask();
-                    try {
-                        storage.appendTask(task);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed"),
-                                                   completeList, incompleteList);
-                    }
-                    if (task.isCompleted()) {
-                        completeList.add(task);
-                    } else {
-                        incompleteList.add(task);
-                    }
-                }
-                undoSuccessfully = true;
-            } else if (lastCommandType == "done") {  //undo done operation
-                int undoMarkedNum = lastCommand.getSelectedIndexNumbers().get(0);
-                for (int i = 0; i < undoMarkedNum; i++) {
-                    Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
-                    Tasks task = commandToUndo.getTask();
-                    int taskID = task.getTaskID();
-                    ArrayList<Integer> taskIDList = new ArrayList<Integer>();
-                    taskIDList.add(taskID);
-                    try {
-                        storage.SetIncompleted(taskIDList);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        return new FeedbackMessage(String.format(MESSAGE_UNDO_, "failed"),
-                                                   completeList, incompleteList);
-                    }
-                    incompleteList.add(task);
-                    int taskIndexInCompleteList = getIndexFromTaskID(completeList, taskID);
-                    completeList.remove(taskIndexInCompleteList);
-                }
-                undoSuccessfully = true;
-            }
-            
+            undoSuccessfully = implementUndoByType(lastCommandType, lastCommand);
         }
         
         try {
@@ -481,6 +386,128 @@ public class Logic {
                                        completeList, incompleteList);
         }
         
+    }
+    
+    private boolean implementUndoByType (String undoType, Command lastCommand) {
+    	if (undoType.equals("add")) {
+    		return tryUndoForAdd();
+    	} else if (undoType.equals("delete")) {
+    		return tryUndoForDelete(lastCommand);
+    	} else if (undoType.equals("update")) {
+    		return tryUndoForUpdate();
+    	} else if (undoType.equals("clear")) {
+    		return tryUndoForClear(lastCommand);
+    	} else if (undoType.equals("done")) {
+    		return tryUndoForDone(lastCommand);
+    	} else {
+    		return false;
+    	}
+     }
+    
+    private boolean tryUndoForAdd() {
+    	boolean isSuccess = true;
+    	Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
+        ArrayList<Integer> taskIDToBeDeletedList = commandToUndo.getSelectedIndexNumbers();
+        int taskIDToBeDeleted = taskIDToBeDeletedList.get(0);
+        taskIDToBeDeletedList.add(taskIDToBeDeleted);
+        try {
+            storage.deleteTask(taskIDToBeDeletedList);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "undo error");
+            isSuccess = false;
+            return isSuccess;
+        }
+        int indexInPreviouslist = getIndexFromTaskID(incompleteList, taskIDToBeDeleted);
+        incompleteList.remove(indexInPreviouslist);
+        return isSuccess;
+    }
+    
+    private boolean tryUndoForDelete(Command lastCommand) {
+    	boolean isSuccess = true;
+    	int undoDeleteNum = lastCommand.getSelectedIndexNumbers().get(0);
+        for (int i = 0; i < undoDeleteNum; i++) {
+            Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
+            Tasks task = commandToUndo.getTask();
+            try {
+                storage.appendTask(task);
+            } catch (IOException e) {
+                e.printStackTrace();
+                isSuccess = false;
+            }
+            incompleteList.add(task);
+        }
+        return isSuccess;
+    }
+    
+    private boolean tryUndoForUpdate() {
+    	boolean isSuccess = true;
+    	Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
+        int taskIDToBeDeleted = commandToUndo.getSelectedIndexNumbers().get(0);
+        ArrayList<Integer> taskIDToBeDeletedList = new ArrayList<Integer>();
+        taskIDToBeDeletedList.add(taskIDToBeDeleted);
+        try {
+            storage.deleteTask(taskIDToBeDeletedList);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "undo error");
+            isSuccess = false;;
+        }
+        int indexInPreviousList = getIndexFromTaskID(incompleteList, taskIDToBeDeleted);
+        incompleteList.remove(indexInPreviousList);
+        
+        commandToUndo = reversedCommandHistory.getLastReversedCommand();
+        try {
+            storage.appendTask(commandToUndo.getTask());
+        } catch (IOException e) {
+            e.printStackTrace();
+            isSuccess = false;
+        }
+        incompleteList.add(commandToUndo.getTask());
+        return isSuccess;
+    }
+    
+    private boolean tryUndoForClear(Command lastCommand) {
+    	boolean isSuccess = true;
+    	int clearedTaskNum = lastCommand.getSelectedIndexNumbers().get(0);
+        for (int i = 0; i < clearedTaskNum; i++) {
+            Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
+            Tasks task = commandToUndo.getTask();
+            try {
+                storage.appendTask(task);
+            } catch (IOException e) {
+                e.printStackTrace();
+                isSuccess = false;
+                return isSuccess;
+            }
+            if (task.isCompleted()) {
+                completeList.add(task);
+            } else {
+                incompleteList.add(task);
+            }
+        }
+        return isSuccess;
+    }
+    
+    private boolean tryUndoForDone(Command lastCommand) {
+    	boolean isSuccess = true;
+    	int undoMarkedNum = lastCommand.getSelectedIndexNumbers().get(0);
+        for (int i = 0; i < undoMarkedNum; i++) {
+            Command commandToUndo = reversedCommandHistory.getLastReversedCommand();
+            Tasks task = commandToUndo.getTask();
+            int taskID = task.getTaskID();
+            ArrayList<Integer> taskIDList = new ArrayList<Integer>();
+            taskIDList.add(taskID);
+            try {
+                storage.SetIncompleted(taskIDList);
+            } catch (Exception e) {
+                e.printStackTrace();
+                isSuccess = false;
+                return isSuccess;
+            }
+            incompleteList.add(task);
+            int taskIndexInCompleteList = getIndexFromTaskID(completeList, taskID);
+            completeList.remove(taskIndexInCompleteList);
+        }
+        return isSuccess;
     }
     
     public FeedbackMessage executeDisplayOnDate(String keyDate) {

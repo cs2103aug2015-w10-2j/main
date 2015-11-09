@@ -16,7 +16,7 @@ public class SearchCommandTest {
     
     /*This is the test for search task successfully*/
     @Test
-    public void searchTaskSuccessfullyTest() throws Exception{
+    public void searchTaskSuccessfullyTest() throws Exception {
         
         logic.executeClear();
         Tasks task1 = new FloatingTask("reading1.");
@@ -36,7 +36,7 @@ public class SearchCommandTest {
     }
     /*This is the test for search task failed*/
     @Test
-    public void searchTaskFailedTest() throws Exception{
+    public void searchTaskFailedTest() throws Exception {
         
         logic.executeClear();
         Tasks task1 = new FloatingTask("reading1.");

@@ -43,7 +43,7 @@ public class DeleteCommandTest {
     
     /*Test for delete multiple tasks*/
     @Test
-    public void deleteMulTest() throws Exception{
+    public void deleteMulTest() throws Exception {
         
         logic.executeClear();
         Tasks task1 = new FloatingTask("reading1.");
@@ -71,7 +71,7 @@ public class DeleteCommandTest {
     
     /*Test for delete failed (index out of range)*/
     @Test
-    public void deleteFailedTest() throws Exception{
+    public void deleteFailedTest() throws Exception {
         
         logic.executeClear();
         Tasks task1 = new FloatingTask("reading1.");

@@ -14,7 +14,7 @@ public class DisplayCommandTest {
 	
 	 /*This is the test for normal adding*/
 	@Test
-	public void displayTest() throws Exception{
+	public void displayTest() throws Exception {
 		logic.executeClear();
 		
         Tasks newFloatingTask = new FloatingTask("floating task");
@@ -39,6 +39,10 @@ public class DisplayCommandTest {
 		assertEquals(1, feedbackFloating.getIncompleteTaskList().size());
 		FeedbackMessage feedbackDuration = logic.executeDisplay("duration");
 		assertEquals(1, feedbackDuration.getIncompleteTaskList().size());
+		FeedbackMessage feedbackIncomplete = logic.executeDisplay("");
+		assertEquals(4, feedbackIncomplete.getIncompleteTaskList().size());
+		FeedbackMessage feedbackComplete = logic.executeDisplay("archive");
+		assertEquals(0, feedbackComplete.getCompleteTaskList().size());
 	}
 	
 }

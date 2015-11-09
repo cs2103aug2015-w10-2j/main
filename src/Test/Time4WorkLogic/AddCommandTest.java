@@ -18,7 +18,7 @@ public class AddCommandTest {
 	
 	 /*This is the test for normal adding*/
 	@Test
-	public void addTest() throws Exception{
+	public void addTest() throws Exception {
 		logic.executeClear();
 		
 		Tasks newTask = new FloatingTask("reading.");

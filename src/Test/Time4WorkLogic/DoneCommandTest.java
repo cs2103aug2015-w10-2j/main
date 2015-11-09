@@ -45,7 +45,7 @@ public class DoneCommandTest {
 	
 	/*Test for mark multiple tasks as done*/
 	@Test
-	public void markMulTest() throws Exception{
+	public void markMulTest() throws Exception {
 		
 		logic.executeClear();
 		Tasks task1 = new FloatingTask("reading1.");
@@ -75,7 +75,7 @@ public class DoneCommandTest {
 	
 	/*Test for mark task as done failed (index out of range)*/
 	@Test
-	public void  markFailedTest() throws Exception{
+	public void  markFailedTest() throws Exception {
 		
 		logic.executeClear();
 		Tasks task1 = new FloatingTask("reading1.");
