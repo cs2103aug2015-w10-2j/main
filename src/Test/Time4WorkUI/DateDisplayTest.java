@@ -8,6 +8,7 @@ import Time4WorkLogic.Logic;
 import Time4WorkData.Tasks;
 import Time4WorkUI.DateDisplay;
 
+//@@author A0112077N
 public class DateDisplayTest {
 	private DateDisplay display = new DateDisplay();
 	private Logic logic= new Logic();
